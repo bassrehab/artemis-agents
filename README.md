@@ -10,7 +10,7 @@ A production-ready framework for structured multi-agent debates with adaptive ev
 
 ---
 
-## 🎯 What is ARTEMIS?
+##  What is ARTEMIS?
 
 ARTEMIS is an open-source implementation of the [Adaptive Reasoning and Evaluation Framework for Multi-agent Intelligent Systems](https://www.tdcommons.org/dpubs_series/7729/) — a framework designed to improve complex decision-making through structured debates between AI agents.
 
@@ -22,7 +22,7 @@ Unlike general-purpose multi-agent frameworks, ARTEMIS is **purpose-built for de
 - **Ethical Alignment**: Built-in ethical considerations in both generation and evaluation
 - **Safety Monitoring**: Real-time detection of sandbagging, deception, and manipulation
 
-## 🚀 Why ARTEMIS?
+##  Why ARTEMIS?
 
 | Feature | AutoGen | CrewAI | CAMEL | **ARTEMIS** |
 |---------|---------|--------|-------|-------------|
@@ -35,7 +35,7 @@ Unlike general-purpose multi-agent frameworks, ARTEMIS is **purpose-built for de
 | Reasoning model support | ⚠️ | ⚠️ | ❌ | ✅ o1/R1 native |
 | MCP server mode | ❌ | ❌ | ❌ | ✅ |
 
-## 📦 Installation
+##  Installation
 
 ```bash
 pip install artemis-agents
@@ -182,49 +182,49 @@ Any MCP-compatible client can now invoke structured debates:
 }
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        ARTEMIS Core                              │
-├─────────────────────────────────────────────────────────────────┤
+┌────────────────────────────────────────────────────────────────┐
+│                        ARTEMIS Core                            │
+├────────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
 │  │   H-L-DAG   │  │   L-AE-CR   │  │    Jury     │             │
 │  │  Argument   │──│  Adaptive   │──│   Scoring   │             │
 │  │ Generation  │  │ Evaluation  │  │  Mechanism  │             │
 │  └─────────────┘  └─────────────┘  └─────────────┘             │
-│         │                │                │                     │
-│         └────────────────┴────────────────┘                     │
-│                          │                                      │
+│         │                │                │                    │
+│         └────────────────┴────────────────┘                    │
+│                          │                                     │
 │  ┌─────────────────────────────────────────────────────────┐   │
-│  │                   Safety Layer                           │   │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │   │
+│  │                   Safety Layer                          │   │
+│  │  ┌───────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │   │
 │  │  │Sandbagging│  │Deception │  │ Behavior │  │ Ethics  │ │   │
-│  │  │ Detector │  │ Monitor  │  │ Tracker  │  │ Guard   │ │   │
-│  │  └──────────┘  └──────────┘  └──────────┘  └─────────┘ │   │
+│  │  │ Detector  │  │ Monitor  │  │ Tracker  │  │ Guard   │ │   │
+│  │  └───────────┘  └──────────┘  └──────────┘  └─────────┘ │   │
 │  └─────────────────────────────────────────────────────────┘   │
-├─────────────────────────────────────────────────────────────────┤
-│                       Integrations                               │
+├────────────────────────────────────────────────────────────────┤
+│                       Integrations                             │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
 │  │LangChain │  │LangGraph │  │ CrewAI   │  │   MCP    │        │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
-├─────────────────────────────────────────────────────────────────┤
-│                      Model Providers                             │
+├────────────────────────────────────────────────────────────────┤
+│                      Model Providers                           │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
 │  │  OpenAI  │  │Anthropic │  │  Google  │  │ DeepSeek │        │
 │  │ (GPT-4o) │  │ (Claude) │  │ (Gemini) │  │  (R1)    │        │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘        │
-└─────────────────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────────────┘
 ```
 
-## 📚 Documentation
+##  Documentation
 
 - [Design Document](docs/DESIGN.md) - Detailed architecture and design decisions
 - [API Reference](docs/API.md) - Complete API documentation
 - [Examples](examples/) - Real-world usage examples
 - [Contributing](CONTRIBUTING.md) - How to contribute
 
-## 🔬 Research Foundation
+##  Research Foundation
 
 ARTEMIS is based on peer-reviewed research:
 
@@ -237,7 +237,7 @@ Key innovations from the paper:
 - **Adaptive Evaluation with Causal Reasoning (L-AE-CR)**: Dynamic criteria weighting based on debate context
 - **Ethical Alignment Integration**: Built-in ethical considerations at every stage
 
-## 🛡️ Safety Features
+##  Safety Features
 
 ARTEMIS includes novel safety monitoring capabilities:
 
@@ -250,7 +250,7 @@ ARTEMIS includes novel safety monitoring capabilities:
 
 These features leverage activation-level analysis and are based on research in AI metacognition.
 
-## 🤝 Framework Integrations
+##  Framework Integrations
 
 ARTEMIS is designed to complement, not replace, existing frameworks:
 
@@ -268,7 +268,7 @@ from artemis.integrations import ArtemisDebateNode
 graph.add_node("debate", ArtemisDebateNode())
 ```
 
-## 📊 Benchmarks
+##  Benchmarks
 
 Performance comparison on the DebateQA benchmark:
 
@@ -281,7 +281,7 @@ Performance comparison on the DebateQA benchmark:
 
 *Benchmarks run on GPT-4o with default configurations. See [benchmarks/](benchmarks/) for methodology.*
 
-## 🗺️ Roadmap
+##  Roadmap
 
 ### v1.0 (Current)
 - [x] Core ARTEMIS implementation (H-L-DAG, L-AE-CR, Jury)
@@ -298,17 +298,17 @@ Performance comparison on the DebateQA benchmark:
 - [ ] Formal verification of argument validity
 - [ ] Real-time streaming debates
 
-## 📄 License
+##  License
 
 Apache License 2.0 - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Original ARTEMIS framework design published via Google Technical Disclosure Commons
 - Safety monitoring capabilities inspired by research in AI metacognition
 - Built with support from the open-source AI community
 
-## 📬 Contact
+##  Contact
 
 - **Author**: [Subhadip Mitra](https://subhadipmitra.com)
 - **GitHub**: [@bassrehab](https://github.com/bassrehab)
