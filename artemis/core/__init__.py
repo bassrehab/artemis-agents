@@ -9,49 +9,50 @@ Contains the core ARTEMIS implementation:
 - Ethics module
 """
 
+from artemis.core.agent import Agent
+from artemis.core.argument import ArgumentBuilder, ArgumentHierarchy, ArgumentParser
 from artemis.core.types import (
-    # Enums
-    ArgumentLevel,
-    DebateState,
-    JuryPerspective,
-    SafetyIndicatorType,
-    # Evidence and Causal
-    CausalLink,
-    Evidence,
     # Argument
     Argument,
     # Evaluation
     ArgumentEvaluation,
+    # Enums
+    ArgumentLevel,
     CausalGraphUpdate,
+    # Evidence and Causal
+    CausalLink,
     CriterionScore,
-    # Safety
-    SafetyAlert,
-    SafetyIndicator,
-    SafetyResult,
-    # Turn
-    Turn,
-    # Verdict
-    DissentingOpinion,
-    Verdict,
+    # Configuration
+    DebateConfig,
+    # Context
+    DebateContext,
     # Debate Result
     DebateMetadata,
     DebateResult,
-    # Configuration
-    DebateConfig,
+    DebateState,
+    # Verdict
+    DissentingOpinion,
     EvaluationCriteria,
-    ReasoningConfig,
+    Evidence,
+    JuryPerspective,
     # Messages
     Message,
     ModelResponse,
+    ReasoningConfig,
     ReasoningResponse,
+    # Safety
+    SafetyAlert,
+    SafetyIndicator,
+    SafetyIndicatorType,
+    SafetyResult,
+    # Turn
+    Turn,
     Usage,
-    # Context
-    DebateContext,
+    Verdict,
 )
 
 # Exports will be added as modules are implemented
 # from artemis.core.debate import Debate
-# from artemis.core.agent import Agent
 # from artemis.core.jury import JuryPanel
 # from artemis.core.evaluation import AdaptiveEvaluator
 
@@ -93,4 +94,10 @@ __all__ = [
     "Usage",
     # Context
     "DebateContext",
+    # Agent
+    "Agent",
+    # Argument utilities
+    "ArgumentBuilder",
+    "ArgumentHierarchy",
+    "ArgumentParser",
 ]
