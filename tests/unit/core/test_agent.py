@@ -2,7 +2,6 @@
 Unit tests for Agent class.
 """
 
-from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -18,7 +17,6 @@ from artemis.core.types import (
     ModelResponse,
     ReasoningConfig,
     ReasoningResponse,
-    Turn,
     Usage,
 )
 from artemis.exceptions import ArgumentGenerationError

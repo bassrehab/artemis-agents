@@ -9,8 +9,22 @@ Contains the core ARTEMIS implementation:
 - Ethics module
 """
 
-from artemis.core.agent import Agent
+from artemis.core.agent import Agent, DebateStrategy, OpponentModel, StrategyContext
 from artemis.core.argument import ArgumentBuilder, ArgumentHierarchy, ArgumentParser
+from artemis.core.causal import (
+    CausalEdge,
+    CausalExtractor,
+    CausalGraph,
+    CausalNode,
+    LinkType,
+)
+from artemis.core.evidence import (
+    CredibilityLevel,
+    EvidenceExtractor,
+    EvidenceLinker,
+    EvidenceType,
+    ExtractedEvidence,
+)
 from artemis.core.types import (
     # Argument
     Argument,
@@ -62,6 +76,10 @@ __all__ = [
     "DebateState",
     "JuryPerspective",
     "SafetyIndicatorType",
+    "DebateStrategy",
+    "EvidenceType",
+    "CredibilityLevel",
+    "LinkType",
     # Evidence and Causal
     "CausalLink",
     "Evidence",
@@ -96,8 +114,19 @@ __all__ = [
     "DebateContext",
     # Agent
     "Agent",
+    "OpponentModel",
+    "StrategyContext",
     # Argument utilities
     "ArgumentBuilder",
     "ArgumentHierarchy",
     "ArgumentParser",
+    # Evidence extraction
+    "EvidenceExtractor",
+    "EvidenceLinker",
+    "ExtractedEvidence",
+    # Causal reasoning
+    "CausalExtractor",
+    "CausalGraph",
+    "CausalNode",
+    "CausalEdge",
 ]

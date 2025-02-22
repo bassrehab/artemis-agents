@@ -2,10 +2,10 @@
 Pytest configuration and shared fixtures for ARTEMIS tests.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock
 from typing import Any
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 
 # =============================================================================
 # Mock Model Fixtures
@@ -45,13 +45,13 @@ def mock_model(mock_response: dict[str, Any]) -> AsyncMock:
     model = AsyncMock()
     model.model_name = "mock-model"
     model.supports_reasoning = False
-    
+
     # Setup generate method
     response = MagicMock()
     response.content = mock_response["content"]
     response.usage = MagicMock(**mock_response["usage"])
     model.generate.return_value = response
-    
+
     return model
 
 
@@ -61,14 +61,14 @@ def mock_reasoning_model(mock_reasoning_response: dict[str, Any]) -> AsyncMock:
     model = AsyncMock()
     model.model_name = "mock-reasoning-model"
     model.supports_reasoning = True
-    
+
     # Setup generate_with_reasoning method
     response = MagicMock()
     response.content = mock_reasoning_response["content"]
     response.thinking = mock_reasoning_response["thinking"]
     response.usage = MagicMock(**mock_reasoning_response["usage"])
     model.generate_with_reasoning.return_value = response
-    
+
     return model
 
 
@@ -109,7 +109,7 @@ def sample_agents_config() -> list[dict[str, str]]:
             "model": "gpt-4o"
         },
         {
-            "name": "Opponent", 
+            "name": "Opponent",
             "role": "Argues against the proposition",
             "model": "gpt-4o"
         },
