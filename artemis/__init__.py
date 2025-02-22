@@ -6,19 +6,19 @@ causal reasoning, and built-in safety monitoring.
 
 Example:
     >>> from artemis import Debate, Agent, JuryPanel
-    >>> 
+    >>>
     >>> agents = [
     ...     Agent(name="Proponent", role="Argues in favor", model="gpt-4o"),
     ...     Agent(name="Opponent", role="Argues against", model="gpt-4o"),
     ... ]
-    >>> 
+    >>>
     >>> debate = Debate(
     ...     topic="Should AI systems be given legal personhood?",
     ...     agents=agents,
     ...     jury=JuryPanel(evaluators=3),
     ...     rounds=3
     ... )
-    >>> 
+    >>>
     >>> result = await debate.run()
     >>> print(f"Verdict: {result.verdict.decision}")
 
@@ -40,7 +40,7 @@ __email__ = "contact@subhadipmitra.com"
 __all__ = [
     "__version__",
     # "Debate",
-    # "Agent", 
+    # "Agent",
     # "JuryPanel",
     # "Argument",
     # "ArgumentLevel",
