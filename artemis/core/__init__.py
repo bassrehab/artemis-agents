@@ -18,6 +18,14 @@ from artemis.core.causal import (
     CausalNode,
     LinkType,
 )
+from artemis.core.evaluation import (
+    AdaptationConfig,
+    AdaptiveEvaluator,
+    CriterionEvaluator,
+    EvaluationDimension,
+    RoundEvaluator,
+    TopicAnalysis,
+)
 from artemis.core.evidence import (
     CredibilityLevel,
     EvidenceExtractor,
@@ -129,4 +137,11 @@ __all__ = [
     "CausalGraph",
     "CausalNode",
     "CausalEdge",
+    # Evaluation
+    "AdaptiveEvaluator",
+    "AdaptationConfig",
+    "CriterionEvaluator",
+    "EvaluationDimension",
+    "RoundEvaluator",
+    "TopicAnalysis",
 ]
