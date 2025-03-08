@@ -33,6 +33,13 @@ from artemis.core.evidence import (
     EvidenceType,
     ExtractedEvidence,
 )
+from artemis.core.jury import (
+    ConsensusResult,
+    JurorEvaluation,
+    JuryConfig,
+    JuryMember,
+    JuryPanel,
+)
 from artemis.core.types import (
     # Argument
     Argument,
@@ -75,8 +82,6 @@ from artemis.core.types import (
 
 # Exports will be added as modules are implemented
 # from artemis.core.debate import Debate
-# from artemis.core.jury import JuryPanel
-# from artemis.core.evaluation import AdaptiveEvaluator
 
 __all__ = [
     # Enums
@@ -144,4 +149,10 @@ __all__ = [
     "EvaluationDimension",
     "RoundEvaluator",
     "TopicAnalysis",
+    # Jury
+    "JuryMember",
+    "JuryPanel",
+    "JuryConfig",
+    "JurorEvaluation",
+    "ConsensusResult",
 ]
