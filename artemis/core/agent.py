@@ -184,6 +184,15 @@ class Agent:
         """Get the agent's current debate strategy."""
         return self._current_strategy
 
+    def set_position(self, position: str) -> None:
+        """
+        Set the agent's debate position.
+
+        Args:
+            position: The position to argue (e.g., "pro", "con").
+        """
+        self.position = position
+
     def select_strategy(self, context: DebateContext) -> DebateStrategy:
         """
         Select the optimal strategy based on debate context.

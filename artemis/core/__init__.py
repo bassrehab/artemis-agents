@@ -18,6 +18,7 @@ from artemis.core.causal import (
     CausalNode,
     LinkType,
 )
+from artemis.core.debate import Debate, DebateError, DebateHaltedError
 from artemis.core.evaluation import (
     AdaptationConfig,
     AdaptiveEvaluator,
@@ -79,9 +80,6 @@ from artemis.core.types import (
     Usage,
     Verdict,
 )
-
-# Exports will be added as modules are implemented
-# from artemis.core.debate import Debate
 
 __all__ = [
     # Enums
@@ -155,4 +153,8 @@ __all__ = [
     "JuryConfig",
     "JurorEvaluation",
     "ConsensusResult",
+    # Debate
+    "Debate",
+    "DebateError",
+    "DebateHaltedError",
 ]
