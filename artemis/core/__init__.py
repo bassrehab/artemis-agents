@@ -19,6 +19,15 @@ from artemis.core.causal import (
     LinkType,
 )
 from artemis.core.debate import Debate, DebateError, DebateHaltedError
+from artemis.core.ethics import (
+    EthicalConcern,
+    EthicalFramework,
+    EthicsEvaluator,
+    EthicsResult,
+    FrameworkScore,
+    StakeholderImpact,
+    StakeholderType,
+)
 from artemis.core.evaluation import (
     AdaptationConfig,
     AdaptiveEvaluator,
@@ -157,4 +166,12 @@ __all__ = [
     "Debate",
     "DebateError",
     "DebateHaltedError",
+    # Ethics
+    "EthicsEvaluator",
+    "EthicsResult",
+    "EthicalFramework",
+    "EthicalConcern",
+    "FrameworkScore",
+    "StakeholderImpact",
+    "StakeholderType",
 ]
