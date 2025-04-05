@@ -18,11 +18,18 @@ from artemis.safety.base import (
     SafetyManager,
     SafetyMonitor,
 )
+from artemis.safety.sandbagging import (
+    AgentBaseline,
+    ArgumentMetrics,
+    SandbagDetector,
+    SandbagSignal,
+)
 
 __all__ = [
     # Enums
     "MonitorMode",
     "MonitorPriority",
+    "SandbagSignal",
     # Configuration
     "MonitorConfig",
     "MonitorState",
@@ -32,4 +39,8 @@ __all__ = [
     # Management
     "MonitorRegistry",
     "SafetyManager",
+    # Sandbagging Detection
+    "SandbagDetector",
+    "ArgumentMetrics",
+    "AgentBaseline",
 ]
