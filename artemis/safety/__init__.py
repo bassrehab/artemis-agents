@@ -18,6 +18,12 @@ from artemis.safety.base import (
     SafetyManager,
     SafetyMonitor,
 )
+from artemis.safety.deception import (
+    AgentClaimHistory,
+    ClaimRecord,
+    DeceptionMonitor,
+    DeceptionSignal,
+)
 from artemis.safety.sandbagging import (
     AgentBaseline,
     ArgumentMetrics,
@@ -30,6 +36,7 @@ __all__ = [
     "MonitorMode",
     "MonitorPriority",
     "SandbagSignal",
+    "DeceptionSignal",
     # Configuration
     "MonitorConfig",
     "MonitorState",
@@ -43,4 +50,8 @@ __all__ = [
     "SandbagDetector",
     "ArgumentMetrics",
     "AgentBaseline",
+    # Deception Detection
+    "DeceptionMonitor",
+    "ClaimRecord",
+    "AgentClaimHistory",
 ]
