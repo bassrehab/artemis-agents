@@ -30,6 +30,13 @@ from artemis.safety.sandbagging import (
     SandbagDetector,
     SandbagSignal,
 )
+from artemis.safety.behavior import (
+    AgentBehaviorProfile,
+    BehaviorSnapshot,
+    BehaviorTracker,
+    DriftSignal,
+    StyleMetrics,
+)
 
 __all__ = [
     # Enums
@@ -54,4 +61,10 @@ __all__ = [
     "DeceptionMonitor",
     "ClaimRecord",
     "AgentClaimHistory",
+    # Behavioral Drift
+    "BehaviorTracker",
+    "DriftSignal",
+    "StyleMetrics",
+    "BehaviorSnapshot",
+    "AgentBehaviorProfile",
 ]
