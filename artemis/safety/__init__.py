@@ -37,6 +37,12 @@ from artemis.safety.behavior import (
     DriftSignal,
     StyleMetrics,
 )
+from artemis.safety.ethics_guard import (
+    EthicsConfig,
+    EthicsGuard,
+    EthicsScore,
+    EthicsViolation,
+)
 
 __all__ = [
     # Enums
@@ -67,4 +73,9 @@ __all__ = [
     "StyleMetrics",
     "BehaviorSnapshot",
     "AgentBehaviorProfile",
+    # Ethics Enforcement
+    "EthicsGuard",
+    "EthicsViolation",
+    "EthicsConfig",
+    "EthicsScore",
 ]
