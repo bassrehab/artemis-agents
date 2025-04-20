@@ -66,6 +66,7 @@ class SafetyIndicatorType(str, Enum):
     EMOTIONAL_MANIPULATION = "emotional_manipulation"
     CITATION_FABRICATION = "citation_fabrication"
     BEHAVIORAL_DRIFT = "behavioral_drift"
+    ETHICS_BOUNDARY = "ethics_boundary"
 
 
 class JuryPerspective(str, Enum):
