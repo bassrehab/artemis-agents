@@ -7,8 +7,32 @@ Framework integrations for popular AI/ML libraries:
 - CrewAI Tool
 """
 
-# from artemis.integrations.langchain import ArtemisDebateTool
-# from artemis.integrations.langgraph import ArtemisDebateNode
+from artemis.integrations.langchain import (
+    ArtemisDebateTool,
+    DebateInput,
+    DebateOutput,
+    QuickDebate,
+)
+from artemis.integrations.langgraph import (
+    ArtemisDebateNode,
+    DebateNodeConfig,
+    DebateNodeState,
+    DebatePhase,
+    create_debate_workflow,
+)
+
 # from artemis.integrations.crewai import ArtemisCrewTool
 
-__all__: list[str] = []
+__all__ = [
+    # LangChain
+    "ArtemisDebateTool",
+    "DebateInput",
+    "DebateOutput",
+    "QuickDebate",
+    # LangGraph
+    "ArtemisDebateNode",
+    "DebateNodeConfig",
+    "DebateNodeState",
+    "DebatePhase",
+    "create_debate_workflow",
+]
