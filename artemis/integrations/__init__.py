@@ -20,8 +20,12 @@ from artemis.integrations.langgraph import (
     DebatePhase,
     create_debate_workflow,
 )
-
-# from artemis.integrations.crewai import ArtemisCrewTool
+from artemis.integrations.crewai import (
+    ArtemisCrewTool,
+    DebateAnalyzer,
+    DebateToolInput,
+    DebateToolOutput,
+)
 
 __all__ = [
     # LangChain
@@ -35,4 +39,9 @@ __all__ = [
     "DebateNodeState",
     "DebatePhase",
     "create_debate_workflow",
+    # CrewAI
+    "ArtemisCrewTool",
+    "DebateToolInput",
+    "DebateToolOutput",
+    "DebateAnalyzer",
 ]
