@@ -8,12 +8,26 @@ Supports reasoning models (o1, R1, Gemini 2.5) with extended thinking.
 from typing import Any
 
 from artemis.models.base import BaseModel, ModelRegistry
+from artemis.models.deepseek import DeepSeekModel
 from artemis.models.openai import OpenAIModel
+from artemis.models.reasoning import (
+    MODEL_CAPABILITIES,
+    ReasoningCapabilities,
+    ReasoningConfig,
+    ReasoningModel,
+    ReasoningPromptBuilder,
+    ReasoningStrategy,
+    ThinkingBudget,
+    calculate_thinking_budget,
+    create_reasoning_config,
+    get_default_thinking_budget,
+    get_model_capabilities,
+    is_reasoning_model,
+)
 
 # Future providers (uncomment when implemented):
 # from artemis.models.anthropic import AnthropicModel
 # from artemis.models.google import GoogleModel
-# from artemis.models.deepseek import DeepSeekModel
 
 
 def create_model(
@@ -55,6 +69,20 @@ __all__ = [
     "ModelRegistry",
     # Providers
     "OpenAIModel",
+    "DeepSeekModel",
+    # Reasoning Configuration
+    "ReasoningModel",
+    "ReasoningStrategy",
+    "ReasoningConfig",
+    "ReasoningCapabilities",
+    "ThinkingBudget",
+    "ReasoningPromptBuilder",
+    "MODEL_CAPABILITIES",
+    "get_model_capabilities",
+    "is_reasoning_model",
+    "get_default_thinking_budget",
+    "calculate_thinking_budget",
+    "create_reasoning_config",
     # Factory
     "create_model",
     "list_providers",
