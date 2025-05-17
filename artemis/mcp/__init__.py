@@ -6,6 +6,14 @@ Exposes ARTEMIS capabilities as MCP tools for any compatible client.
 """
 
 from artemis.mcp.server import ArtemisMCPServer, create_mcp_server
+from artemis.mcp.sessions import (
+    SessionManager,
+    SessionMetadata,
+    SessionSnapshot,
+    SessionStore,
+    create_session_manager,
+    generate_session_id,
+)
 from artemis.mcp.tools import (
     ARTEMIS_TOOLS,
     AddRoundOutput,
@@ -26,6 +34,13 @@ __all__ = [
     # Server
     "ArtemisMCPServer",
     "create_mcp_server",
+    # Sessions
+    "SessionManager",
+    "SessionStore",
+    "SessionMetadata",
+    "SessionSnapshot",
+    "create_session_manager",
+    "generate_session_id",
     # Tools
     "ARTEMIS_TOOLS",
     "get_tool_by_name",
