@@ -5,8 +5,7 @@ RELEASE.md
 # OS
 .DS_Store
 
-# Documentation (generated)
-docs/
+_dev/
 
 # Python
 __pycache__/
