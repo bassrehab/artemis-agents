@@ -293,7 +293,6 @@ Fixes #123
 
 - **Code**: Docstrings for all public APIs
 - **README.md**: High-level overview and quick start
-- **docs/**: Detailed guides and references
 - **examples/**: Runnable code examples
 
 ### Documentation Style
@@ -307,7 +306,7 @@ Fixes #123
 
 - Open a [GitHub Discussion](https://github.com/bassrehab/artemis-agents/discussions)
 - Check existing issues and PRs
-- Read the [documentation](docs/)
+- Read the [README](README.md)
 
 ## Recognition
 

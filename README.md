@@ -219,8 +219,6 @@ Any MCP-compatible client can now invoke structured debates:
 
 ##  Documentation
 
-- [Design Document](docs/DESIGN.md) - Detailed architecture and design decisions
-- [API Reference](docs/API.md) - Complete API documentation
 - [Examples](examples/) - Real-world usage examples
 - [Contributing](CONTRIBUTING.md) - How to contribute
 
