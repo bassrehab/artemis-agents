@@ -55,3 +55,6 @@ htmlcov/
 
 # ruff
 .ruff_cache/
+
+# MkDocs build output
+site/

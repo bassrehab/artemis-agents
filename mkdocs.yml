@@ -1,0 +1,104 @@
+site_name: ARTEMIS Agents
+site_description: Adaptive Reasoning Through Evaluation of Multi-agent Intelligent Systems
+site_author: Subhadip Mitra
+site_url: https://bassrehab.github.io/artemis-agents/
+
+repo_name: bassrehab/artemis-agents
+repo_url: https://github.com/bassrehab/artemis-agents
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/bassrehab
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/bassrehab
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Configuration: getting-started/configuration.md
+  - Core Concepts:
+    - Overview: concepts/overview.md
+    - H-L-DAG Arguments: concepts/h-l-dag.md
+    - L-AE-CR Evaluation: concepts/l-ae-cr.md
+    - Jury Mechanism: concepts/jury.md
+    - Ethics Module: concepts/ethics.md
+  - Safety Monitoring:
+    - Overview: safety/overview.md
+    - Sandbagging Detection: safety/sandbagging.md
+    - Deception Monitoring: safety/deception.md
+    - Behavior Tracking: safety/behavior.md
+    - Ethics Guard: safety/ethics-guard.md
+  - Integrations:
+    - LangChain: integrations/langchain.md
+    - LangGraph: integrations/langgraph.md
+    - CrewAI: integrations/crewai.md
+    - MCP Server: integrations/mcp.md
+  - API Reference:
+    - Core: api/core.md
+    - Models: api/models.md
+    - Safety: api/safety.md
+    - Integrations: api/integrations.md
+  - Examples:
+    - Basic Debate: examples/basic-debate.md
+    - With Safety Monitors: examples/safety-monitors.md
+    - LangGraph Workflow: examples/langgraph-workflow.md
+  - Contributing: contributing.md
