@@ -99,7 +99,13 @@ nav:
     - Integrations: api/integrations.md
   - Examples:
     - Basic Debate: examples/basic-debate.md
+    - Multi-Agent Debates: examples/multi-agent.md
+    - Custom Jury: examples/custom-jury.md
+    - Ethical Dilemmas: examples/ethical-dilemmas.md
+    - Enterprise Decisions: examples/enterprise-decisions.md
     - With Safety Monitors: examples/safety-monitors.md
     - LangGraph Workflow: examples/langgraph-workflow.md
+    - CrewAI Workflow: examples/crewai-workflow.md
+    - Streaming Output: examples/streaming.md
     - Google ADK via MCP: examples/google-adk.md
   - Contributing: contributing.md
