@@ -101,4 +101,5 @@ nav:
     - Basic Debate: examples/basic-debate.md
     - With Safety Monitors: examples/safety-monitors.md
     - LangGraph Workflow: examples/langgraph-workflow.md
+    - Google ADK via MCP: examples/google-adk.md
   - Contributing: contributing.md
