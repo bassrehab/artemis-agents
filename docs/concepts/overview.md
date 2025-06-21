@@ -113,8 +113,8 @@ from artemis.core.agent import Agent
 
 agent = Agent(
     name="analyst",
+    role="Domain expert analyzing the topic",
     model="gpt-4o",
-    position="supports the proposition",
 )
 ```
 

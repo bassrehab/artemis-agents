@@ -15,14 +15,14 @@ async def run_debate():
     # Create two agents with opposing positions
     pro_agent = Agent(
         name="proponent",
+        role="Advocate arguing in favor of the proposition",
         model="gpt-4o",
-        position="supports the proposition",
     )
 
     con_agent = Agent(
         name="opponent",
+        role="Advocate arguing against the proposition",
         model="gpt-4o",
-        position="opposes the proposition",
     )
 
     # Create and run the debate
@@ -59,25 +59,39 @@ Add safety monitors to detect problematic behavior:
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.safety import SandbagDetector, DeceptionMonitor, SafetyManager
+from artemis.safety import SandbagDetector, DeceptionMonitor, MonitorMode
 
 async def run_safe_debate():
     # Create agents
     agents = [
-        Agent(name="pro", model="gpt-4o", position="supports"),
-        Agent(name="con", model="gpt-4o", position="opposes"),
+        Agent(
+            name="pro",
+            role="Advocate arguing for the proposition",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="con",
+            role="Advocate arguing against the proposition",
+            model="gpt-4o",
+        ),
     ]
 
-    # Create safety manager with monitors
-    safety = SafetyManager()
-    safety.add_monitor(SandbagDetector(sensitivity=0.7))
-    safety.add_monitor(DeceptionMonitor(sensitivity=0.6))
+    # Create safety monitors
+    sandbag_detector = SandbagDetector(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.7,
+    )
+    deception_monitor = DeceptionMonitor(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.6,
+    )
 
-    # Create debate
+    # Create debate with safety monitors
     debate = Debate(
         topic="Should cryptocurrency replace traditional banking?",
         agents=agents,
         rounds=3,
+        safety_monitors=[sandbag_detector.process, deception_monitor.process],
     )
 
     debate.assign_positions({
@@ -85,10 +99,16 @@ async def run_safe_debate():
         "con": "supports traditional banking",
     })
 
-    # Run with safety monitoring
+    # Run the debate
     result = await debate.run()
 
-    # Check for safety alerts in transcript
+    # Check for safety alerts
+    if result.safety_alerts:
+        print("Safety alerts detected:")
+        for alert in result.safety_alerts:
+            print(f"  {alert.type}: {alert.severity:.0%} severity")
+
+    # Check results in transcript
     for turn in result.transcript:
         print(f"Round {turn.round} - {turn.agent}")
         if turn.evaluation:
@@ -105,20 +125,29 @@ Use reasoning models (o1, DeepSeek R1) for deeper analysis:
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.models import create_model
+from artemis.core.types import ReasoningConfig
 
 async def run_reasoning_debate():
+    # Create reasoning config for extended thinking
+    reasoning_config = ReasoningConfig(
+        enabled=True,
+        thinking_budget=8000,
+        include_trace_in_output=False,
+    )
+
     # Create agents with reasoning models
     pro_agent = Agent(
         name="deep_thinker_pro",
+        role="Philosopher arguing consciousness is computable",
         model="deepseek-reasoner",  # DeepSeek R1
-        position="supports",
+        reasoning=reasoning_config,
     )
 
     con_agent = Agent(
         name="deep_thinker_con",
+        role="Philosopher arguing consciousness is not computable",
         model="deepseek-reasoner",
-        position="opposes",
+        reasoning=reasoning_config,
     )
 
     debate = Debate(
@@ -184,25 +213,24 @@ async def use_mcp():
 ### LangChain
 
 ```python
-from artemis.integrations import ArtemisDebateTool
+from artemis.integrations.langchain import ArtemisDebateTool
 
 # Create the tool
 debate_tool = ArtemisDebateTool(model="gpt-4o")
 
-# Use as a LangChain tool
-result = debate_tool.invoke({
-    "topic": "Should we adopt microservices?",
-    "rounds": 2,
-})
+# Use as a LangChain tool - returns formatted string result
+result = debate_tool.run(
+    topic="Should we adopt microservices?",
+    rounds=2,
+)
 
-print(result.verdict)
+print(result)  # Formatted debate analysis string
 ```
 
 ### LangGraph
 
 ```python
-from langgraph.graph import StateGraph
-from artemis.integrations import ArtemisDebateNode, create_debate_workflow
+from artemis.integrations.langgraph import create_debate_workflow
 
 # Create a complete debate workflow
 workflow = create_debate_workflow(model="gpt-4o")
@@ -210,24 +238,27 @@ workflow = create_debate_workflow(model="gpt-4o")
 # Run it
 result = await workflow.ainvoke({
     "topic": "Is functional programming better than OOP?",
+    "rounds": 2,
 })
+
+print(f"Verdict: {result['verdict']['decision']}")
 ```
 
 ### CrewAI
 
 ```python
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 # Create the tool
 crew_tool = ArtemisCrewTool(model="gpt-4o")
 
-# Run a debate
+# Run a debate - returns formatted string
 result = crew_tool.run(
     topic="Should we use NoSQL or SQL for this project?",
     rounds=2,
 )
 
-print(result)
+print(result)  # Formatted debate analysis string
 ```
 
 ## Next Steps

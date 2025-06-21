@@ -8,67 +8,32 @@ This example demonstrates using ARTEMIS for real-world enterprise decision-makin
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
-from artemis.core.types import DebateConfig
+from artemis.core.jury import JuryPanel
 
 async def run_tech_stack_debate():
-    # Enterprise-focused perspectives
-    engineering = Perspective(
-        name="engineering",
-        description="Technical excellence and developer experience",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "logical_coherence": 1.4,
-        },
-    )
-
-    operations = Perspective(
-        name="operations",
-        description="Reliability, scalability, and maintenance",
-        criteria_adjustments={
-            "evidence_quality": 1.4,
-            "argument_strength": 1.3,
-        },
-    )
-
-    business = Perspective(
-        name="business",
-        description="Cost, time-to-market, and ROI",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "evidence_quality": 1.2,
-        },
-    )
-
-    talent = Perspective(
-        name="talent",
-        description="Hiring, retention, and team growth",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "ethical_considerations": 1.2,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="vp_engineering", perspective=engineering, weight=1.3),
-            JuryMember(name="vp_ops", perspective=operations, weight=1.2),
-            JuryMember(name="cto", perspective=business, weight=1.5),
-            JuryMember(name="hr_director", perspective=talent, weight=0.8),
-        ],
-        voting="weighted",
-    )
-
-    config = DebateConfig(
-        argument_depth="deep",
-        require_evidence=True,
-        min_tactical_points=3,
+    # Enterprise jury with high consensus for technology decisions
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,
     )
 
     agents = [
-        Agent(name="rust_advocate", model="gpt-4o"),
-        Agent(name="go_advocate", model="gpt-4o"),
-        Agent(name="python_advocate", model="gpt-4o"),
+        Agent(
+            name="rust_advocate",
+            role="Systems architect advocating for Rust adoption",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="go_advocate",
+            role="Platform engineer advocating for Go adoption",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="python_advocate",
+            role="Engineering lead advocating for Python optimization",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -82,7 +47,6 @@ async def run_tech_stack_debate():
         agents=agents,
         rounds=3,
         jury=jury,
-        config=config,
     )
 
     debate.assign_positions({
@@ -110,10 +74,12 @@ async def run_tech_stack_debate():
     print("=" * 60)
     print(f"\nRecommendation: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-    print("\nSTAKEHOLDER VOTES:")
-    for vote in result.verdict.votes:
-        print(f"  {vote.juror}: {vote.decision} ({vote.confidence:.0%})")
+    if result.verdict.score_breakdown:
+        print("\nAGENT SCORES:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
 
     print(f"\nRATIONALE:\n{result.verdict.reasoning}")
 
@@ -126,60 +92,32 @@ asyncio.run(run_tech_stack_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_build_vs_buy_debate():
-    # Decision-making perspectives
-    financial = Perspective(
-        name="financial",
-        description="TCO, ROI, and budget impact",
-        criteria_adjustments={
-            "evidence_quality": 1.6,
-            "logical_coherence": 1.3,
-        },
-    )
-
-    strategic = Perspective(
-        name="strategic",
-        description="Competitive advantage and differentiation",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "logical_coherence": 1.3,
-        },
-    )
-
-    risk = Perspective(
-        name="risk",
-        description="Vendor lock-in, security, and continuity",
-        criteria_adjustments={
-            "causal_validity": 1.5,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    execution = Perspective(
-        name="execution",
-        description="Timeline, resources, and delivery",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="cfo", perspective=financial, weight=1.4),
-            JuryMember(name="ceo", perspective=strategic, weight=1.5),
-            JuryMember(name="ciso", perspective=risk, weight=1.2),
-            JuryMember(name="cto", perspective=execution, weight=1.3),
-        ],
-        voting="weighted",
+    # Executive-level jury for strategic decisions
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,
     )
 
     agents = [
-        Agent(name="build", model="gpt-4o"),
-        Agent(name="buy", model="gpt-4o"),
-        Agent(name="hybrid", model="gpt-4o"),
+        Agent(
+            name="build",
+            role="Engineering advocate for building in-house",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="buy",
+            role="Operations advocate for purchasing solution",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="hybrid",
+            role="Strategy advocate for hybrid approach",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -224,10 +162,11 @@ async def run_build_vs_buy_debate():
     print(f"\nDecision: {result.verdict.decision}")
     print(f"Executive Confidence: {result.verdict.confidence:.0%}")
 
-    print("\nC-SUITE VOTES:")
-    for vote in result.verdict.votes:
-        emoji = "🏗️" if "build" in vote.decision.lower() else "🛒" if "buy" in vote.decision.lower() else "🔀"
-        print(f"  {emoji} {vote.juror}: {vote.decision}")
+    if result.verdict.score_breakdown:
+        print("\nAPPROACH SCORES:")
+        for agent, score in result.verdict.score_breakdown.items():
+            indicator = "BUILD" if "build" in agent else "BUY" if "buy" in agent else "HYBRID"
+            print(f"  {indicator}: {score:.2f}")
 
     print(f"\nEXECUTIVE SUMMARY:\n{result.verdict.reasoning}")
 
@@ -240,49 +179,32 @@ asyncio.run(run_build_vs_buy_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_vendor_selection_debate():
-    # Procurement perspectives
-    technical_fit = Perspective(
-        name="technical",
-        description="Technical capabilities and integration",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "logical_coherence": 1.4,
-        },
-    )
-
-    commercial = Perspective(
-        name="commercial",
-        description="Pricing, terms, and value",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    vendor_risk = Perspective(
-        name="vendor_risk",
-        description="Vendor stability and support",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "causal_validity": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="tech_lead", perspective=technical_fit),
-            JuryMember(name="procurement", perspective=commercial),
-            JuryMember(name="risk_manager", perspective=vendor_risk),
-        ],
+    # Procurement-focused jury
+    jury = JuryPanel(
+        evaluators=3,
+        model="gpt-4o",
+        consensus_threshold=0.7,
     )
 
     agents = [
-        Agent(name="vendor_a", model="gpt-4o"),
-        Agent(name="vendor_b", model="gpt-4o"),
-        Agent(name="vendor_c", model="gpt-4o"),
+        Agent(
+            name="vendor_a",
+            role="Advocate for Datadog platform",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="vendor_b",
+            role="Advocate for New Relic platform",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="vendor_c",
+            role="Advocate for Grafana Cloud platform",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -328,9 +250,10 @@ async def run_vendor_selection_debate():
     print(f"\nSelected Vendor: {result.verdict.decision}")
     print(f"Selection Confidence: {result.verdict.confidence:.0%}")
 
-    print("\nEVALUATION SCORES:")
-    for vote in result.verdict.votes:
-        print(f"  {vote.juror}: recommends {vote.decision}")
+    if result.verdict.score_breakdown:
+        print("\nEVALUATION SCORES:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
 
     print(f"\nSELECTION RATIONALE:\n{result.verdict.reasoning}")
 
@@ -343,58 +266,47 @@ asyncio.run(run_vendor_selection_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
-from artemis.safety import EthicsGuard, SafetyManager
+from artemis.core.jury import JuryPanel
+from artemis.safety import MonitorMode, EthicsGuard, EthicsConfig
 
 async def run_reorg_debate():
     # Ethics guard for sensitive HR decisions
-    ethics = EthicsGuard(
-        sensitivity=0.8,
-        principles=["fairness", "transparency", "respect"],
-    )
-    safety = SafetyManager()
-    safety.add_monitor(ethics)
-
-    # Leadership perspectives
-    efficiency = Perspective(
-        name="efficiency",
-        description="Operational efficiency and cost",
-        criteria_adjustments={
-            "evidence_quality": 1.4,
-            "logical_coherence": 1.3,
-        },
+    ethics_config = EthicsConfig(
+        harmful_content_threshold=0.5,
+        bias_threshold=0.4,
+        fairness_threshold=0.4,
+        enabled_checks=["harmful_content", "bias", "fairness"],
     )
 
-    culture = Perspective(
-        name="culture",
-        description="Culture, morale, and retention",
-        criteria_adjustments={
-            "ethical_considerations": 1.6,
-            "argument_strength": 1.2,
-        },
+    ethics_guard = EthicsGuard(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.7,
+        ethics_config=ethics_config,
     )
 
-    growth = Perspective(
-        name="growth",
-        description="Innovation and market position",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "causal_validity": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="coo", perspective=efficiency),
-            JuryMember(name="chro", perspective=culture),
-            JuryMember(name="ceo", perspective=growth),
-        ],
+    # Leadership jury
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,
     )
 
     agents = [
-        Agent(name="consolidation", model="gpt-4o"),
-        Agent(name="expansion", model="gpt-4o"),
-        Agent(name="transformation", model="gpt-4o"),
+        Agent(
+            name="consolidation",
+            role="COO advocating for team consolidation",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="expansion",
+            role="CPO advocating for team expansion",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="transformation",
+            role="CTO advocating for platform team model",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -412,7 +324,7 @@ async def run_reorg_debate():
         agents=agents,
         rounds=2,
         jury=jury,
-        safety_manager=safety,
+        safety_monitors=[ethics_guard.process],
     )
 
     debate.assign_positions({
@@ -439,9 +351,9 @@ async def run_reorg_debate():
     print("=" * 60)
 
     if result.safety_alerts:
-        print("\n⚠️  ETHICS CONSIDERATIONS:")
+        print("\nETHICS CONSIDERATIONS:")
         for alert in result.safety_alerts:
-            print(f"  - {alert.details.get('summary', alert.type)}")
+            print(f"  - {alert.type}: severity {alert.severity:.2f}")
 
     print(f"\nDecision: {result.verdict.decision}")
     print(f"Leadership Alignment: {result.verdict.confidence:.0%}")
@@ -456,59 +368,27 @@ asyncio.run(run_reorg_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_ma_debate():
-    # Due diligence perspectives
-    financial_dd = Perspective(
-        name="financial",
-        description="Financial health and valuation",
-        criteria_adjustments={
-            "evidence_quality": 1.8,
-            "logical_coherence": 1.4,
-        },
-    )
-
-    technical_dd = Perspective(
-        name="technical",
-        description="Technology and product assessment",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "causal_validity": 1.3,
-        },
-    )
-
-    strategic_dd = Perspective(
-        name="strategic",
-        description="Strategic fit and synergies",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "logical_coherence": 1.4,
-        },
-    )
-
-    integration = Perspective(
-        name="integration",
-        description="Integration complexity and risks",
-        criteria_adjustments={
-            "causal_validity": 1.5,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="cfo", perspective=financial_dd, weight=1.5),
-            JuryMember(name="cto", perspective=technical_dd, weight=1.3),
-            JuryMember(name="ceo", perspective=strategic_dd, weight=1.4),
-            JuryMember(name="coo", perspective=integration, weight=1.2),
-        ],
-        voting="weighted",
+    # Executive committee jury for major decisions
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.75,  # High bar for M&A
     )
 
     agents = [
-        Agent(name="bull_case", model="gpt-4o"),
-        Agent(name="bear_case", model="gpt-4o"),
+        Agent(
+            name="bull_case",
+            role="M&A advocate presenting acquisition thesis",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="bear_case",
+            role="Risk analyst presenting concerns",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -554,13 +434,21 @@ async def run_ma_debate():
     print("=" * 60)
     print(f"\nRecommendation: {result.verdict.decision}")
     print(f"Board Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-    print("\nEXECUTIVE COMMITTEE VOTES:")
-    for vote in result.verdict.votes:
-        rec = "PROCEED" if vote.decision == "pro" else "PASS"
-        print(f"  {vote.juror}: {rec} ({vote.confidence:.0%})")
+    if result.verdict.score_breakdown:
+        print("\nARGUMENT STRENGTH:")
+        for agent, score in result.verdict.score_breakdown.items():
+            position = "PROCEED" if "bull" in agent else "CAUTION"
+            print(f"  {position}: {score:.2f}")
 
     print(f"\nINVESTMENT THESIS:\n{result.verdict.reasoning}")
+
+    # Show dissenting opinions if any
+    if result.verdict.dissenting_opinions:
+        print("\nDISSENTING VIEWS:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"  {dissent.perspective.value}: {dissent.reasoning[:150]}...")
 
 asyncio.run(run_ma_debate())
 ```
@@ -571,49 +459,32 @@ asyncio.run(run_ma_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_pricing_debate():
-    # Pricing perspectives
-    revenue = Perspective(
-        name="revenue",
-        description="Revenue maximization",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "argument_strength": 1.4,
-        },
-    )
-
-    market = Perspective(
-        name="market",
-        description="Market share and competitive position",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "causal_validity": 1.3,
-        },
-    )
-
-    customer = Perspective(
-        name="customer",
-        description="Customer satisfaction and retention",
-        criteria_adjustments={
-            "ethical_considerations": 1.4,
-            "argument_strength": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="cro", perspective=revenue),
-            JuryMember(name="cmo", perspective=market),
-            JuryMember(name="vp_customer_success", perspective=customer),
-        ],
+    # Revenue and marketing jury
+    jury = JuryPanel(
+        evaluators=3,
+        model="gpt-4o",
+        consensus_threshold=0.6,
     )
 
     agents = [
-        Agent(name="premium", model="gpt-4o"),
-        Agent(name="competitive", model="gpt-4o"),
-        Agent(name="value_based", model="gpt-4o"),
+        Agent(
+            name="premium",
+            role="Chief Revenue Officer advocating premium pricing",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="competitive",
+            role="CMO advocating competitive pricing for market share",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="value_based",
+            role="VP Strategy advocating value-based pricing",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -658,9 +529,185 @@ async def run_pricing_debate():
     print("=" * 60)
     print(f"\nRecommended Strategy: {result.verdict.decision}")
     print(f"Alignment: {result.verdict.confidence:.0%}")
+
+    if result.verdict.score_breakdown:
+        print("\nSTRATEGY SCORES:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
+
     print(f"\nSTRATEGIC RATIONALE:\n{result.verdict.reasoning}")
 
 asyncio.run(run_pricing_debate())
+```
+
+## Cloud Migration Strategy
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+
+async def run_cloud_migration_debate():
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,
+    )
+
+    agents = [
+        Agent(
+            name="lift_shift",
+            role="Infrastructure lead advocating lift-and-shift",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="re_architect",
+            role="Architect advocating cloud-native re-architecture",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="hybrid",
+            role="CTO advocating phased hybrid approach",
+            model="gpt-4o",
+        ),
+    ]
+
+    debate = Debate(
+        topic="""
+        How should we migrate our on-premise infrastructure to cloud?
+
+        Current state:
+        - 200 VMs running legacy applications
+        - 50 databases (Oracle, SQL Server, PostgreSQL)
+        - $3M/year data center costs
+        - 18-month lease remaining
+
+        Options: Lift-and-shift, Re-architect, or Phased hybrid
+        """,
+        agents=agents,
+        rounds=2,
+        jury=jury,
+    )
+
+    debate.assign_positions({
+        "lift_shift": """
+        Advocates lift-and-shift: Fastest path to cloud, lowest risk,
+        preserve existing investments, train team on cloud gradually.
+        Optimize later. Meet lease deadline. Predictable costs.
+        """,
+        "re_architect": """
+        Advocates re-architecture: Build cloud-native, leverage managed
+        services, reduce operational burden, future-proof architecture.
+        Higher upfront cost but better long-term. Modernize tech debt.
+        """,
+        "hybrid": """
+        Advocates phased approach: Start with lift-and-shift for non-critical,
+        re-architect critical apps, keep some on-prem for compliance.
+        Balance speed with optimization. Reduce risk through phases.
+        """,
+    })
+
+    result = await debate.run()
+
+    print("CLOUD MIGRATION STRATEGY")
+    print("=" * 60)
+    print(f"\nRecommended Approach: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
+
+    if result.verdict.score_breakdown:
+        print("\nAPPROACH ANALYSIS:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
+
+    print(f"\nMIGRATION RATIONALE:\n{result.verdict.reasoning}")
+
+asyncio.run(run_cloud_migration_debate())
+```
+
+## Security Investment Prioritization
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+
+async def run_security_debate():
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.75,  # High bar for security
+    )
+
+    agents = [
+        Agent(
+            name="zero_trust",
+            role="Security architect advocating zero trust",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="detection",
+            role="SOC lead advocating detection and response",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="compliance",
+            role="GRC lead advocating compliance-first",
+            model="gpt-4o",
+        ),
+    ]
+
+    debate = Debate(
+        topic="""
+        Where should we invest our $2M security budget?
+
+        Current state:
+        - Basic perimeter security
+        - No SOC, reactive incident response
+        - SOC2 certification needed in 6 months
+        - Recent phishing incidents
+
+        Options: Zero trust architecture, Detection/Response, Compliance-first
+        """,
+        agents=agents,
+        rounds=2,
+        jury=jury,
+    )
+
+    debate.assign_positions({
+        "zero_trust": """
+        Advocates zero trust: Prevent breaches at source, identity-centric
+        security, microsegmentation. Long-term protection. Industry direction.
+        Reduces blast radius. Works for remote workforce.
+        """,
+        "detection": """
+        Advocates detection/response: Build SOC capability, SIEM/SOAR,
+        threat hunting. Can't prevent everything, need to detect and respond.
+        Faster time to value. Address immediate risks.
+        """,
+        "compliance": """
+        Advocates compliance-first: SOC2 is blocking sales. Address
+        compliance gap first, then build security. Frameworks provide
+        good baseline. Certification enables growth.
+        """,
+    })
+
+    result = await debate.run()
+
+    print("SECURITY INVESTMENT DECISION")
+    print("=" * 60)
+    print(f"\nPriority: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
+
+    if result.verdict.score_breakdown:
+        print("\nINVESTMENT ANALYSIS:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
+
+    print(f"\nSECURITY RATIONALE:\n{result.verdict.reasoning}")
+
+asyncio.run(run_security_debate())
 ```
 
 ## Next Steps

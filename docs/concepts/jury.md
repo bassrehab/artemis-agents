@@ -13,285 +13,53 @@ Single-evaluator systems have limitations:
 A jury addresses these by:
 
 - **Multiple Perspectives**: Different viewpoints considered
-- **Deliberation**: Jurors discuss before deciding
-- **Transparency**: Each vote is explained
+- **Deliberation**: Jurors evaluate arguments independently then aggregate
+- **Transparency**: Each evaluation is explained
 
-## Jury Composition
+## JuryPanel
 
-### Basic Jury
+The `JuryPanel` class manages multiple jury members:
 
 ```python
-from artemis.core.jury import Jury, JuryMember
+from artemis.core.jury import JuryPanel
 
-jury = Jury(
-    members=[
-        JuryMember(name="logical", perspective="values logical consistency"),
-        JuryMember(name="ethical", perspective="values ethical considerations"),
-        JuryMember(name="practical", perspective="values practical implications"),
-    ]
+panel = JuryPanel(
+    evaluators=5,              # Number of jury members
+    model="gpt-4o",            # Model for jurors
+    consensus_threshold=0.7,   # Required agreement (0-1)
 )
 ```
 
-### Jury Member Perspectives
+### JuryPanel Options
 
-Different perspectives emphasize different criteria:
-
-| Perspective | Primary Focus | Weight Adjustments |
-|-------------|---------------|-------------------|
-| `logical` | Argument structure | +logic, -emotion |
-| `ethical` | Moral implications | +ethics, -efficiency |
-| `practical` | Real-world impact | +evidence, -theory |
-| `analytical` | Data and facts | +evidence, +causal |
-| `empathetic` | Human impact | +ethics, +argument |
-
-### Custom Perspectives
-
-```python
-from artemis.core.jury import JuryMember, Perspective
-
-custom_perspective = Perspective(
-    name="scientific",
-    description="Values empirical evidence and scientific methodology",
-    criteria_adjustments={
-        "evidence_quality": 1.5,  # 50% more weight
-        "causal_validity": 1.3,
-        "ethical_considerations": 0.8,
-    },
-    required_evidence=["peer_reviewed", "empirical"],
-)
-
-juror = JuryMember(
-    name="scientist",
-    perspective=custom_perspective,
-)
-```
-
-## Deliberation Process
-
-### Flow
-
-```mermaid
-graph TD
-    A[Arguments Presented] --> B[Individual Scoring]
-    B --> C[Initial Votes]
-    C --> D{Consensus?}
-    D -->|Yes| E[Verdict]
-    D -->|No| F[Deliberation Round]
-    F --> G[Discussion]
-    G --> H[Updated Votes]
-    H --> D
-```
-
-### Stages
-
-1. **Individual Scoring**: Each juror scores arguments independently
-2. **Initial Votes**: Jurors cast preliminary votes
-3. **Deliberation**: If no consensus, jurors exchange reasoning
-4. **Updated Votes**: Jurors can change votes based on deliberation
-5. **Final Verdict**: Decision is made
-
-### Configuration
-
-```python
-from artemis.core.types import JuryConfig
-
-config = JuryConfig(
-    size=5,
-    require_unanimous=False,
-    majority_threshold=0.6,  # 60% agreement needed
-    max_deliberation_rounds=3,
-    allow_abstention=True,
-)
-```
-
-## Voting Mechanisms
-
-### Simple Majority
-
-```python
-jury = Jury(
-    members=members,
-    voting="simple_majority",  # >50% wins
-)
-```
-
-### Supermajority
-
-```python
-jury = Jury(
-    members=members,
-    voting="supermajority",
-    threshold=0.67,  # 2/3 required
-)
-```
-
-### Unanimous
-
-```python
-jury = Jury(
-    members=members,
-    voting="unanimous",  # All must agree
-)
-```
-
-### Weighted Voting
-
-```python
-from artemis.core.jury import WeightedJury
-
-jury = WeightedJury(
-    members=[
-        JuryMember(name="expert", perspective="domain_expert", weight=2.0),
-        JuryMember(name="generalist", perspective="balanced", weight=1.0),
-        JuryMember(name="contrarian", perspective="skeptical", weight=1.0),
-    ]
-)
-```
-
-## Verdict Structure
-
-### Basic Verdict
-
-```python
-verdict = await jury.deliberate(debate_result)
-
-print(f"Decision: {verdict.decision}")  # "pro", "con", or "tie"
-print(f"Confidence: {verdict.confidence}")  # 0.0 to 1.0
-print(f"Reasoning: {verdict.reasoning}")
-```
-
-### Detailed Verdict
-
-```python
-# Access individual votes
-for vote in verdict.votes:
-    print(f"Juror: {vote.juror}")
-    print(f"Vote: {vote.decision}")
-    print(f"Confidence: {vote.confidence}")
-    print(f"Reasoning: {vote.reasoning}")
-    print("---")
-
-# Deliberation history
-for round in verdict.deliberation_history:
-    print(f"Round {round.number}:")
-    print(f"  Discussion: {round.discussion}")
-    print(f"  Vote changes: {round.changes}")
-```
-
-### Verdict Metadata
-
-```python
-print(f"Deliberation rounds: {verdict.rounds_needed}")
-print(f"Was unanimous: {verdict.was_unanimous}")
-print(f"Margin: {verdict.margin}")
-print(f"Abstentions: {verdict.abstention_count}")
-```
-
-## Deliberation Dynamics
-
-### Sharing Reasoning
-
-During deliberation, jurors share their reasoning:
-
-```python
-# Internal deliberation process
-class DeliberationRound:
-    async def execute(self, jury: Jury, current_votes: list[Vote]) -> list[Vote]:
-        # Each juror sees other votes and reasoning
-        shared_reasoning = [
-            f"{vote.juror}: {vote.reasoning}"
-            for vote in current_votes
-        ]
-
-        # Jurors can update their position
-        updated_votes = []
-        for juror in jury.members:
-            new_vote = await juror.reconsider(
-                own_vote=juror.current_vote,
-                other_reasoning=shared_reasoning,
-            )
-            updated_votes.append(new_vote)
-
-        return updated_votes
-```
-
-### Convergence Tracking
-
-```python
-# Track how votes change during deliberation
-for round in verdict.deliberation_history:
-    print(f"Round {round.number}:")
-    print(f"  Agreement: {round.agreement_level:.0%}")
-    print(f"  Changes: {round.vote_changes}")
-```
-
-## Using the Jury
-
-### In Debates
-
-```python
-from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember
-
-# Create jury
-jury = Jury(
-    members=[
-        JuryMember(name="j1", perspective="logical"),
-        JuryMember(name="j2", perspective="ethical"),
-        JuryMember(name="j3", perspective="practical"),
-    ]
-)
-
-# Create debate with jury
-debate = Debate(
-    topic="Should we adopt this policy?",
-    agents=agents,
-    jury=jury,
-)
-
-result = await debate.run()
-print(f"Verdict: {result.verdict}")
-```
-
-### Standalone Jury
-
-```python
-from artemis.core.jury import Jury
-from artemis.core.types import DebateTranscript
-
-# Use jury to evaluate existing arguments
-transcript = DebateTranscript(...)
-
-verdict = await jury.evaluate(transcript)
-```
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `evaluators` | int | 3 | Number of jury members |
+| `model` | str | "gpt-4o" | Model for jurors |
+| `consensus_threshold` | float | 0.7 | Required agreement |
+| `criteria` | list[str] | default | Evaluation criteria |
 
 ## Jury Perspectives
 
-### Built-in Perspectives
-
-ARTEMIS includes several built-in perspectives:
+ARTEMIS includes five built-in perspectives via the `JuryPerspective` enum:
 
 ```python
-from artemis.core.jury import PERSPECTIVES
+from artemis.core.types import JuryPerspective
 
 # Available perspectives
-print(PERSPECTIVES.keys())
-# ['logical', 'ethical', 'practical', 'analytical',
-#  'empathetic', 'skeptical', 'creative', 'conservative']
-
-# Use a built-in perspective
-juror = JuryMember(
-    name="logic_juror",
-    perspective=PERSPECTIVES["logical"],
-)
+JuryPerspective.ANALYTICAL   # Focus on logic and evidence
+JuryPerspective.ETHICAL      # Focus on moral implications
+JuryPerspective.PRACTICAL    # Focus on feasibility and impact
+JuryPerspective.ADVERSARIAL  # Challenge all arguments
+JuryPerspective.SYNTHESIZING # Find common ground
 ```
 
 ### Perspective Details
 
-**Logical Perspective**:
+**Analytical Perspective**:
 - Prioritizes valid reasoning
-- Detects logical fallacies
-- Values internal consistency
+- Evaluates logical consistency
+- Values strong evidence
 
 **Ethical Perspective**:
 - Considers moral implications
@@ -303,48 +71,198 @@ juror = JuryMember(
 - Considers implementation
 - Values real-world evidence
 
-**Skeptical Perspective**:
+**Adversarial Perspective**:
 - Questions all claims
 - Requires strong evidence
 - Identifies weak points
 
-## Advanced Configuration
+**Synthesizing Perspective**:
+- Seeks common ground
+- Recognizes valid points from all sides
+- Values constructive framing
 
-### Model-Backed Jurors
+### Automatic Perspective Assignment
+
+When you create a `JuryPanel`, perspectives are automatically distributed among jurors:
 
 ```python
-from artemis.core.jury import ModelJuryMember
+panel = JuryPanel(evaluators=5, model="gpt-4o")
 
-# Juror backed by a specific model
-expert_juror = ModelJuryMember(
-    name="expert",
-    perspective="domain_expert",
+# Check assigned perspectives
+for juror in panel.jurors:
+    print(f"{juror.juror_id}: {juror.perspective.value}")
+# juror_0: analytical
+# juror_1: ethical
+# juror_2: practical
+# juror_3: adversarial
+# juror_4: synthesizing
+```
+
+## Deliberation Process
+
+### Flow
+
+```mermaid
+graph TD
+    A[Arguments Presented] --> B[Individual Evaluation]
+    B --> C[Score Computation]
+    C --> D[Consensus Building]
+    D --> E[Verdict Generation]
+```
+
+### Stages
+
+1. **Individual Evaluation**: Each juror evaluates arguments independently from their perspective
+2. **Score Computation**: Jurors compute scores for each agent based on evaluation criteria
+3. **Consensus Building**: Weighted voting determines the winner based on confidence
+4. **Verdict Generation**: Final verdict with reasoning and dissenting opinions
+
+## Verdict Structure
+
+The `Verdict` returned by deliberation includes:
+
+```python
+from artemis.core.debate import Debate
+
+# After running a debate
+result = await debate.run()
+verdict = result.verdict
+
+print(f"Decision: {verdict.decision}")       # Winner name or "draw"
+print(f"Confidence: {verdict.confidence}")   # 0.0 to 1.0
+print(f"Reasoning: {verdict.reasoning}")     # Explanation
+print(f"Unanimous: {verdict.unanimous}")     # Whether all jurors agreed
+
+# Score breakdown by agent
+if verdict.score_breakdown:
+    for agent, score in verdict.score_breakdown.items():
+        print(f"  {agent}: {score:.2f}")
+
+# Dissenting opinions
+for dissent in verdict.dissenting_opinions:
+    print(f"Dissent from {dissent.juror_id} ({dissent.perspective.value}):")
+    print(f"  Position: {dissent.position}")
+    print(f"  Reasoning: {dissent.reasoning}")
+```
+
+### Verdict Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `decision` | str | Winner name or "draw" |
+| `confidence` | float | Confidence level (0-1) |
+| `reasoning` | str | Explanation of verdict |
+| `unanimous` | bool | Whether all jurors agreed |
+| `score_breakdown` | dict | Scores by agent |
+| `dissenting_opinions` | list | Dissenting juror opinions |
+
+## Using the Jury
+
+### In Debates
+
+```python
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+from artemis.core.agent import Agent
+
+# Create agents
+agents = [
+    Agent(
+        name="pro",
+        role="Advocate supporting the proposition",
+        model="gpt-4o",
+    ),
+    Agent(
+        name="con",
+        role="Advocate opposing the proposition",
+        model="gpt-4o",
+    ),
+]
+
+# Create jury panel
+jury = JuryPanel(
+    evaluators=5,
     model="gpt-4o",
-    temperature=0.3,  # More deterministic
+    consensus_threshold=0.7,
 )
 
-# Different model for different perspective
-creative_juror = ModelJuryMember(
-    name="creative",
-    perspective="creative",
-    model="claude-3-opus",
-    temperature=0.8,  # More creative
+# Create debate with jury
+debate = Debate(
+    topic="Should we adopt this policy?",
+    agents=agents,
+    jury=jury,
+)
+
+debate.assign_positions({
+    "pro": "supports the policy",
+    "con": "opposes the policy",
+})
+
+result = await debate.run()
+print(f"Verdict: {result.verdict.decision}")
+print(f"Confidence: {result.verdict.confidence:.0%}")
+```
+
+### Custom Criteria
+
+```python
+# Create jury with custom evaluation criteria
+jury = JuryPanel(
+    evaluators=3,
+    model="gpt-4o",
+    criteria=[
+        "argument_quality",
+        "evidence_strength",
+        "logical_consistency",
+        "persuasiveness",
+        "ethical_alignment",
+    ],
 )
 ```
 
-### Jury Presets
+## JuryMember
+
+Individual jurors can be accessed and examined:
 
 ```python
-from artemis.core.jury import create_jury
+from artemis.core.jury import JuryPanel, JuryMember
+from artemis.core.types import JuryPerspective
 
-# Balanced jury (default)
-balanced = create_jury(preset="balanced", size=3)
+panel = JuryPanel(evaluators=3, model="gpt-4o")
 
-# Technical jury
-technical = create_jury(preset="technical", size=5)
+# Access individual jurors
+for juror in panel.jurors:
+    print(f"ID: {juror.juror_id}")
+    print(f"Perspective: {juror.perspective.value}")
+    print(f"Criteria: {juror.criteria}")
 
-# Ethical jury
-ethical = create_jury(preset="ethical", size=3)
+# Get specific juror
+juror = panel.get_juror("juror_0")
+if juror:
+    print(f"Found: {juror.juror_id}")
+```
+
+## Consensus Calculation
+
+The jury uses weighted voting to reach consensus:
+
+1. Each juror evaluates and determines their winner
+2. Votes are weighted by juror confidence
+3. Agreement score is calculated
+4. If below threshold, may result in "draw"
+
+```python
+# Consensus threshold affects verdict
+panel = JuryPanel(
+    evaluators=5,
+    consensus_threshold=0.6,  # Lower threshold = easier consensus
+)
+
+# Higher threshold requires stronger agreement
+strict_panel = JuryPanel(
+    evaluators=5,
+    consensus_threshold=0.9,  # Requires near-unanimous agreement
+)
 ```
 
 ## Benefits of Jury System
@@ -355,15 +273,15 @@ Multiple perspectives prevent single-viewpoint dominance.
 
 ### 2. Transparent Decisions
 
-Each vote and reasoning is recorded and explainable.
+Each juror's evaluation and reasoning is recorded.
 
 ### 3. Robust Verdicts
 
-Deliberation process improves decision quality.
+Consensus-based approach improves decision quality.
 
-### 4. Configurable Fairness
+### 4. Explainable Results
 
-Voting mechanisms can be tuned for different needs.
+Dissenting opinions provide insight into alternative viewpoints.
 
 ## Next Steps
 

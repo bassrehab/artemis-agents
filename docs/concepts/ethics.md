@@ -6,9 +6,9 @@ ARTEMIS includes an ethics module that ensures debates remain within ethical bou
 
 The ethics module operates at three levels:
 
-1. **Generation**: Filters unethical argument content
-2. **Evaluation**: Weights ethical criteria in scoring
-3. **Monitoring**: Detects ethical boundary violations
+1. **Evaluation**: Ethical criteria are weighted in argument scoring
+2. **Monitoring**: EthicsGuard detects ethical boundary violations
+3. **Jury Perspective**: Ethical jury perspective considers moral implications
 
 ## Ethical Principles
 
@@ -27,301 +27,233 @@ ARTEMIS is built on core ethical principles:
 The `EthicsGuard` monitors arguments for ethical violations:
 
 ```python
-from artemis.safety import EthicsGuard
+from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
-guard = EthicsGuard(
-    sensitivity=0.6,
+# Configure ethics guard
+ethics_config = EthicsConfig(
+    sensitivity=0.7,
     principles=["fairness", "transparency", "non-harm"],
 )
 
-result = await guard.analyze(argument, context)
+guard = EthicsGuard(
+    mode=MonitorMode.PASSIVE,
+    config=ethics_config,
+)
 
-if result.has_violation:
-    print(f"Violation: {result.violation_type}")
-    print(f"Severity: {result.severity}")
-    print(f"Details: {result.details}")
+# Use in debate
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[guard.process],
+)
 ```
 
-### Violation Types
+### EthicsConfig Options
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `discrimination` | Unfair treatment of groups | Racist or sexist arguments |
-| `deception` | Intentional misleading | False statistics |
-| `harm_advocacy` | Promoting harmful actions | Violence endorsement |
-| `privacy_violation` | Exposing private info | Doxxing attempts |
-| `manipulation` | Psychological manipulation | Emotional exploitation |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `principles` | list | default | Ethical principles to enforce |
 
 ### Sensitivity Levels
 
 ```python
+from artemis.safety import EthicsConfig
+
 # Low sensitivity - only severe violations
-guard = EthicsGuard(sensitivity=0.3)
+low_config = EthicsConfig(sensitivity=0.3)
 
 # Medium sensitivity - most violations
-guard = EthicsGuard(sensitivity=0.6)
+medium_config = EthicsConfig(sensitivity=0.6)
 
 # High sensitivity - strict enforcement
-guard = EthicsGuard(sensitivity=0.9)
+high_config = EthicsConfig(sensitivity=0.9)
 ```
 
-## Ethical Evaluation
+## Ethical Evaluation in L-AE-CR
 
-Arguments receive an ethics score as part of L-AE-CR evaluation:
+Arguments receive an ethics score as part of the adaptive evaluation:
 
 ```python
-from artemis.core.evaluation import AdaptiveEvaluator
+from artemis.core.types import EvaluationCriteria
 
-evaluator = AdaptiveEvaluator(
-    criteria_weights={
-        "logical_coherence": 0.25,
-        "evidence_quality": 0.25,
-        "argument_strength": 0.20,
-        "ethical_considerations": 0.15,  # Ethics weight
-        "causal_validity": 0.15,
-    }
+# Ethical alignment is one of the default criteria
+criteria = EvaluationCriteria(
+    logical_coherence=0.25,
+    evidence_quality=0.25,
+    causal_reasoning=0.20,
+    ethical_alignment=0.15,  # Ethics weight
+    persuasiveness=0.15,
 )
 ```
 
-### Ethics Score Components
+### What Ethical Evaluation Considers
 
-The ethics score evaluates:
+- **Claim Fairness**: Are claims fair to all parties?
+- **Evidence Ethics**: Is evidence used responsibly?
+- **Conclusion Ethics**: Are conclusions ethically sound?
+- **Stakeholder Impact**: Who is affected and how?
 
-1. **Claim Fairness**: Are claims fair to all parties?
-2. **Evidence Ethics**: Is evidence obtained ethically?
-3. **Conclusion Ethics**: Are conclusions ethically sound?
-4. **Stakeholder Impact**: Who is affected and how?
+## Ethical Jury Perspective
+
+The jury includes an ethical perspective:
 
 ```python
-ethics_breakdown = evaluation.ethics_details
+from artemis.core.types import JuryPerspective
 
-print(f"Claim Fairness: {ethics_breakdown.claim_fairness:.2f}")
-print(f"Evidence Ethics: {ethics_breakdown.evidence_ethics:.2f}")
-print(f"Conclusion Ethics: {ethics_breakdown.conclusion_ethics:.2f}")
-print(f"Stakeholder Impact: {ethics_breakdown.stakeholder_impact:.2f}")
+# The ETHICAL perspective focuses on moral implications
+JuryPerspective.ETHICAL
 ```
 
-## Content Filtering
-
-### Generation-Time Filtering
-
-Arguments are filtered during generation:
+When creating a jury panel, the ethical perspective is automatically included:
 
 ```python
+from artemis.core.jury import JuryPanel
+
+# Create panel - ethical perspective is assigned to one juror
+panel = JuryPanel(evaluators=5, model="gpt-4o")
+
+# The ethical juror focuses on:
+# - Consideration of ethical principles
+# - Attention to stakeholder welfare
+# - Fairness and justice concerns
+# - Long-term societal impact
+```
+
+## Handling Ethical Debates
+
+ARTEMIS can handle debates on complex ethical topics:
+
+```python
+import asyncio
 from artemis.core.agent import Agent
-
-agent = Agent(
-    name="ethical_agent",
-    model="gpt-4o",
-    ethics_filter=True,  # Enable filtering
-    ethics_sensitivity=0.7,
-)
-```
-
-### Filtered Content Types
-
-- Personal attacks
-- Discriminatory statements
-- Misinformation claims
-- Harmful recommendations
-- Privacy violations
-
-## Ethical Dilemmas
-
-ARTEMIS can handle complex ethical debates:
-
-```python
 from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
 
+async def ethical_debate():
+    # Create agents for ethical debate
+    agents = [
+        Agent(
+            name="utilitarian",
+            role="Advocate arguing from consequentialist ethics",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="deontologist",
+            role="Advocate arguing from duty-based ethics",
+            model="gpt-4o",
+        ),
+    ]
+
+    # Create jury - will include ethical perspective
+    jury = JuryPanel(evaluators=5, model="gpt-4o")
+
+    debate = Debate(
+        topic="Should autonomous vehicles prioritize passenger or pedestrian safety?",
+        agents=agents,
+        jury=jury,
+        rounds=3,
+    )
+
+    debate.assign_positions({
+        "utilitarian": "maximize overall welfare in collision scenarios",
+        "deontologist": "respect individual rights regardless of outcomes",
+    })
+
+    result = await debate.run()
+    return result
+
+asyncio.run(ethical_debate())
+```
+
+## Safety Integration
+
+Ethics monitoring integrates with other safety monitors:
+
+```python
+from artemis.safety import (
+    SandbagDetector,
+    DeceptionMonitor,
+    EthicsGuard,
+    MonitorMode,
+    EthicsConfig,
+)
+
+# Configure all monitors
+sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
+deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
+ethics = EthicsGuard(
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(sensitivity=0.7),
+)
+
+# Use all monitors together
 debate = Debate(
-    topic="Should autonomous vehicles prioritize passenger or pedestrian safety?",
+    topic="Your topic",
     agents=agents,
-    ethical_framework="utilitarian",  # or "deontological", "virtue", "care"
-)
-```
-
-### Ethical Frameworks
-
-| Framework | Focus | Evaluation Priority |
-|-----------|-------|---------------------|
-| Utilitarian | Greatest good | Outcomes, consequences |
-| Deontological | Rules and duties | Principles, rights |
-| Virtue | Character | Intentions, virtues |
-| Care | Relationships | Context, relationships |
-
-### Multi-Framework Analysis
-
-```python
-from artemis.core.ethics import MultiFrameworkAnalysis
-
-analysis = MultiFrameworkAnalysis(
-    frameworks=["utilitarian", "deontological", "virtue"]
-)
-
-result = await analysis.evaluate(argument)
-
-for framework, score in result.framework_scores.items():
-    print(f"{framework}: {score:.2f}")
-
-print(f"Overall Ethics: {result.overall_score:.2f}")
-print(f"Framework Conflicts: {result.conflicts}")
-```
-
-## Stakeholder Analysis
-
-ARTEMIS can identify and track stakeholder impact:
-
-```python
-from artemis.core.ethics import StakeholderAnalyzer
-
-analyzer = StakeholderAnalyzer()
-
-stakeholders = await analyzer.identify(argument)
-
-for stakeholder in stakeholders:
-    print(f"Group: {stakeholder.name}")
-    print(f"Impact: {stakeholder.impact}")  # positive, negative, neutral
-    print(f"Severity: {stakeholder.severity}")
-    print(f"Considerations: {stakeholder.considerations}")
-```
-
-## Configuration
-
-### Debate-Level Ethics
-
-```python
-from artemis.core.types import DebateConfig, EthicsConfig
-
-ethics_config = EthicsConfig(
-    enable_ethics_guard=True,
-    sensitivity=0.7,
-    principles=["fairness", "transparency", "non-harm"],
-    ethical_framework="utilitarian",
-    halt_on_violation=False,
-    violation_threshold=0.9,
-)
-
-config = DebateConfig(
-    ethics=ethics_config,
-)
-```
-
-### Custom Principles
-
-```python
-from artemis.core.ethics import EthicalPrinciple
-
-custom_principle = EthicalPrinciple(
-    name="sustainability",
-    description="Arguments should consider environmental sustainability",
-    detection_keywords=["environment", "climate", "sustainable"],
-    violation_patterns=[
-        "ignores environmental impact",
-        "dismisses climate concerns",
+    safety_monitors=[
+        sandbag.process,
+        deception.process,
+        ethics.process,
     ],
-    weight=0.2,
-)
-
-guard = EthicsGuard(
-    principles=["fairness", "non-harm", custom_principle],
 )
 ```
 
-## Ethics in Jury
+## Safety Alerts
 
-Jury members can have ethical perspectives:
-
-```python
-from artemis.core.jury import JuryMember, PERSPECTIVES
-
-ethical_juror = JuryMember(
-    name="ethicist",
-    perspective=PERSPECTIVES["ethical"],
-)
-
-# Or with custom ethical focus
-from artemis.core.jury import Perspective
-
-environmental_perspective = Perspective(
-    name="environmental",
-    description="Prioritizes environmental ethics and sustainability",
-    criteria_adjustments={
-        "ethical_considerations": 2.0,  # Double weight
-    },
-    custom_criteria={
-        "environmental_impact": 0.3,
-    },
-)
-
-eco_juror = JuryMember(
-    name="environmentalist",
-    perspective=environmental_perspective,
-)
-```
-
-## Handling Violations
-
-### Soft Handling
+When ethical violations are detected, they appear in the debate results:
 
 ```python
-guard = EthicsGuard(
-    mode="warn",  # Just warn, don't block
-)
+result = await debate.run()
 
-result = await guard.analyze(argument, context)
-if result.has_violation:
-    logging.warning(f"Ethics warning: {result.details}")
-    # Argument continues with warning attached
-```
-
-### Hard Handling
-
-```python
-guard = EthicsGuard(
-    mode="block",  # Block violating content
-    violation_threshold=0.8,
-)
-
-result = await guard.analyze(argument, context)
-if result.has_violation and result.severity > guard.violation_threshold:
-    raise EthicsViolationError(result.details)
-```
-
-### Remediation
-
-```python
-guard = EthicsGuard(
-    mode="remediate",  # Attempt to fix violations
-)
-
-result = await guard.analyze(argument, context)
-if result.has_violation:
-    remediated = await guard.remediate(argument, result)
-    # Use remediated version
-```
-
-## Transparency and Explainability
-
-Ethics decisions are fully explainable:
-
-```python
-result = await guard.analyze(argument, context)
-
-# Full explanation
-explanation = result.explain()
-print(f"Decision: {explanation.decision}")
-print(f"Reasons: {explanation.reasons}")
-print(f"Principle Scores: {explanation.principle_scores}")
-print(f"Evidence: {explanation.evidence}")
+# Check for ethical safety alerts
+for alert in result.safety_alerts:
+    if "ethics" in alert.type.lower():
+        print(f"Ethics alert: {alert.type}")
+        print(f"Severity: {alert.severity:.0%}")
+        print(f"Agent: {alert.agent}")
 ```
 
 ## Best Practices
 
 1. **Set Appropriate Sensitivity**: Match sensitivity to debate context
 2. **Define Clear Principles**: Be explicit about ethical boundaries
-3. **Use Multiple Frameworks**: Consider different ethical perspectives
+3. **Include Ethical Perspectives**: Use jury to consider moral implications
 4. **Enable Transparency**: Make ethics decisions explainable
 5. **Review Edge Cases**: Some arguments may need human review
+
+## Ethical Frameworks
+
+When debating ethical topics, different ethical frameworks provide different perspectives:
+
+| Framework | Focus | What It Values |
+|-----------|-------|----------------|
+| **Utilitarian** | Greatest good | Outcomes, consequences |
+| **Deontological** | Rules and duties | Principles, rights |
+| **Virtue Ethics** | Character | Intentions, virtues |
+| **Care Ethics** | Relationships | Context, relationships |
+
+These frameworks can be represented by different agents in a debate:
+
+```python
+agents = [
+    Agent(
+        name="consequentialist",
+        role="Argues from utilitarian perspective focusing on outcomes",
+        model="gpt-4o",
+    ),
+    Agent(
+        name="deontologist",
+        role="Argues from duty-based perspective focusing on principles",
+        model="gpt-4o",
+    ),
+    Agent(
+        name="virtue_ethicist",
+        role="Argues from virtue ethics focusing on character",
+        model="gpt-4o",
+    ),
+]
+```
 
 ## Next Steps
 
