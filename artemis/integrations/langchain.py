@@ -18,6 +18,19 @@ from artemis.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
+class AgentConfig(BaseModel):
+    """Configuration for a debate agent."""
+
+    name: str = Field(..., description="Unique name for the agent.")
+    role: str = Field(..., description="Role description for the agent.")
+    position: str = Field(
+        default="", description="Position the agent will argue for."
+    )
+    model: str | None = Field(
+        default=None, description="Model override for this agent."
+    )
+
+
 class DebateInput(BaseModel):
     """Input schema for ARTEMIS debate tool."""
 
@@ -25,13 +38,9 @@ class DebateInput(BaseModel):
         ...,
         description="The debate topic or question to analyze.",
     )
-    pro_position: str = Field(
-        default="supports the topic",
-        description="Position for the pro-side agent.",
-    )
-    con_position: str = Field(
-        default="opposes the topic",
-        description="Position for the con-side agent.",
+    agents: list[AgentConfig] | None = Field(
+        default=None,
+        description="List of agent configurations. If not provided, uses default pro/con agents.",
     )
     rounds: int = Field(
         default=3,
@@ -39,17 +48,27 @@ class DebateInput(BaseModel):
         le=10,
         description="Number of debate rounds (1-10).",
     )
+    # Backward compatibility for simple pro/con debates
+    pro_position: str | None = Field(
+        default=None,
+        description="Position for the pro-side agent (used if agents not provided).",
+    )
+    con_position: str | None = Field(
+        default=None,
+        description="Position for the con-side agent (used if agents not provided).",
+    )
 
 
 class DebateOutput(BaseModel):
     """Output schema for ARTEMIS debate tool."""
 
     topic: str = Field(..., description="The debate topic.")
-    verdict: str = Field(..., description="Final verdict (pro/con/draw).")
+    verdict: str = Field(..., description="Final verdict (winner agent name or draw).")
     confidence: float = Field(..., description="Confidence in verdict (0-1).")
     reasoning: str = Field(..., description="Reasoning for the verdict.")
-    pro_score: float = Field(..., description="Average score for pro agent.")
-    con_score: float = Field(..., description="Average score for con agent.")
+    agent_scores: dict[str, float] = Field(
+        default_factory=dict, description="Scores for each agent."
+    )
     total_turns: int = Field(..., description="Total debate turns.")
     summary: str = Field(..., description="Brief summary of the debate.")
 
@@ -61,25 +80,40 @@ class ArtemisDebateTool:
     Can be used as a standalone tool or integrated into LangChain agents
     and chains for structured multi-agent debate analysis.
 
-    Example:
+    Supports both simple pro/con debates and complex multi-agent scenarios.
+
+    Example (simple):
         >>> from artemis.integrations.langchain import ArtemisDebateTool
         >>> tool = ArtemisDebateTool(model="gpt-4o")
         >>> result = tool.invoke({
         ...     "topic": "Should AI be regulated?",
-        ...     "rounds": 3,
+        ...     "pro_position": "supports regulation",
+        ...     "con_position": "opposes regulation",
         ... })
-        >>> print(result.verdict)
 
-    With LangChain:
-        >>> from langchain.agents import initialize_agent
-        >>> tools = [ArtemisDebateTool().as_langchain_tool()]
-        >>> agent = initialize_agent(tools, llm, agent="zero-shot-react")
+    Example (multi-agent):
+        >>> result = tool.invoke({
+        ...     "topic": "How should we approach climate change?",
+        ...     "agents": [
+        ...         {"name": "economist", "role": "Economic analyst", "position": "focus on market solutions"},
+        ...         {"name": "scientist", "role": "Climate scientist", "position": "focus on scientific solutions"},
+        ...         {"name": "activist", "role": "Environmental activist", "position": "focus on policy changes"},
+        ...     ],
+        ... })
+
+    With pre-configured agents:
+        >>> tool = ArtemisDebateTool(
+        ...     agents=[
+        ...         Agent(name="pro", role="Advocate", model="gpt-4o"),
+        ...         Agent(name="con", role="Critic", model="gpt-4o"),
+        ...     ]
+        ... )
     """
 
     name: str = "artemis_debate"
     description: str = (
         "Conducts a structured multi-agent debate on a given topic. "
-        "Two AI agents argue opposing positions through multiple rounds. "
+        "Multiple AI agents argue different positions through multiple rounds. "
         "A jury evaluates arguments and delivers a verdict. "
         "Use for complex decision-making requiring balanced analysis."
     )
@@ -88,6 +122,7 @@ class ArtemisDebateTool:
         self,
         model: str = "gpt-4o",
         default_rounds: int = 3,
+        agents: list[Agent] | None = None,
         config: DebateConfig | None = None,
         safety_monitors: list | None = None,
         **kwargs: Any,
@@ -96,14 +131,16 @@ class ArtemisDebateTool:
         Initialize the ARTEMIS debate tool.
 
         Args:
-            model: LLM model to use for agents.
+            model: Default LLM model to use for agents.
             default_rounds: Default number of debate rounds.
+            agents: Pre-configured agents to use (optional).
             config: Optional debate configuration.
             safety_monitors: Optional safety monitor instances.
             **kwargs: Additional configuration.
         """
         self.model = model
         self.default_rounds = default_rounds
+        self.default_agents = agents
         self.config = config or DebateConfig()
         self.safety_monitors = safety_monitors or []
         self.extra_config = kwargs
@@ -112,6 +149,7 @@ class ArtemisDebateTool:
             "ArtemisDebateTool initialized",
             model=model,
             default_rounds=default_rounds,
+            pre_configured_agents=len(agents) if agents else 0,
         )
 
     def invoke(self, input_data: dict | DebateInput) -> DebateOutput:
@@ -148,22 +186,14 @@ class ArtemisDebateTool:
             rounds=input_data.rounds,
         )
 
-        # Create agents
-        pro_agent = Agent(
-            name="pro_agent",
-            model=self.model,
-            position=input_data.pro_position,
-        )
-        con_agent = Agent(
-            name="con_agent",
-            model=self.model,
-            position=input_data.con_position,
-        )
+        # Create or use agents
+        agents = self._create_agents(input_data)
+        positions = self._get_positions(input_data, agents)
 
         # Create and run debate
         debate = Debate(
             topic=input_data.topic,
-            agents=[pro_agent, con_agent],
+            agents=agents,
             rounds=input_data.rounds or self.default_rounds,
             config=self.config,
             **self.extra_config,
@@ -174,14 +204,61 @@ class ArtemisDebateTool:
             if hasattr(monitor, "process"):
                 debate.add_safety_monitor(monitor.process)
 
-        debate.assign_positions({
-            "pro_agent": input_data.pro_position,
-            "con_agent": input_data.con_position,
-        })
+        # Assign positions
+        debate.assign_positions(positions)
 
         result = await debate.run()
 
         return self._format_output(result, input_data)
+
+    def _create_agents(self, input_data: DebateInput) -> list[Agent]:
+        """Create agents from input or use defaults."""
+        # Use pre-configured agents if available
+        if self.default_agents:
+            return self.default_agents
+
+        # Create from input agent configs
+        if input_data.agents:
+            return [
+                Agent(
+                    name=agent_config.name,
+                    role=agent_config.role,
+                    model=agent_config.model or self.model,
+                )
+                for agent_config in input_data.agents
+            ]
+
+        # Fall back to default pro/con agents
+        return [
+            Agent(
+                name="pro_agent",
+                role="Debate advocate for the proposition",
+                model=self.model,
+            ),
+            Agent(
+                name="con_agent",
+                role="Debate advocate against the proposition",
+                model=self.model,
+            ),
+        ]
+
+    def _get_positions(
+        self, input_data: DebateInput, agents: list[Agent]
+    ) -> dict[str, str]:
+        """Get positions mapping for agents."""
+        # From input agent configs
+        if input_data.agents:
+            return {
+                agent_config.name: agent_config.position
+                for agent_config in input_data.agents
+                if agent_config.position
+            }
+
+        # From simple pro/con positions
+        return {
+            "pro_agent": input_data.pro_position or "supports the topic",
+            "con_agent": input_data.con_position or "opposes the topic",
+        }
 
     def _format_output(
         self,
@@ -197,8 +274,7 @@ class ArtemisDebateTool:
             verdict=result.verdict.decision,
             confidence=result.verdict.confidence,
             reasoning=result.verdict.reasoning,
-            pro_score=scores.get("pro_agent", 0.0),
-            con_score=scores.get("con_agent", 0.0),
+            agent_scores=scores,
             total_turns=len(result.transcript),
             summary=summary,
         )
@@ -226,21 +302,14 @@ class ArtemisDebateTool:
         if not transcript:
             return "No debate occurred."
 
-        opening_pro = next(
-            (t for t in transcript if t.agent == "pro_agent" and t.round == 0),
-            None,
-        )
-        opening_con = next(
-            (t for t in transcript if t.agent == "con_agent" and t.round == 0),
-            None,
-        )
+        # Get opening turns
+        opening_turns = [t for t in transcript if t.round == 0]
 
         parts = [f"Debate on: {result.topic}"]
 
-        if opening_pro:
-            parts.append(f"Pro argued: {opening_pro.argument.content[:100]}...")
-        if opening_con:
-            parts.append(f"Con argued: {opening_con.argument.content[:100]}...")
+        for turn in opening_turns[:2]:  # First two opening statements
+            content = turn.argument.content
+            parts.append(f"{turn.agent} argued: {content[:100]}...")
 
         parts.append(
             f"After {len(transcript)} turns, verdict: {verdict.decision} "
@@ -292,13 +361,18 @@ class ArtemisDebateTool:
                         "type": "string",
                         "description": "The debate topic or question.",
                     },
-                    "pro_position": {
-                        "type": "string",
-                        "description": "Position for the pro-side agent.",
-                    },
-                    "con_position": {
-                        "type": "string",
-                        "description": "Position for the con-side agent.",
+                    "agents": {
+                        "type": "array",
+                        "description": "List of agent configurations.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "role": {"type": "string"},
+                                "position": {"type": "string"},
+                            },
+                            "required": ["name", "role"],
+                        },
                     },
                     "rounds": {
                         "type": "integer",
@@ -332,6 +406,7 @@ class QuickDebate:
         topic: str,
         rounds: int = 3,
         model: str = "gpt-4o",
+        agents: list[AgentConfig] | None = None,
     ) -> DebateOutput:
         """
         Run a quick debate on a topic.
@@ -340,18 +415,20 @@ class QuickDebate:
             topic: The debate topic.
             rounds: Number of rounds.
             model: LLM model to use.
+            agents: Optional agent configurations.
 
         Returns:
             DebateOutput with verdict.
         """
         tool = ArtemisDebateTool(model=model, default_rounds=rounds)
-        return tool.invoke({"topic": topic, "rounds": rounds})
+        return tool.invoke({"topic": topic, "rounds": rounds, "agents": agents})
 
     @staticmethod
     async def arun(
         topic: str,
         rounds: int = 3,
         model: str = "gpt-4o",
+        agents: list[AgentConfig] | None = None,
     ) -> DebateOutput:
         """
         Run a quick debate asynchronously.
@@ -360,9 +437,10 @@ class QuickDebate:
             topic: The debate topic.
             rounds: Number of rounds.
             model: LLM model to use.
+            agents: Optional agent configurations.
 
         Returns:
             DebateOutput with verdict.
         """
         tool = ArtemisDebateTool(model=model, default_rounds=rounds)
-        return await tool.ainvoke({"topic": topic, "rounds": rounds})
+        return await tool.ainvoke({"topic": topic, "rounds": rounds, "agents": agents})

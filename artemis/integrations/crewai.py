@@ -18,6 +18,19 @@ from artemis.utils.logging import get_logger
 logger = get_logger(__name__)
 
 
+class AgentConfig(BaseModel):
+    """Configuration for a debate agent."""
+
+    name: str = Field(..., description="Unique name for the agent.")
+    role: str = Field(..., description="Role description for the agent.")
+    position: str = Field(
+        default="", description="Position the agent will argue for."
+    )
+    model: str | None = Field(
+        default=None, description="Model override for this agent."
+    )
+
+
 class DebateToolInput(BaseModel):
     """Input schema for ARTEMIS debate tool in CrewAI."""
 
@@ -25,19 +38,24 @@ class DebateToolInput(BaseModel):
         ...,
         description="The debate topic or question to analyze through structured argumentation.",
     )
-    pro_position: str = Field(
-        default="supports the proposition",
-        description="The position that the pro-side agent will argue for.",
-    )
-    con_position: str = Field(
-        default="opposes the proposition",
-        description="The position that the con-side agent will argue for.",
+    agents: list[AgentConfig] | None = Field(
+        default=None,
+        description="List of agent configurations. If not provided, uses default pro/con agents.",
     )
     rounds: int = Field(
         default=3,
         ge=1,
         le=10,
         description="Number of debate rounds (1-10). More rounds provide deeper analysis.",
+    )
+    # Backward compatibility for simple pro/con debates
+    pro_position: str | None = Field(
+        default=None,
+        description="The position that the pro-side agent will argue for (used if agents not provided).",
+    )
+    con_position: str | None = Field(
+        default=None,
+        description="The position that the con-side agent will argue for (used if agents not provided).",
     )
 
 
@@ -48,8 +66,7 @@ class DebateToolOutput(BaseModel):
     verdict: str
     confidence: float
     reasoning: str
-    pro_score: float
-    con_score: float
+    agent_scores: dict[str, float]
     key_arguments: list[str]
     recommendation: str
 
@@ -61,7 +78,9 @@ class ArtemisCrewTool:
     Integrates structured multi-agent debates into CrewAI workflows,
     enabling crews to leverage adversarial analysis for decision-making.
 
-    Example:
+    Supports configurable agents - either simple pro/con or multi-agent.
+
+    Example (simple pro/con):
         >>> from crewai import Agent, Task, Crew
         >>> from artemis.integrations.crewai import ArtemisCrewTool
         >>>
@@ -70,6 +89,15 @@ class ArtemisCrewTool:
         >>> analyst = Agent(
         ...     role="Decision Analyst",
         ...     tools=[debate_tool.as_crewai_tool()],
+        ... )
+
+    Example (multi-agent):
+        >>> result = tool.run(
+        ...     topic="How should we approach AI safety?",
+        ...     agents=[
+        ...         {"name": "researcher", "role": "AI Researcher", "position": "focus on alignment"},
+        ...         {"name": "ethicist", "role": "Ethicist", "position": "focus on ethics"},
+        ...     ],
         ... )
 
     Direct usage:
@@ -83,17 +111,18 @@ class ArtemisCrewTool:
     name: str = "artemis_structured_debate"
     description: str = (
         "Conducts a structured multi-agent debate on a given topic. "
-        "Two AI agents argue opposing positions through multiple rounds, "
+        "Multiple AI agents argue different positions through multiple rounds, "
         "with a jury evaluating arguments and delivering a verdict. "
         "Use this tool when you need balanced analysis of complex decisions, "
         "policy questions, or trade-off evaluations. Returns a verdict with "
-        "confidence score, key arguments from both sides, and a recommendation."
+        "confidence score, key arguments from all sides, and a recommendation."
     )
 
     def __init__(
         self,
         model: str = "gpt-4o",
         default_rounds: int = 3,
+        agents: list[Agent] | None = None,
         config: DebateConfig | None = None,
         verbose: bool = False,
         **kwargs: Any,
@@ -104,12 +133,14 @@ class ArtemisCrewTool:
         Args:
             model: LLM model to use for debate agents.
             default_rounds: Default number of debate rounds.
+            agents: Pre-configured agents (optional).
             config: Optional debate configuration.
             verbose: Whether to log detailed progress.
             **kwargs: Additional configuration.
         """
         self.model = model
         self.default_rounds = default_rounds
+        self.default_agents = agents
         self.config = config or DebateConfig()
         self.verbose = verbose
         self.extra_config = kwargs
@@ -118,13 +149,15 @@ class ArtemisCrewTool:
             "ArtemisCrewTool initialized",
             model=model,
             default_rounds=default_rounds,
+            pre_configured_agents=len(agents) if agents else 0,
         )
 
     def run(
         self,
         topic: str,
-        pro_position: str = "supports the proposition",
-        con_position: str = "opposes the proposition",
+        agents: list[dict] | None = None,
+        pro_position: str | None = None,
+        con_position: str | None = None,
         rounds: int | None = None,
     ) -> str:
         """
@@ -134,23 +167,25 @@ class ArtemisCrewTool:
 
         Args:
             topic: The debate topic.
-            pro_position: Pro-side position.
-            con_position: Con-side position.
+            agents: List of agent configurations (optional).
+            pro_position: Pro-side position (for simple pro/con, if agents not provided).
+            con_position: Con-side position (for simple pro/con, if agents not provided).
             rounds: Number of rounds (uses default if not specified).
 
         Returns:
             Formatted string with debate results.
         """
         result = asyncio.run(
-            self._run_debate(topic, pro_position, con_position, rounds)
+            self._run_debate(topic, agents, pro_position, con_position, rounds)
         )
         return self._format_result_string(result)
 
     async def arun(
         self,
         topic: str,
-        pro_position: str = "supports the proposition",
-        con_position: str = "opposes the proposition",
+        agents: list[dict] | None = None,
+        pro_position: str | None = None,
+        con_position: str | None = None,
         rounds: int | None = None,
     ) -> str:
         """
@@ -158,21 +193,80 @@ class ArtemisCrewTool:
 
         Args:
             topic: The debate topic.
-            pro_position: Pro-side position.
-            con_position: Con-side position.
+            agents: List of agent configurations (optional).
+            pro_position: Pro-side position (for simple pro/con).
+            con_position: Con-side position (for simple pro/con).
             rounds: Number of rounds.
 
         Returns:
             Formatted string with debate results.
         """
-        result = await self._run_debate(topic, pro_position, con_position, rounds)
+        result = await self._run_debate(topic, agents, pro_position, con_position, rounds)
         return self._format_result_string(result)
+
+    def _create_agents(
+        self,
+        agent_configs: list[dict] | None,
+        pro_position: str | None,
+        con_position: str | None,
+    ) -> list[Agent]:
+        """Create agents from configs or use defaults."""
+        # Use pre-configured agents if available
+        if self.default_agents:
+            return self.default_agents
+
+        # Create from input agent configs
+        if agent_configs:
+            return [
+                Agent(
+                    name=cfg["name"],
+                    role=cfg["role"],
+                    model=cfg.get("model") or self.model,
+                )
+                for cfg in agent_configs
+            ]
+
+        # Fall back to default pro/con agents
+        return [
+            Agent(
+                name="pro_agent",
+                role="Debate advocate for the proposition",
+                model=self.model,
+            ),
+            Agent(
+                name="con_agent",
+                role="Debate advocate against the proposition",
+                model=self.model,
+            ),
+        ]
+
+    def _get_positions(
+        self,
+        agent_configs: list[dict] | None,
+        pro_position: str | None,
+        con_position: str | None,
+    ) -> dict[str, str]:
+        """Get positions mapping for agents."""
+        # From input agent configs
+        if agent_configs:
+            return {
+                cfg["name"]: cfg.get("position", "")
+                for cfg in agent_configs
+                if cfg.get("position")
+            }
+
+        # From simple pro/con positions
+        return {
+            "pro_agent": pro_position or "supports the proposition",
+            "con_agent": con_position or "opposes the proposition",
+        }
 
     async def _run_debate(
         self,
         topic: str,
-        pro_position: str,
-        con_position: str,
+        agent_configs: list[dict] | None,
+        pro_position: str | None,
+        con_position: str | None,
         rounds: int | None,
     ) -> DebateToolOutput:
         """Execute the debate and return structured output."""
@@ -180,30 +274,19 @@ class ArtemisCrewTool:
             logger.info("Starting debate", topic=topic[:50])
 
         # Create agents
-        pro_agent = Agent(
-            name="pro_agent",
-            model=self.model,
-            position=pro_position,
-        )
-        con_agent = Agent(
-            name="con_agent",
-            model=self.model,
-            position=con_position,
-        )
+        agents = self._create_agents(agent_configs, pro_position, con_position)
+        positions = self._get_positions(agent_configs, pro_position, con_position)
 
         # Create and run debate
         debate = Debate(
             topic=topic,
-            agents=[pro_agent, con_agent],
+            agents=agents,
             rounds=rounds or self.default_rounds,
             config=self.config,
             **self.extra_config,
         )
 
-        debate.assign_positions({
-            "pro_agent": pro_position,
-            "con_agent": con_position,
-        })
+        debate.assign_positions(positions)
 
         result = await debate.run()
 
@@ -229,8 +312,7 @@ class ArtemisCrewTool:
             verdict=result.verdict.decision,
             confidence=result.verdict.confidence,
             reasoning=result.verdict.reasoning,
-            pro_score=scores.get("pro_agent", 0.0),
-            con_score=scores.get("con_agent", 0.0),
+            agent_scores=scores,
             key_arguments=key_arguments,
             recommendation=recommendation,
         )
@@ -282,14 +364,17 @@ class ArtemisCrewTool:
         verdict = result.verdict
         confidence = verdict.confidence
 
-        if verdict.decision == "pro":
-            strength = "strongly " if confidence > 0.7 else ""
-            return f"Based on the debate analysis, the evidence {strength}supports the proposition. {verdict.reasoning[:100]}"
-        elif verdict.decision == "con":
-            strength = "strongly " if confidence > 0.7 else ""
-            return f"Based on the debate analysis, the evidence {strength}opposes the proposition. {verdict.reasoning[:100]}"
+        if confidence > 0.7:
+            strength = "strongly "
+        elif confidence > 0.5:
+            strength = ""
         else:
+            strength = "cautiously "
+
+        if verdict.decision in ["draw", "tie", "inconclusive"]:
             return f"The debate resulted in a balanced outcome. Both positions have merit. {verdict.reasoning[:100]}"
+        else:
+            return f"Based on the debate analysis, the evidence {strength}supports '{verdict.decision}'. {verdict.reasoning[:100]}"
 
     def _format_result_string(self, output: DebateToolOutput) -> str:
         """Format output as a string for CrewAI consumption."""
@@ -299,12 +384,16 @@ class ArtemisCrewTool:
             f"VERDICT: {output.verdict.upper()}",
             f"CONFIDENCE: {output.confidence:.0%}",
             "",
-            "SCORES:",
-            f"  Pro Position: {output.pro_score:.2f}",
-            f"  Con Position: {output.con_score:.2f}",
+            "AGENT SCORES:",
+        ]
+
+        for agent, score in output.agent_scores.items():
+            lines.append(f"  {agent}: {score:.2f}")
+
+        lines.extend([
             "",
             "KEY ARGUMENTS:",
-        ]
+        ])
 
         for arg in output.key_arguments:
             lines.append(f"  - {arg}")
@@ -348,21 +437,23 @@ class ArtemisCrewTool:
             def _run(
                 self,
                 topic: str,
-                pro_position: str = "supports the proposition",
-                con_position: str = "opposes the proposition",
+                agents: list[dict] | None = None,
+                pro_position: str | None = None,
+                con_position: str | None = None,
                 rounds: int = 3,
             ) -> str:
-                return tool_instance.run(topic, pro_position, con_position, rounds)
+                return tool_instance.run(topic, agents, pro_position, con_position, rounds)
 
             async def _arun(
                 self,
                 topic: str,
-                pro_position: str = "supports the proposition",
-                con_position: str = "opposes the proposition",
+                agents: list[dict] | None = None,
+                pro_position: str | None = None,
+                con_position: str | None = None,
                 rounds: int = 3,
             ) -> str:
                 return await tool_instance.arun(
-                    topic, pro_position, con_position, rounds
+                    topic, agents, pro_position, con_position, rounds
                 )
 
         return ArtemisDebateTool()
@@ -384,15 +475,18 @@ class ArtemisCrewTool:
                         "type": "string",
                         "description": "The debate topic or question.",
                     },
-                    "pro_position": {
-                        "type": "string",
-                        "description": "The position for the pro-side agent.",
-                        "default": "supports the proposition",
-                    },
-                    "con_position": {
-                        "type": "string",
-                        "description": "The position for the con-side agent.",
-                        "default": "opposes the proposition",
+                    "agents": {
+                        "type": "array",
+                        "description": "List of agent configurations.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                                "role": {"type": "string"},
+                                "position": {"type": "string"},
+                            },
+                            "required": ["name", "role"],
+                        },
                     },
                     "rounds": {
                         "type": "integer",
@@ -471,6 +565,7 @@ class DebateAnalyzer:
             # Single comprehensive debate
             result = await self._tool._run_debate(
                 topic=decision,
+                agent_configs=None,
                 pro_position="recommends this course of action",
                 con_position="recommends against this course of action",
                 rounds=self.rounds,
@@ -488,6 +583,7 @@ class DebateAnalyzer:
             topic = f"{decision} - focusing on {aspect}"
             result = await self._tool._run_debate(
                 topic=topic,
+                agent_configs=None,
                 pro_position=f"argues {aspect} supports this decision",
                 con_position=f"argues {aspect} opposes this decision",
                 rounds=self.rounds,

@@ -1,18 +1,20 @@
-# Streaming Output
+# Working with Debate Results
 
-This example demonstrates how to stream debate progress in real-time for better user experience.
+This example demonstrates how to work with ARTEMIS debate results and implement progress tracking patterns.
 
-## Basic Streaming
+> **Note**: Real-time streaming of debate turns is a planned feature. Currently, debates run asynchronously and return complete results. The patterns below show how to work effectively with the async API.
+
+## Basic Async Execution
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 
-async def stream_basic_debate():
+async def run_basic_debate():
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(name="pro", role="Proposition advocate", model="gpt-4o"),
+        Agent(name="con", role="Opposition advocate", model="gpt-4o"),
     ]
 
     debate = Debate(
@@ -28,288 +30,167 @@ async def stream_basic_debate():
 
     print("DEBATE: Return to Office")
     print("=" * 60)
+    print("Running debate... (this may take a moment)")
 
-    # Stream each turn as it happens
-    async for turn in debate.stream():
+    # Run the debate - returns complete result
+    result = await debate.run()
+
+    # Process results after completion
+    print(f"\nCompleted {len(result.transcript)} turns")
+
+    for turn in result.transcript:
         print(f"\n[Round {turn.round}] {turn.agent.upper()}")
         print("-" * 40)
-        print(turn.argument.content)
+        print(turn.argument.content[:300] + "..." if len(turn.argument.content) > 300 else turn.argument.content)
 
         if turn.evaluation:
             print(f"\n  Score: {turn.evaluation.total_score:.1f}/10")
 
-    # Get final verdict
-    result = await debate.get_result()
     print("\n" + "=" * 60)
     print(f"VERDICT: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
     print(f"\n{result.verdict.reasoning}")
 
-asyncio.run(stream_basic_debate())
+asyncio.run(run_basic_debate())
 ```
 
-## Streaming with Progress Indicators
+## Running Multiple Debates Concurrently
 
 ```python
 import asyncio
-import sys
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 
-async def stream_with_progress():
+async def run_single_debate(topic: str, debate_id: int) -> dict:
+    """Run a single debate and return results."""
     agents = [
-        Agent(name="advocate", model="gpt-4o"),
-        Agent(name="critic", model="gpt-4o"),
+        Agent(name="pro", role="Advocate", model="gpt-4o"),
+        Agent(name="con", role="Critic", model="gpt-4o"),
     ]
 
-    debate = Debate(
-        topic="Is blockchain technology overhyped?",
-        agents=agents,
-        rounds=3,
-    )
-
+    debate = Debate(topic=topic, agents=agents, rounds=2)
     debate.assign_positions({
-        "advocate": "argues blockchain is transformative",
-        "critic": "argues blockchain is overhyped",
+        "pro": "supports the proposition",
+        "con": "opposes the proposition",
     })
 
-    total_turns = len(agents) * 3  # agents * rounds
-    current_turn = 0
+    print(f"[Debate {debate_id}] Starting: {topic[:40]}...")
+    result = await debate.run()
+    print(f"[Debate {debate_id}] Completed: {result.verdict.decision}")
 
-    def print_progress(current: int, total: int, agent: str, status: str):
-        bar_length = 30
-        filled = int(bar_length * current / total)
-        bar = "█" * filled + "░" * (bar_length - filled)
-        percent = current / total * 100
-        sys.stdout.write(f"\r[{bar}] {percent:.0f}% - {agent}: {status}")
-        sys.stdout.flush()
+    return {
+        "id": debate_id,
+        "topic": topic,
+        "verdict": result.verdict.decision,
+        "confidence": result.verdict.confidence,
+    }
 
-    print("Starting debate...\n")
+async def run_parallel_debates():
+    """Run multiple debates concurrently."""
+    topics = [
+        "Should AI development be open-sourced?",
+        "Is blockchain technology overhyped?",
+        "Should programming be taught in elementary schools?",
+    ]
 
-    async for event in debate.stream_events():
-        if event.type == "turn_start":
-            current_turn += 1
-            print_progress(current_turn, total_turns, event.agent, "thinking...")
+    print("Starting parallel debates...")
+    print("=" * 60)
 
-        elif event.type == "turn_progress":
-            print_progress(current_turn, total_turns, event.agent, "generating...")
+    # Run all debates concurrently
+    tasks = [
+        run_single_debate(topic, i)
+        for i, topic in enumerate(topics, 1)
+    ]
 
-        elif event.type == "turn_complete":
-            print_progress(current_turn, total_turns, event.agent, "done ✓")
-            print()  # New line after progress bar
+    results = await asyncio.gather(*tasks)
 
-            # Print the argument
-            print(f"\n{event.agent.upper()}:")
-            print(event.turn.argument.content[:300] + "...")
+    print("\n" + "=" * 60)
+    print("ALL RESULTS:")
+    for r in results:
+        print(f"\nDebate {r['id']}: {r['topic'][:40]}...")
+        print(f"  Verdict: {r['verdict']} ({r['confidence']:.0%} confidence)")
 
-        elif event.type == "evaluation_complete":
-            print(f"  → Score: {event.evaluation.total_score:.1f}/10")
-
-        elif event.type == "round_complete":
-            print(f"\n--- Round {event.round} Complete ---\n")
-
-        elif event.type == "deliberation_start":
-            print("\n🎓 Jury deliberating...")
-
-        elif event.type == "verdict_complete":
-            print(f"\n✅ Verdict: {event.verdict.decision}")
-
-    result = await debate.get_result()
-    print(f"\nFinal reasoning: {result.verdict.reasoning}")
-
-asyncio.run(stream_with_progress())
+asyncio.run(run_parallel_debates())
 ```
 
-## Streaming with Callbacks
+## Progress Tracking with Task Wrapper
 
 ```python
 import asyncio
+import time
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.types import Turn, Evaluation, Verdict
 
-class DebateStreamHandler:
-    """Handler for debate streaming events."""
+class DebateRunner:
+    """Wrapper for running debates with progress tracking."""
 
-    def __init__(self):
-        self.turns = []
+    def __init__(self, topic: str, agents: list[Agent], rounds: int = 3):
+        self.topic = topic
+        self.debate = Debate(topic=topic, agents=agents, rounds=rounds)
         self.start_time = None
+        self.end_time = None
 
-    async def on_debate_start(self, topic: str, agents: list[str]):
-        import time
+    async def run_with_progress(self, positions: dict[str, str]) -> dict:
+        """Run debate and track timing."""
+        self.debate.assign_positions(positions)
+
         self.start_time = time.time()
-        print(f"🎬 Debate starting: {topic}")
-        print(f"   Participants: {', '.join(agents)}")
+        print(f"Starting debate on: {self.topic[:50]}...")
 
-    async def on_round_start(self, round_num: int):
-        print(f"\n📍 Round {round_num}")
+        result = await self.debate.run()
 
-    async def on_turn_start(self, agent: str, round_num: int):
-        print(f"   {agent} is formulating argument...", end="", flush=True)
+        self.end_time = time.time()
+        duration = self.end_time - self.start_time
 
-    async def on_turn_complete(self, turn: Turn):
-        print(" done!")
-        self.turns.append(turn)
+        return {
+            "result": result,
+            "duration_seconds": duration,
+            "turns": len(result.transcript),
+            "turns_per_second": len(result.transcript) / duration if duration > 0 else 0,
+        }
 
-        # Show preview of argument
-        preview = turn.argument.content[:100].replace("\n", " ")
-        print(f"   └─ \"{preview}...\"")
-
-    async def on_evaluation_complete(self, agent: str, evaluation: Evaluation):
-        scores = evaluation.scores
-        print(f"   └─ Scores: Logic={scores.get('logical_coherence', 0):.1f}, "
-              f"Evidence={scores.get('evidence_quality', 0):.1f}")
-
-    async def on_deliberation_start(self):
-        print("\n⚖️  Jury deliberating...")
-
-    async def on_verdict(self, verdict: Verdict):
-        import time
-        duration = time.time() - self.start_time
-        print(f"\n🏆 VERDICT: {verdict.decision.upper()}")
-        print(f"   Confidence: {verdict.confidence:.0%}")
-        print(f"   Duration: {duration:.1f}s")
-
-    async def on_safety_alert(self, alert):
-        print(f"\n⚠️  Safety Alert: {alert.type} (severity: {alert.severity:.2f})")
-
-
-async def stream_with_callbacks():
-    handler = DebateStreamHandler()
-
+async def main():
     agents = [
-        Agent(name="optimist", model="gpt-4o"),
-        Agent(name="realist", model="gpt-4o"),
+        Agent(name="optimist", role="Technology optimist", model="gpt-4o"),
+        Agent(name="realist", role="Pragmatic realist", model="gpt-4o"),
     ]
 
-    debate = Debate(
+    runner = DebateRunner(
         topic="Will AGI be achieved within 10 years?",
         agents=agents,
         rounds=2,
     )
 
-    debate.assign_positions({
+    stats = await runner.run_with_progress({
         "optimist": "believes AGI will be achieved within 10 years",
         "realist": "believes AGI is further away than optimists think",
     })
 
-    # Register callbacks
-    debate.on("debate_start", handler.on_debate_start)
-    debate.on("round_start", handler.on_round_start)
-    debate.on("turn_start", handler.on_turn_start)
-    debate.on("turn_complete", handler.on_turn_complete)
-    debate.on("evaluation_complete", handler.on_evaluation_complete)
-    debate.on("deliberation_start", handler.on_deliberation_start)
-    debate.on("verdict", handler.on_verdict)
-    debate.on("safety_alert", handler.on_safety_alert)
+    print(f"\nDebate completed in {stats['duration_seconds']:.1f}s")
+    print(f"Total turns: {stats['turns']}")
+    print(f"Verdict: {stats['result'].verdict.decision}")
 
-    result = await debate.run()
-
-    print(f"\n📊 Summary: {len(handler.turns)} turns completed")
-
-asyncio.run(stream_with_callbacks())
+asyncio.run(main())
 ```
 
-## Streaming to Web Interface
+## Processing Results with Rich Console
 
 ```python
 import asyncio
-import json
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 
-async def stream_to_websocket(websocket):
-    """Stream debate events to a WebSocket connection."""
-
-    agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
-    ]
-
-    debate = Debate(
-        topic="Should AI development be open-sourced?",
-        agents=agents,
-        rounds=2,
-    )
-
-    debate.assign_positions({
-        "pro": "supports open-source AI development",
-        "con": "supports controlled AI development",
-    })
-
-    async for event in debate.stream_events():
-        # Send event to WebSocket client
-        message = {
-            "type": event.type,
-            "data": event.to_dict(),
-            "timestamp": event.timestamp.isoformat(),
-        }
-
-        await websocket.send(json.dumps(message))
-
-        # Handle specific event types
-        if event.type == "turn_complete":
-            # Also send structured argument data
-            arg_message = {
-                "type": "argument",
-                "agent": event.agent,
-                "round": event.turn.round,
-                "level": event.turn.argument.level,
-                "content": event.turn.argument.content,
-                "evidence": [
-                    {"type": e.type, "source": e.source}
-                    for e in event.turn.argument.evidence
-                ],
-            }
-            await websocket.send(json.dumps(arg_message))
-
-        elif event.type == "verdict_complete":
-            # Send final verdict
-            verdict_message = {
-                "type": "final_verdict",
-                "decision": event.verdict.decision,
-                "confidence": event.verdict.confidence,
-                "reasoning": event.verdict.reasoning,
-            }
-            await websocket.send(json.dumps(verdict_message))
-
-
-# Example FastAPI integration
-"""
-from fastapi import FastAPI, WebSocket
-from fastapi.websockets import WebSocketDisconnect
-
-app = FastAPI()
-
-@app.websocket("/debate/stream")
-async def debate_stream(websocket: WebSocket):
-    await websocket.accept()
-    try:
-        await stream_to_websocket(websocket)
-    except WebSocketDisconnect:
-        pass
-"""
-```
-
-## Streaming with Rich Console
-
-```python
-import asyncio
+# Install: pip install rich
 from rich.console import Console
-from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn
-
-from artemis.core.agent import Agent
-from artemis.core.debate import Debate
 
 console = Console()
 
-async def stream_with_rich():
+async def run_rich_debate():
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(name="pro", role="Cryptocurrency advocate", model="gpt-4o"),
+        Agent(name="con", role="Traditional finance advocate", model="gpt-4o"),
     ]
 
     debate = Debate(
@@ -326,109 +207,151 @@ async def stream_with_rich():
     console.print(Panel.fit(
         "[bold blue]ARTEMIS Debate[/bold blue]\n"
         f"Topic: {debate.topic}",
-        title="🎯 Starting Debate"
+        title="Starting Debate"
     ))
 
-    current_round = 0
+    with console.status("[cyan]Running debate...[/cyan]"):
+        result = await debate.run()
 
-    async for event in debate.stream_events():
-        if event.type == "round_start":
-            current_round = event.round
-            console.print(f"\n[bold yellow]━━━ Round {current_round} ━━━[/bold yellow]")
+    # Display results with rich formatting
+    for turn in result.transcript:
+        agent_color = "green" if turn.agent == "pro" else "red"
+        panel = Panel(
+            turn.argument.content,
+            title=f"[bold {agent_color}]Round {turn.round} - {turn.agent.upper()}[/bold {agent_color}]",
+            subtitle=f"Level: {turn.argument.level.value}",
+            border_style=agent_color,
+        )
+        console.print(panel)
 
-        elif event.type == "turn_start":
-            with console.status(f"[cyan]{event.agent}[/cyan] is thinking..."):
-                # Wait for turn to complete
-                pass
+        if turn.argument.evidence:
+            table = Table(title="Evidence", show_header=True)
+            table.add_column("Type")
+            table.add_column("Source")
+            for e in turn.argument.evidence[:3]:
+                table.add_row(e.type, e.source)
+            console.print(table)
 
-        elif event.type == "turn_complete":
-            # Create argument panel
-            agent_color = "green" if event.agent == "pro" else "red"
-            panel = Panel(
-                event.turn.argument.content,
-                title=f"[bold {agent_color}]{event.agent.upper()}[/bold {agent_color}]",
-                subtitle=f"Level: {event.turn.argument.level}",
-                border_style=agent_color,
-            )
-            console.print(panel)
+    # Verdict
+    verdict = result.verdict
+    decision_color = "green" if "pro" in verdict.decision else "red" if "con" in verdict.decision else "yellow"
 
-            # Show evidence if any
-            if event.turn.argument.evidence:
-                table = Table(title="Evidence", show_header=True)
-                table.add_column("Type")
-                table.add_column("Source")
-                for e in event.turn.argument.evidence[:3]:
-                    table.add_row(e.type, e.source)
-                console.print(table)
+    console.print(Panel(
+        f"[bold {decision_color}]{verdict.decision.upper()}[/bold {decision_color}]\n\n"
+        f"Confidence: {verdict.confidence:.0%}\n\n"
+        f"{verdict.reasoning}",
+        title="Final Verdict",
+        border_style=decision_color,
+    ))
 
-        elif event.type == "evaluation_complete":
-            score = event.evaluation.total_score
-            score_color = "green" if score >= 7 else "yellow" if score >= 5 else "red"
-            console.print(f"  [dim]Score:[/dim] [{score_color}]{score:.1f}/10[/{score_color}]")
-
-        elif event.type == "deliberation_start":
-            console.print("\n[bold magenta]🎓 Jury Deliberation[/bold magenta]")
-
-        elif event.type == "verdict_complete":
-            verdict = event.verdict
-            decision_color = "green" if verdict.decision == "pro" else "red" if verdict.decision == "con" else "yellow"
-
-            console.print(Panel(
-                f"[bold {decision_color}]{verdict.decision.upper()}[/bold {decision_color}]\n\n"
-                f"Confidence: {verdict.confidence:.0%}\n\n"
-                f"{verdict.reasoning}",
-                title="🏆 Final Verdict",
-                border_style=decision_color,
-            ))
-
-asyncio.run(stream_with_rich())
+asyncio.run(run_rich_debate())
 ```
 
-## Streaming in LangGraph
+## LangGraph Integration for Step-by-Step Execution
+
+For step-by-step execution with intermediate state access, use the LangGraph integration:
 
 ```python
 import asyncio
-from artemis.integrations import create_debate_workflow
+from artemis.integrations.langgraph import create_debate_workflow
 
-async def stream_langgraph_debate():
+async def run_stepwise_debate():
+    # Create step-by-step workflow
     workflow = create_debate_workflow(
         model="gpt-4o",
-        rounds=2,
-        enable_safety=True,
+        step_by_step=True,
     )
 
-    app = workflow.compile()
+    initial_state = {
+        "topic": "Should we adopt microservices architecture?",
+        "agents": [
+            {"name": "architect", "role": "System Architect", "position": "pro microservices"},
+            {"name": "pragmatist", "role": "Senior Dev", "position": "pro monolith"},
+        ],
+        "rounds": 2,
+    }
 
-    print("Starting LangGraph debate stream...")
-    print("=" * 60)
+    print("Starting stepwise debate...")
 
-    async for event in app.astream(
-        {"topic": "Should we adopt microservices architecture?"},
-        stream_mode="values",  # Stream state updates
-    ):
-        if "current_round" in event:
-            print(f"\n📍 Round {event['current_round']}")
+    # In LangGraph, you can checkpoint and observe state between steps
+    result = await workflow.ainvoke(initial_state)
 
-        if "transcript" in event:
-            transcript = event["transcript"]
-            if transcript:
-                latest = transcript[-1]
-                print(f"\n{latest['agent'].upper()}:")
-                print(f"{latest['argument']['content'][:200]}...")
+    print(f"\nPhase: {result['phase']}")
+    print(f"Verdict: {result['verdict']['decision']}")
+    print(f"Confidence: {result['verdict']['confidence']:.0%}")
 
-        if "verdict" in event and event["verdict"]:
-            verdict = event["verdict"]
-            print(f"\n🏆 Verdict: {verdict['decision']}")
-            print(f"Confidence: {verdict['confidence']:.0%}")
-
-        if "safety_alerts" in event and event["safety_alerts"]:
-            for alert in event["safety_alerts"]:
-                print(f"\n⚠️ Safety: {alert['type']}")
-
-asyncio.run(stream_langgraph_debate())
+asyncio.run(run_stepwise_debate())
 ```
 
-## Buffered Streaming for Slow Connections
+## Sending Results to WebSocket
+
+```python
+import asyncio
+import json
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+
+async def run_debate_for_websocket(topic: str) -> dict:
+    """Run debate and format for WebSocket transmission."""
+    agents = [
+        Agent(name="pro", role="Advocate", model="gpt-4o"),
+        Agent(name="con", role="Critic", model="gpt-4o"),
+    ]
+
+    debate = Debate(topic=topic, agents=agents, rounds=2)
+    debate.assign_positions({
+        "pro": "supports the proposition",
+        "con": "opposes the proposition",
+    })
+
+    result = await debate.run()
+
+    # Format for JSON transmission
+    return {
+        "type": "debate_complete",
+        "topic": topic,
+        "transcript": [
+            {
+                "round": turn.round,
+                "agent": turn.agent,
+                "level": turn.argument.level.value,
+                "content": turn.argument.content,
+                "score": turn.evaluation.total_score if turn.evaluation else None,
+            }
+            for turn in result.transcript
+        ],
+        "verdict": {
+            "decision": result.verdict.decision,
+            "confidence": result.verdict.confidence,
+            "reasoning": result.verdict.reasoning,
+        },
+    }
+
+# Example FastAPI endpoint
+"""
+from fastapi import FastAPI, WebSocket
+
+app = FastAPI()
+
+@app.websocket("/debate")
+async def debate_endpoint(websocket: WebSocket):
+    await websocket.accept()
+
+    data = await websocket.receive_json()
+    topic = data.get("topic", "Default topic")
+
+    # Send start message
+    await websocket.send_json({"type": "debate_started", "topic": topic})
+
+    # Run debate
+    result = await run_debate_for_websocket(topic)
+
+    # Send complete result
+    await websocket.send_json(result)
+"""
+```
+
+## Buffering Results for Late Consumers
 
 ```python
 import asyncio
@@ -436,44 +359,45 @@ from collections import deque
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 
-class BufferedStreamer:
-    """Buffer events for slow consumers."""
+class DebateResultBuffer:
+    """Buffer debate results for consumers that join late."""
 
-    def __init__(self, max_buffer: int = 100):
-        self.buffer = deque(maxlen=max_buffer)
+    def __init__(self, max_size: int = 100):
+        self.buffer = deque(maxlen=max_size)
         self.consumers = []
 
-    async def add_event(self, event):
-        self.buffer.append(event)
+    def add_result(self, result: dict):
+        """Add a result to the buffer."""
+        self.buffer.append(result)
 
         # Notify all consumers
         for consumer in self.consumers:
             try:
-                await consumer(event)
+                consumer(result)
             except Exception as e:
                 print(f"Consumer error: {e}")
 
     def add_consumer(self, callback):
+        """Add a consumer callback."""
         self.consumers.append(callback)
 
-    def get_buffered_events(self):
-        """Get all buffered events (for late joiners)."""
+    def get_all(self) -> list[dict]:
+        """Get all buffered results."""
         return list(self.buffer)
 
+async def main():
+    buffer = DebateResultBuffer()
 
-async def stream_with_buffer():
-    streamer = BufferedStreamer()
+    # Add a simple consumer
+    def print_consumer(result):
+        print(f"New result: {result['verdict']}")
 
-    # Add a consumer
-    async def print_consumer(event):
-        if event["type"] == "turn_complete":
-            print(f"[{event['agent']}] {event['content'][:50]}...")
+    buffer.add_consumer(print_consumer)
 
-    streamer.add_consumer(print_consumer)
-
+    # Run a debate
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(name="pro", role="Advocate", model="gpt-4o"),
+        Agent(name="con", role="Critic", model="gpt-4o"),
     ]
 
     debate = Debate(
@@ -481,32 +405,30 @@ async def stream_with_buffer():
         agents=agents,
         rounds=2,
     )
-
     debate.assign_positions({
         "pro": "argues remote work is more productive",
         "con": "argues office work is more productive",
     })
 
-    async for event in debate.stream_events():
-        await streamer.add_event({
-            "type": event.type,
-            "agent": getattr(event, "agent", None),
-            "content": getattr(event.turn.argument, "content", None)
-                       if hasattr(event, "turn") else None,
-            "timestamp": event.timestamp.isoformat(),
-        })
+    result = await debate.run()
 
-    # Late joiner can get buffered events
-    print("\n--- Buffered Events ---")
-    for event in streamer.get_buffered_events():
-        if event["type"] == "turn_complete":
-            print(f"Buffered: [{event['agent']}]")
+    # Add to buffer
+    buffer.add_result({
+        "topic": debate.topic,
+        "verdict": result.verdict.decision,
+        "confidence": result.verdict.confidence,
+    })
 
-asyncio.run(stream_with_buffer())
+    # Late consumer can get buffered results
+    print("\nBuffered results:")
+    for r in buffer.get_all():
+        print(f"  {r['topic'][:30]}... -> {r['verdict']}")
+
+asyncio.run(main())
 ```
 
 ## Next Steps
 
 - See [Basic Debate](basic-debate.md) for fundamentals
-- Explore [LangGraph Workflow](langgraph-workflow.md) for graph-based streaming
-- Add [Safety Monitors](safety-monitors.md) with streamed alerts
+- Explore [LangGraph Workflow](langgraph-workflow.md) for step-by-step execution
+- Add [Safety Monitors](safety-monitors.md) to track debate safety

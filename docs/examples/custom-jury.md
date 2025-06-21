@@ -2,59 +2,35 @@
 
 This example demonstrates how to create custom jury configurations for specialized evaluation needs.
 
-## Basic Custom Jury
+## Basic Jury Panel
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_with_custom_jury():
-    # Define custom perspectives
-    technical_perspective = Perspective(
-        name="technical",
-        description="Evaluates technical accuracy and feasibility",
-        criteria_adjustments={
-            "evidence_quality": 1.5,      # 50% more weight
-            "logical_coherence": 1.3,
-            "ethical_considerations": 0.7,  # 30% less weight
-        },
-    )
-
-    business_perspective = Perspective(
-        name="business",
-        description="Evaluates business viability and ROI",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "evidence_quality": 1.2,
-            "ethical_considerations": 0.8,
-        },
-    )
-
-    user_perspective = Perspective(
-        name="user_advocate",
-        description="Evaluates user experience and accessibility",
-        criteria_adjustments={
-            "ethical_considerations": 1.5,
-            "argument_strength": 1.2,
-            "evidence_quality": 0.9,
-        },
-    )
-
-    # Create jury with custom perspectives
-    jury = Jury(
-        members=[
-            JuryMember(name="tech_lead", perspective=technical_perspective),
-            JuryMember(name="product_manager", perspective=business_perspective),
-            JuryMember(name="ux_researcher", perspective=user_perspective),
-        ],
-        voting="simple_majority",
+    # Create a jury panel with 5 evaluators
+    # JuryPanel automatically assigns perspectives from the JuryPerspective enum:
+    # ANALYTICAL, ETHICAL, PRACTICAL, ADVERSARIAL, SYNTHESIZING
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,  # 70% agreement needed for consensus
     )
 
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(
+            name="pro",
+            role="Framework migration advocate",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="con",
+            role="Current framework defender",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -71,91 +47,126 @@ async def run_with_custom_jury():
 
     result = await debate.run()
 
-    print("CUSTOM JURY VERDICT")
+    print("JURY PANEL VERDICT")
     print("=" * 60)
     print(f"\nDecision: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-    print("\nINDIVIDUAL JURY VOTES:")
-    for vote in result.verdict.votes:
-        print(f"\n  {vote.juror} ({vote.decision}):")
-        print(f"    Confidence: {vote.confidence:.0%}")
-        print(f"    Reasoning: {vote.reasoning[:150]}...")
+    # Show score breakdown
+    if result.verdict.score_breakdown:
+        print("\nScore Breakdown:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
+
+    # Show dissenting opinions if any
+    if result.verdict.dissenting_opinions:
+        print("\nDissenting Opinions:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"\n  {dissent.juror_id} ({dissent.perspective.value}):")
+            print(f"    Position: {dissent.position}")
+            print(f"    Reasoning: {dissent.reasoning[:150]}...")
+
+    print(f"\nReasoning:\n{result.verdict.reasoning}")
 
 asyncio.run(run_with_custom_jury())
 ```
 
-## Domain-Specific Jury
-
-Create a jury tailored to a specific domain:
+## Different Panel Sizes
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
-async def create_medical_jury():
-    """Jury for evaluating medical/healthcare debates."""
+async def compare_panel_sizes():
+    """Compare verdicts with different jury sizes."""
+    topic = "Should AI-generated content require disclosure?"
 
-    clinical_perspective = Perspective(
-        name="clinical",
-        description="Evaluates clinical evidence and patient outcomes",
-        criteria_adjustments={
-            "evidence_quality": 2.0,       # Double weight on evidence
-            "causal_validity": 1.5,
-            "logical_coherence": 1.2,
-            "argument_strength": 0.8,
-        },
-        required_evidence=["clinical_trial", "peer_reviewed", "meta_analysis"],
+    results = {}
+
+    for size in [3, 5, 7]:
+        jury = JuryPanel(
+            evaluators=size,
+            model="gpt-4o",
+            consensus_threshold=0.6,
+        )
+
+        agents = [
+            Agent(name="pro", role="Disclosure advocate", model="gpt-4o"),
+            Agent(name="con", role="Free speech advocate", model="gpt-4o"),
+        ]
+
+        debate = Debate(
+            topic=topic,
+            agents=agents,
+            rounds=2,
+            jury=jury,
+        )
+
+        debate.assign_positions({
+            "pro": "supports mandatory AI content disclosure",
+            "con": "opposes mandatory disclosure requirements",
+        })
+
+        result = await debate.run()
+
+        results[size] = {
+            "decision": result.verdict.decision,
+            "confidence": result.verdict.confidence,
+            "unanimous": result.verdict.unanimous,
+            "dissent_count": len(result.verdict.dissenting_opinions),
+        }
+
+    print("JURY SIZE COMPARISON")
+    print("=" * 60)
+    for size, data in results.items():
+        print(f"\n{size} Jurors:")
+        print(f"  Decision: {data['decision']}")
+        print(f"  Confidence: {data['confidence']:.0%}")
+        print(f"  Unanimous: {data['unanimous']}")
+        print(f"  Dissenting: {data['dissent_count']}")
+
+asyncio.run(compare_panel_sizes())
+```
+
+## Custom Criteria
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+
+async def run_with_custom_criteria():
+    # Define custom evaluation criteria
+    medical_criteria = [
+        "clinical_evidence",
+        "patient_safety",
+        "ethical_alignment",
+        "implementation_feasibility",
+        "cost_effectiveness",
+    ]
+
+    jury = JuryPanel(
+        evaluators=5,
+        criteria=medical_criteria,
+        model="gpt-4o",
+        consensus_threshold=0.75,  # Higher threshold for medical decisions
     )
-
-    ethical_perspective = Perspective(
-        name="bioethics",
-        description="Evaluates ethical implications and patient rights",
-        criteria_adjustments={
-            "ethical_considerations": 2.0,
-            "argument_strength": 1.0,
-            "evidence_quality": 1.0,
-        },
-    )
-
-    practical_perspective = Perspective(
-        name="healthcare_admin",
-        description="Evaluates implementation feasibility and costs",
-        criteria_adjustments={
-            "argument_strength": 1.3,
-            "evidence_quality": 1.1,
-            "ethical_considerations": 1.0,
-        },
-    )
-
-    patient_perspective = Perspective(
-        name="patient_advocate",
-        description="Evaluates patient experience and accessibility",
-        criteria_adjustments={
-            "ethical_considerations": 1.5,
-            "argument_strength": 1.3,
-            "evidence_quality": 0.9,
-        },
-    )
-
-    return Jury(
-        members=[
-            JuryMember(name="physician", perspective=clinical_perspective, weight=1.5),
-            JuryMember(name="ethicist", perspective=ethical_perspective, weight=1.2),
-            JuryMember(name="administrator", perspective=practical_perspective, weight=1.0),
-            JuryMember(name="patient_rep", perspective=patient_perspective, weight=1.0),
-        ],
-        voting="weighted",
-    )
-
-async def run_medical_debate():
-    jury = await create_medical_jury()
 
     agents = [
-        Agent(name="advocate", model="gpt-4o"),
-        Agent(name="skeptic", model="gpt-4o"),
+        Agent(
+            name="advocate",
+            role="Medical technology advocate",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="skeptic",
+            role="Clinical safety reviewer",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -175,70 +186,36 @@ async def run_medical_debate():
     print("MEDICAL PANEL VERDICT")
     print("=" * 60)
     print(f"\nDecision: {result.verdict.decision}")
-    print(f"Clinical Confidence: {result.verdict.confidence:.0%}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-    print("\nPANEL VOTES (weighted):")
-    for vote in result.verdict.votes:
-        print(f"  {vote.juror}: {vote.decision} ({vote.confidence:.0%})")
+    if result.verdict.score_breakdown:
+        print("\nAgent Scores (across all criteria):")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
 
-asyncio.run(run_medical_debate())
+asyncio.run(run_with_custom_criteria())
 ```
 
-## Legal Jury
+## High Consensus Threshold
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
-async def create_legal_jury():
-    """Jury for evaluating legal/policy debates."""
-
-    constitutional_perspective = Perspective(
-        name="constitutional",
-        description="Evaluates constitutional and legal precedent",
-        criteria_adjustments={
-            "logical_coherence": 1.8,
-            "evidence_quality": 1.5,
-            "causal_validity": 1.3,
-        },
+async def run_high_consensus_debate():
+    # High threshold for consensus - useful for critical decisions
+    jury = JuryPanel(
+        evaluators=7,
+        model="gpt-4o",
+        consensus_threshold=0.85,  # Require 85% agreement
     )
-
-    rights_perspective = Perspective(
-        name="civil_rights",
-        description="Evaluates civil liberties and individual rights",
-        criteria_adjustments={
-            "ethical_considerations": 1.8,
-            "logical_coherence": 1.2,
-        },
-    )
-
-    practical_perspective = Perspective(
-        name="enforcement",
-        description="Evaluates enforcement feasibility",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "evidence_quality": 1.2,
-        },
-    )
-
-    return Jury(
-        members=[
-            JuryMember(name="constitutional_scholar", perspective=constitutional_perspective),
-            JuryMember(name="civil_rights_attorney", perspective=rights_perspective),
-            JuryMember(name="law_enforcement", perspective=practical_perspective),
-        ],
-        voting="supermajority",
-        threshold=0.67,
-    )
-
-async def run_legal_debate():
-    jury = await create_legal_jury()
 
     agents = [
-        Agent(name="prosecution", model="gpt-4o"),
-        Agent(name="defense", model="gpt-4o"),
+        Agent(name="prosecution", role="Security advocate", model="gpt-4o"),
+        Agent(name="defense", role="Privacy advocate", model="gpt-4o"),
     ]
 
     debate = Debate(
@@ -255,167 +232,103 @@ async def run_legal_debate():
 
     result = await debate.run()
 
-    print("LEGAL PANEL RULING")
+    print("HIGH-CONSENSUS VERDICT")
     print("=" * 60)
-    print(f"\nRuling: {result.verdict.decision}")
-    print(f"Supermajority reached: {result.verdict.confidence >= 0.67}")
-    print(f"\nLegal reasoning:\n{result.verdict.reasoning}")
+    print(f"\nDecision: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Consensus threshold: 85%")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-asyncio.run(run_legal_debate())
+    if result.verdict.confidence < 0.85:
+        print("\nNote: Consensus threshold not met - decision may require further deliberation")
+
+    print(f"\nReasoning:\n{result.verdict.reasoning}")
+
+asyncio.run(run_high_consensus_debate())
 ```
 
-## Academic Peer Review Jury
+## Accessing Jury Perspectives
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
+from artemis.core.types import JuryPerspective
 
-async def create_academic_jury():
-    """Jury simulating academic peer review."""
-
-    methodology_perspective = Perspective(
-        name="methodology",
-        description="Evaluates research methodology and rigor",
-        criteria_adjustments={
-            "evidence_quality": 2.0,
-            "causal_validity": 1.8,
-            "logical_coherence": 1.5,
-            "argument_strength": 0.7,
-        },
+async def examine_perspectives():
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
     )
 
-    theory_perspective = Perspective(
-        name="theoretical",
-        description="Evaluates theoretical contribution and novelty",
-        criteria_adjustments={
-            "logical_coherence": 1.8,
-            "argument_strength": 1.5,
-            "evidence_quality": 1.0,
-        },
-    )
-
-    impact_perspective = Perspective(
-        name="impact",
-        description="Evaluates practical impact and significance",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "ethical_considerations": 1.3,
-            "evidence_quality": 1.0,
-        },
-    )
-
-    return Jury(
-        members=[
-            JuryMember(name="reviewer_1", perspective=methodology_perspective),
-            JuryMember(name="reviewer_2", perspective=theory_perspective),
-            JuryMember(name="reviewer_3", perspective=impact_perspective),
-        ],
-        voting="unanimous",  # All reviewers must agree for acceptance
-    )
-
-async def run_academic_debate():
-    jury = await create_academic_jury()
+    # Show what perspectives are assigned
+    print("JURY PERSPECTIVES")
+    print("-" * 40)
+    perspectives = jury.get_perspectives()
+    for i, perspective in enumerate(perspectives):
+        print(f"Juror {i}: {perspective.value}")
+        # JuryPerspective values: analytical, ethical, practical, adversarial, synthesizing
 
     agents = [
-        Agent(name="proponent", model="gpt-4o"),
-        Agent(name="challenger", model="gpt-4o"),
+        Agent(name="pro", role="Tech advocate", model="gpt-4o"),
+        Agent(name="con", role="Tech skeptic", model="gpt-4o"),
     ]
 
     debate = Debate(
-        topic="Does the evidence support that transformer models exhibit emergent reasoning?",
+        topic="Should we adopt microservices architecture?",
         agents=agents,
         rounds=2,
         jury=jury,
     )
 
     debate.assign_positions({
-        "proponent": "argues transformers exhibit genuine emergent reasoning capabilities",
-        "challenger": "argues apparent reasoning is sophisticated pattern matching, not emergence",
+        "pro": "supports microservices adoption",
+        "con": "supports monolithic architecture",
     })
 
     result = await debate.run()
 
-    print("PEER REVIEW DECISION")
-    print("=" * 60)
-    print(f"\nDecision: {result.verdict.decision}")
-    print(f"Unanimous: {result.verdict.was_unanimous}")
+    print(f"\nVerdict: {result.verdict.decision}")
 
-    print("\nREVIEWER COMMENTS:")
-    for vote in result.verdict.votes:
-        print(f"\n{vote.juror}:")
-        print(f"  Recommendation: {vote.decision}")
-        print(f"  Comments: {vote.reasoning[:200]}...")
+    # Examine dissenting opinions by perspective
+    if result.verdict.dissenting_opinions:
+        print("\nDissents by Perspective:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"  {dissent.perspective.value}: preferred {dissent.position}")
+            print(f"    Score deviation: {dissent.score_deviation:.2f}")
 
-asyncio.run(run_academic_debate())
+asyncio.run(examine_perspectives())
 ```
 
-## Investment Committee Jury
+## Investment Committee Pattern
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
-
-async def create_investment_jury():
-    """Jury for investment decisions."""
-
-    financial_perspective = Perspective(
-        name="financial",
-        description="Evaluates financial metrics and returns",
-        criteria_adjustments={
-            "evidence_quality": 1.8,
-            "logical_coherence": 1.5,
-            "causal_validity": 1.3,
-        },
-    )
-
-    risk_perspective = Perspective(
-        name="risk",
-        description="Evaluates risk factors and mitigation",
-        criteria_adjustments={
-            "causal_validity": 1.8,
-            "evidence_quality": 1.5,
-            "ethical_considerations": 1.2,
-        },
-    )
-
-    strategic_perspective = Perspective(
-        name="strategic",
-        description="Evaluates strategic fit and long-term value",
-        criteria_adjustments={
-            "argument_strength": 1.5,
-            "logical_coherence": 1.3,
-        },
-    )
-
-    esg_perspective = Perspective(
-        name="esg",
-        description="Evaluates environmental, social, governance factors",
-        criteria_adjustments={
-            "ethical_considerations": 2.0,
-            "evidence_quality": 1.2,
-        },
-    )
-
-    return Jury(
-        members=[
-            JuryMember(name="cfo", perspective=financial_perspective, weight=1.5),
-            JuryMember(name="risk_officer", perspective=risk_perspective, weight=1.3),
-            JuryMember(name="ceo", perspective=strategic_perspective, weight=1.2),
-            JuryMember(name="esg_officer", perspective=esg_perspective, weight=1.0),
-        ],
-        voting="weighted",
-    )
+from artemis.core.jury import JuryPanel
 
 async def run_investment_debate():
-    jury = await create_investment_jury()
+    # Financial/investment evaluation criteria
+    investment_criteria = [
+        "financial_viability",
+        "risk_assessment",
+        "strategic_alignment",
+        "market_opportunity",
+        "execution_capability",
+    ]
+
+    jury = JuryPanel(
+        evaluators=5,
+        criteria=investment_criteria,
+        model="gpt-4o",
+        consensus_threshold=0.7,
+    )
 
     agents = [
-        Agent(name="bull", model="gpt-4o"),
-        Agent(name="bear", model="gpt-4o"),
+        Agent(name="bull", role="Investment advocate", model="gpt-4o"),
+        Agent(name="bear", role="Risk analyst", model="gpt-4o"),
     ]
 
     debate = Debate(
@@ -436,109 +349,150 @@ async def run_investment_debate():
     print("=" * 60)
     print(f"\nDecision: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
 
-    print("\nCOMMITTEE VOTES:")
-    for vote in result.verdict.votes:
-        emoji = "✅" if vote.decision == "pro" else "❌"
-        print(f"  {emoji} {vote.juror}: {vote.decision} ({vote.confidence:.0%})")
+    if result.verdict.score_breakdown:
+        print("\nAgent Scores:")
+        for agent, score in result.verdict.score_breakdown.items():
+            status = "RECOMMEND" if score > 6.0 else "CAUTION"
+            print(f"  {agent}: {score:.2f} [{status}]")
 
-    print(f"\nRATIONALE:\n{result.verdict.reasoning}")
+    print(f"\nRationale:\n{result.verdict.reasoning}")
 
 asyncio.run(run_investment_debate())
 ```
 
-## Dynamic Jury Based on Topic
+## Academic Peer Review Pattern
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, PERSPECTIVES
+from artemis.core.jury import JuryPanel
 
-def create_jury_for_domain(domain: str) -> Jury:
-    """Create appropriate jury based on topic domain."""
-
-    domain_configs = {
-        "technical": {
-            "perspectives": ["logical", "analytical", "practical"],
-            "voting": "simple_majority",
-        },
-        "ethical": {
-            "perspectives": ["ethical", "empathetic", "logical"],
-            "voting": "supermajority",
-            "threshold": 0.67,
-        },
-        "business": {
-            "perspectives": ["analytical", "practical", "skeptical"],
-            "voting": "simple_majority",
-        },
-        "policy": {
-            "perspectives": ["logical", "ethical", "practical", "skeptical"],
-            "voting": "supermajority",
-            "threshold": 0.75,
-        },
-    }
-
-    config = domain_configs.get(domain, domain_configs["technical"])
-
-    members = [
-        JuryMember(
-            name=f"juror_{i}",
-            perspective=PERSPECTIVES[p],
-        )
-        for i, p in enumerate(config["perspectives"])
+async def run_academic_debate():
+    # Academic peer review criteria
+    academic_criteria = [
+        "methodology_rigor",
+        "theoretical_contribution",
+        "evidence_quality",
+        "logical_coherence",
+        "practical_impact",
     ]
 
-    return Jury(
-        members=members,
-        voting=config["voting"],
-        threshold=config.get("threshold", 0.5),
+    jury = JuryPanel(
+        evaluators=3,  # Typical peer review panel
+        criteria=academic_criteria,
+        model="gpt-4o",
+        consensus_threshold=0.8,  # High threshold - all reviewers should agree
     )
 
-async def run_domain_debate(topic: str, domain: str):
-    jury = create_jury_for_domain(domain)
-
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(name="proponent", role="Research claim advocate", model="gpt-4o"),
+        Agent(name="challenger", role="Research claim skeptic", model="gpt-4o"),
     ]
 
     debate = Debate(
-        topic=topic,
+        topic="Does the evidence support that transformer models exhibit emergent reasoning?",
         agents=agents,
         rounds=2,
         jury=jury,
     )
 
     debate.assign_positions({
-        "pro": "argues in favor",
-        "con": "argues against",
+        "proponent": "argues transformers exhibit genuine emergent reasoning capabilities",
+        "challenger": "argues apparent reasoning is sophisticated pattern matching, not emergence",
     })
 
     result = await debate.run()
-    return result
 
-# Example usage
-async def main():
-    # Technical debate
-    tech_result = await run_domain_debate(
-        "Should we use Rust instead of Go for our backend?",
-        domain="technical",
+    print("PEER REVIEW DECISION")
+    print("=" * 60)
+    print(f"\nDecision: {result.verdict.decision}")
+    print(f"Consensus: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
+
+    # In academic review, dissent is important
+    if result.verdict.dissenting_opinions:
+        print("\nReviewer Concerns (Dissents):")
+        for i, dissent in enumerate(result.verdict.dissenting_opinions):
+            print(f"\nReviewer {i+1} ({dissent.perspective.value}):")
+            print(f"  Position: {dissent.position}")
+            print(f"  Comments: {dissent.reasoning[:200]}...")
+    else:
+        print("\nAll reviewers reached consensus.")
+
+asyncio.run(run_academic_debate())
+```
+
+## Comparing Jury vs No Jury
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+
+async def compare_jury_modes():
+    topic = "Should programming be taught in elementary schools?"
+
+    # Without custom jury (uses default evaluation)
+    agents_no_jury = [
+        Agent(name="pro", role="Education advocate", model="gpt-4o"),
+        Agent(name="con", role="Education traditionalist", model="gpt-4o"),
+    ]
+
+    debate_no_jury = Debate(
+        topic=topic,
+        agents=agents_no_jury,
+        rounds=2,
     )
-    print(f"Technical verdict: {tech_result.verdict.decision}")
+    debate_no_jury.assign_positions({
+        "pro": "supports early programming education",
+        "con": "opposes mandatory programming in elementary schools",
+    })
 
-    # Ethical debate
-    ethics_result = await run_domain_debate(
-        "Should AI be used in criminal sentencing?",
-        domain="ethical",
+    result_no_jury = await debate_no_jury.run()
+
+    # With custom jury
+    jury = JuryPanel(evaluators=5, consensus_threshold=0.7)
+
+    agents_jury = [
+        Agent(name="pro", role="Education advocate", model="gpt-4o"),
+        Agent(name="con", role="Education traditionalist", model="gpt-4o"),
+    ]
+
+    debate_jury = Debate(
+        topic=topic,
+        agents=agents_jury,
+        rounds=2,
+        jury=jury,
     )
-    print(f"Ethical verdict: {ethics_result.verdict.decision}")
+    debate_jury.assign_positions({
+        "pro": "supports early programming education",
+        "con": "opposes mandatory programming in elementary schools",
+    })
 
-asyncio.run(main())
+    result_jury = await debate_jury.run()
+
+    print("COMPARISON: Default vs Custom Jury")
+    print("=" * 60)
+
+    print("\nDefault Evaluation:")
+    print(f"  Decision: {result_no_jury.verdict.decision}")
+    print(f"  Confidence: {result_no_jury.verdict.confidence:.0%}")
+
+    print("\nCustom Jury Panel (5 evaluators):")
+    print(f"  Decision: {result_jury.verdict.decision}")
+    print(f"  Confidence: {result_jury.verdict.confidence:.0%}")
+    print(f"  Unanimous: {result_jury.verdict.unanimous}")
+    print(f"  Dissenting: {len(result_jury.verdict.dissenting_opinions)}")
+
+asyncio.run(compare_jury_modes())
 ```
 
 ## Next Steps
 
 - See [Multi-Agent Debates](multi-agent.md) for complex agent setups
-- Explore [Ethical Dilemmas](ethical-dilemmas.md) with ethics-focused juries
-- Learn about [Enterprise Decisions](enterprise-decisions.md) with business juries
+- Explore [Ethical Dilemmas](ethical-dilemmas.md) with ethics-focused evaluation
+- Learn about [Enterprise Decisions](enterprise-decisions.md) with business criteria
