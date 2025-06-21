@@ -64,17 +64,16 @@ from artemis.integrations import ArtemisCrewTool
 from artemis.core.types import DebateConfig
 
 config = DebateConfig(
-    max_round_time_seconds=300,
-    jury_size=3,
-    enable_safety_monitoring=True,
+    turn_timeout=60,
+    round_timeout=300,
+    require_evidence=True,
+    safety_mode="passive",
 )
 
 tool = ArtemisCrewTool(
     model="gpt-4o",
     default_rounds=3,
     config=config,
-    name="Structured Debate",
-    description="Run a structured debate to analyze a topic from multiple perspectives",
 )
 ```
 
@@ -215,22 +214,25 @@ crew = Crew(
 
 ## Safety Integration
 
+Safety monitoring is configured via the `DebateConfig`:
+
 ```python
 from artemis.integrations import ArtemisCrewTool
-from artemis.safety import CompositeMonitor
+from artemis.core.types import DebateConfig
+
+config = DebateConfig(
+    safety_mode="active",
+    halt_on_safety_violation=True,
+)
 
 tool = ArtemisCrewTool(
     model="gpt-4o",
-    safety_monitor=CompositeMonitor.default(),
+    config=config,
 )
 
-# Safety alerts are included in results
+# Run debate - safety alerts appear in the formatted result
 result = tool.run(topic="Sensitive topic")
-
-if result.get("safety_alerts"):
-    print("Safety concerns detected:")
-    for alert in result["safety_alerts"]:
-        print(f"  - {alert['type']}: {alert['details']}")
+print(result)  # Includes SAFETY section if alerts were generated
 ```
 
 ## Output Formatting

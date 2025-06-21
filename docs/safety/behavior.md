@@ -25,36 +25,40 @@ Behavior tracking helps detect:
 ### Basic Setup
 
 ```python
-from artemis.safety import BehaviorTracker
+from artemis.safety import BehaviorTracker, MonitorMode
 
 tracker = BehaviorTracker(
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.5,
     window_size=5,
-    drift_threshold=0.3,
 )
 
-safety.add_monitor(tracker)
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[tracker.process],
+)
 ```
 
-### Full Configuration
+### Configuration Options
 
 ```python
 tracker = BehaviorTracker(
-    # Window settings
-    window_size=5,           # Turns to consider
-    min_samples=3,           # Minimum turns before tracking
-
-    # What to track
-    track_style=True,        # Track writing style
-    track_position=True,     # Track argued position
-    track_capability=True,   # Track capability metrics
-    track_engagement=True,   # Track engagement patterns
-
-    # Thresholds
-    drift_threshold=0.3,     # Overall drift threshold
-    style_threshold=0.25,    # Style change threshold
-    position_threshold=0.4,  # Position change threshold
+    mode=MonitorMode.PASSIVE,     # PASSIVE, ACTIVE, or LEARNING
+    sensitivity=0.5,               # 0.0 to 1.0
+    window_size=5,                 # Turns to consider for drift detection
+    drift_threshold=0.3,           # Threshold for drift alerts
 )
 ```
+
+### Configuration Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `window_size` | int | 5 | Turns to consider |
+| `drift_threshold` | float | 0.3 | Drift detection threshold |
 
 ## Tracked Metrics
 
@@ -62,80 +66,31 @@ tracker = BehaviorTracker(
 
 How the agent communicates:
 
-```python
-style_metrics = tracker.compute_style_metrics(turn)
-
-print(f"Formality: {style_metrics['formality']}")
-print(f"Aggression: {style_metrics['aggression']}")
-print(f"Complexity: {style_metrics['complexity']}")
-print(f"Sentiment: {style_metrics['sentiment']}")
-print(f"Confidence: {style_metrics['confidence']}")
-```
+- Formality level
+- Aggression/assertiveness
+- Complexity
+- Sentiment
+- Confidence
 
 ### Position Metrics
 
 What position the agent argues:
 
-```python
-position_metrics = tracker.compute_position_metrics(turn)
-
-print(f"Position alignment: {position_metrics['alignment']}")
-print(f"Position strength: {position_metrics['strength']}")
-print(f"Concession rate: {position_metrics['concessions']}")
-print(f"Counter-argument engagement: {position_metrics['engagement']}")
-```
+- Position alignment with assigned stance
+- Position strength
+- Concession rate
+- Counter-argument engagement
 
 ### Capability Metrics
 
 How capable the agent appears:
 
-```python
-capability_metrics = tracker.compute_capability_metrics(turn)
-
-print(f"Vocabulary: {capability_metrics['vocabulary']}")
-print(f"Reasoning: {capability_metrics['reasoning']}")
-print(f"Evidence: {capability_metrics['evidence']}")
-print(f"Structure: {capability_metrics['structure']}")
-```
-
-### Engagement Metrics
-
-How the agent engages with debate:
-
-```python
-engagement_metrics = tracker.compute_engagement_metrics(turn)
-
-print(f"Response relevance: {engagement_metrics['relevance']}")
-print(f"Opponent acknowledgment: {engagement_metrics['acknowledgment']}")
-print(f"Question answering: {engagement_metrics['question_response']}")
-print(f"Proactive contribution: {engagement_metrics['proactivity']}")
-```
+- Vocabulary complexity
+- Reasoning depth
+- Evidence usage
+- Argument structure
 
 ## Drift Detection
-
-### How Drift Is Calculated
-
-```python
-# Simplified drift calculation
-def calculate_drift(
-    self,
-    current_metrics: dict,
-    historical_metrics: list[dict],
-) -> float:
-    # Calculate mean of historical metrics
-    historical_mean = {
-        k: np.mean([h[k] for h in historical_metrics])
-        for k in current_metrics
-    }
-
-    # Calculate drift as normalized difference
-    drifts = [
-        abs(current_metrics[k] - historical_mean[k])
-        for k in current_metrics
-    ]
-
-    return np.mean(drifts)
-```
 
 ### Drift Types
 
@@ -146,108 +101,18 @@ def calculate_drift(
 | Oscillating | Back and forth | Medium |
 | Escalating | Increasing severity | High |
 
-### Detecting Drift Patterns
-
-```python
-drift_analysis = tracker.analyze_drift_pattern(agent_turns)
-
-print(f"Drift type: {drift_analysis.pattern_type}")
-print(f"Severity: {drift_analysis.severity}")
-print(f"Direction: {drift_analysis.direction}")
-print(f"Acceleration: {drift_analysis.acceleration}")
-```
-
-## Position Monitoring
-
-### Position Alignment
-
-Tracks whether agent maintains assigned position:
-
-```python
-# Check position alignment
-alignment = tracker.check_position_alignment(
-    turn=turn,
-    assigned_position=agent.position,
-)
-
-print(f"Aligned: {alignment.is_aligned}")
-print(f"Alignment score: {alignment.score}")
-print(f"Drift direction: {alignment.drift_direction}")
-```
-
-### Concession Tracking
-
-Monitors when agents concede points:
-
-```python
-concessions = tracker.track_concessions(agent_turns)
-
-for concession in concessions:
-    print(f"Round: {concession.round}")
-    print(f"Point conceded: {concession.point}")
-    print(f"Strategic: {concession.appears_strategic}")
-```
-
-## Style Monitoring
-
-### Style Profile
-
-Establishes a style profile for each agent:
-
-```python
-profile = tracker.get_style_profile(agent_name)
-
-print(f"Average formality: {profile.avg_formality}")
-print(f"Typical complexity: {profile.typical_complexity}")
-print(f"Sentiment range: {profile.sentiment_range}")
-```
-
-### Style Deviation
-
-Detects unusual style changes:
-
-```python
-deviation = tracker.detect_style_deviation(turn, agent_profile)
-
-if deviation.is_significant:
-    print(f"Significant style change detected:")
-    print(f"  Changed: {deviation.changed_metrics}")
-    print(f"  Magnitude: {deviation.magnitude}")
-```
-
 ## Results
 
-The tracker returns comprehensive results:
+The tracker contributes to debate safety alerts:
 
 ```python
-result = await tracker.analyze(turn, context)
+result = await debate.run()
 
-print(f"Is Safe: {result.is_safe}")
-print(f"Drift Score: {result.score}")
-
-details = result.details
-print(f"Style drift: {details['style_drift']}")
-print(f"Position drift: {details['position_drift']}")
-print(f"Capability drift: {details['capability_drift']}")
-print(f"Engagement drift: {details['engagement_drift']}")
-print(f"Pattern: {details['drift_pattern']}")
-```
-
-## Visualization
-
-Track behavior over time:
-
-```python
-# Get behavior history
-history = tracker.get_history(agent_name)
-
-# Plot drift over time
-import matplotlib.pyplot as plt
-
-plt.plot([h['round'] for h in history], [h['drift'] for h in history])
-plt.xlabel('Round')
-plt.ylabel('Drift Score')
-plt.title(f'Behavior Drift: {agent_name}')
+# Check for behavior drift alerts
+for alert in result.safety_alerts:
+    if "behavior" in alert.type.lower() or "drift" in alert.type.lower():
+        print(f"Agent: {alert.agent}")
+        print(f"Severity: {alert.severity:.0%}")
 ```
 
 ## Integration
@@ -255,24 +120,42 @@ plt.title(f'Behavior Drift: {agent_name}')
 ### With Debate
 
 ```python
+from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.safety import BehaviorTracker, SafetyManager
+from artemis.safety import BehaviorTracker, MonitorMode
 
-safety = SafetyManager()
-safety.add_monitor(BehaviorTracker(window_size=5))
+agents = [
+    Agent(name="pro", role="Advocate for the proposition", model="gpt-4o"),
+    Agent(name="con", role="Advocate against the proposition", model="gpt-4o"),
+]
+
+tracker = BehaviorTracker(
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.5,
+    window_size=5,
+)
 
 debate = Debate(
     topic="Your topic",
     agents=agents,
-    safety_manager=safety,
+    safety_monitors=[tracker.process],
 )
+
+debate.assign_positions({
+    "pro": "supports the proposition",
+    "con": "opposes the proposition",
+})
 
 result = await debate.run()
 
-# Get behavior summary
-for agent in agents:
-    behavior_summary = result.get_behavior_summary(agent.name)
-    print(f"{agent.name}: {behavior_summary}")
+# Check for behavior alerts
+behavior_alerts = [
+    a for a in result.safety_alerts
+    if "behavior" in a.type.lower()
+]
+
+for alert in behavior_alerts:
+    print(f"Agent {alert.agent}: {alert.severity:.0%} severity")
 ```
 
 ### With Other Monitors
@@ -284,57 +167,43 @@ from artemis.safety import (
     BehaviorTracker,
     SandbagDetector,
     DeceptionMonitor,
-    CompositeMonitor,
+    MonitorMode,
 )
 
-# Combine for comprehensive monitoring
-composite = CompositeMonitor(
-    monitors=[
-        BehaviorTracker(window_size=5),
-        SandbagDetector(sensitivity=0.7),
-        DeceptionMonitor(sensitivity=0.6),
+behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5, window_size=5)
+sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
+deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
+
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[
+        behavior.process,
+        sandbag.process,
+        deception.process,
     ],
-    aggregation="max",
 )
 ```
 
-## Alerting
+## Sensitivity Tuning
 
-### Drift Alerts
+### Low Sensitivity (0.3)
 
-```python
-tracker = BehaviorTracker(
-    drift_threshold=0.3,
-    alert_on_sudden_change=True,
-    sudden_change_threshold=0.5,
-)
+- Only catches severe drift
+- Minimal false positives
+- May miss gradual changes
 
-# Alert when:
-# - Overall drift exceeds threshold
-# - Sudden change detected
-# - Position significantly shifts
-```
+### Medium Sensitivity (0.5)
 
-### Custom Alerts
+- Balanced detection
+- Catches most concerning drift
+- Good general setting
 
-```python
-tracker = BehaviorTracker(
-    custom_alerts=[
-        {
-            "name": "aggression_spike",
-            "metric": "style.aggression",
-            "condition": "increase",
-            "threshold": 0.4,
-        },
-        {
-            "name": "position_reversal",
-            "metric": "position.alignment",
-            "condition": "decrease",
-            "threshold": 0.5,
-        },
-    ]
-)
-```
+### High Sensitivity (0.8)
+
+- Catches subtle changes
+- More false positives
+- For high-stakes scenarios
 
 ## Best Practices
 

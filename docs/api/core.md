@@ -17,9 +17,8 @@ Debate(
     topic: str,
     agents: list[Agent],
     rounds: int = 3,
-    jury: Jury | None = None,
     config: DebateConfig | None = None,
-    safety_manager: SafetyManager | None = None,
+    safety_monitors: list[Callable] | None = None,
 )
 ```
 
@@ -28,11 +27,10 @@ Debate(
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `topic` | str | Yes | The debate topic |
-| `agents` | list[Agent] | Yes | List of participating agents |
+| `agents` | list[Agent] | Yes | List of participating agents (2+) |
 | `rounds` | int | No | Number of debate rounds (default: 3) |
-| `jury` | Jury | No | Jury for evaluation |
 | `config` | DebateConfig | No | Debate configuration |
-| `safety_manager` | SafetyManager | No | Safety monitoring manager |
+| `safety_monitors` | list | No | List of safety monitor process methods |
 
 ### Methods
 
@@ -110,12 +108,9 @@ from artemis.core.agent import Agent
 ```python
 Agent(
     name: str,
-    model: str,
-    position: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int = 2000,
-    reasoning_enabled: bool = False,
-    thinking_budget: int = 8000,
+    role: str,
+    model: str = "gpt-4o",
+    reasoning_config: ReasoningConfig | None = None,
 )
 ```
 
@@ -124,12 +119,9 @@ Agent(
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | str | Yes | Unique agent identifier |
-| `model` | str | Yes | LLM model to use |
-| `position` | str | No | Agent's debate position |
-| `temperature` | float | No | Sampling temperature (default: 0.7) |
-| `max_tokens` | int | No | Max response tokens (default: 2000) |
-| `reasoning_enabled` | bool | No | Enable extended thinking (default: False) |
-| `thinking_budget` | int | No | Tokens for reasoning (default: 8000) |
+| `role` | str | Yes | Agent's role description |
+| `model` | str | No | LLM model to use (default: "gpt-4o") |
+| `reasoning_config` | ReasoningConfig | No | Configuration for reasoning models |
 
 ### Methods
 
@@ -203,41 +195,54 @@ class Evidence(BaseModel):
 
 ```python
 class CausalLink(BaseModel):
-    source: str
-    target: str
-    relation: CausalRelationType
-    strength: float
-    evidence: list[str] = []
+    id: str
+    cause: str
+    effect: str
+    mechanism: str | None = None
+    strength: float = 0.5  # 0.0 to 1.0
+    bidirectional: bool = False
 ```
 
 ---
 
-## Jury
+## JuryPanel
 
 Multi-perspective evaluation jury.
 
 ```python
-from artemis.core.jury import Jury, JuryMember
+from artemis.core.jury import JuryPanel
+from artemis.core.types import JuryPerspective
 ```
 
 ### Constructor
 
 ```python
-Jury(
-    members: list[JuryMember],
-    voting: str = "simple_majority",
-    threshold: float = 0.5,
+JuryPanel(
+    evaluators: int = 3,
+    model: str = "gpt-4o",
+    perspectives: list[JuryPerspective] | None = None,
+    consensus_threshold: float = 0.7,
 )
 ```
 
-### JuryMember
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `evaluators` | int | 3 | Number of jury evaluators |
+| `model` | str | "gpt-4o" | LLM model for evaluators |
+| `perspectives` | list | None | Evaluation perspectives |
+| `consensus_threshold` | float | 0.7 | Threshold for consensus |
+
+### JuryPerspective
 
 ```python
-JuryMember(
-    name: str,
-    perspective: str | Perspective,
-    weight: float = 1.0,
-)
+class JuryPerspective(str, Enum):
+    ANALYTICAL = "analytical"    # Focus on logic and evidence
+    ETHICAL = "ethical"          # Focus on moral implications
+    PRACTICAL = "practical"      # Focus on feasibility
+    ADVERSARIAL = "adversarial"  # Challenge all arguments
+    SYNTHESIZING = "synthesizing" # Find common ground
 ```
 
 ### Methods
@@ -245,7 +250,7 @@ JuryMember(
 #### deliberate
 
 ```python
-async def deliberate(self, debate_result: DebateResult) -> Verdict
+async def deliberate(self, transcript: list[Turn]) -> Verdict
 ```
 
 Conducts jury deliberation and returns verdict.
@@ -286,30 +291,27 @@ from artemis.core.types import DebateConfig
 ```python
 class DebateConfig(BaseModel):
     # Timing
-    max_round_time_seconds: int = 300
-    max_total_time_seconds: int = 1800
+    turn_timeout: int = 60           # Timeout per turn (seconds)
+    round_timeout: int = 300         # Timeout per round (seconds)
+
+    # Argument generation
+    max_argument_tokens: int = 1000
+    require_evidence: bool = True
+    require_causal_links: bool = True
+    min_evidence_per_argument: int = 0
 
     # Evaluation
-    evaluation_criteria: list[str] = [
-        "logical_coherence",
-        "evidence_quality",
-        "argument_strength",
-        "ethical_considerations",
-    ]
-
-    # Jury
-    jury_size: int = 3
-    require_unanimous: bool = False
+    evaluation_criteria: EvaluationCriteria = EvaluationCriteria()
+    adaptation_enabled: bool = True
+    adaptation_rate: float = 0.1
 
     # Safety
-    enable_safety_monitoring: bool = True
+    safety_mode: str = "passive"     # "off", "passive", "active"
     halt_on_safety_violation: bool = False
 
-    # Arguments
-    argument_depth: str = "medium"  # shallow, medium, deep
-    require_evidence: bool = True
-    min_tactical_points: int = 2
-    min_operational_facts: int = 3
+    # Logging
+    log_level: str = "INFO"
+    trace_enabled: bool = False
 ```
 
 ---
@@ -326,33 +328,27 @@ from artemis.core.types import DebateResult
 
 ```python
 class DebateResult(BaseModel):
+    debate_id: str
     topic: str
     verdict: Verdict
     transcript: list[Turn]
     safety_alerts: list[SafetyAlert] = []
-    metadata: dict = {}
-    duration_seconds: float
+    metadata: DebateMetadata
+    final_state: DebateState = DebateState.COMPLETE
 ```
 
-### Methods
-
-#### get_alerts_by_type
+### DebateMetadata
 
 ```python
-def get_alerts_by_type(self, alert_type: str) -> list[SafetyAlert]
-```
-
-#### get_alerts_by_agent
-
-```python
-def get_alerts_by_agent(self, agent_name: str) -> list[SafetyAlert]
-```
-
-#### safety_summary
-
-```python
-@property
-def safety_summary(self) -> SafetySummary
+class DebateMetadata(BaseModel):
+    started_at: datetime
+    ended_at: datetime | None
+    total_rounds: int
+    total_turns: int
+    agents: list[str]
+    jury_size: int
+    safety_monitors: list[str]
+    model_usage: dict[str, dict[str, int]]
 ```
 
 ---

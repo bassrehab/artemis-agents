@@ -199,29 +199,16 @@ from artemis.mcp import ArtemisMCPServer
 from artemis.core.types import DebateConfig
 
 config = DebateConfig(
-    max_round_time_seconds=300,
-    jury_size=3,
-    enable_safety_monitoring=True,
+    turn_timeout=60,
+    round_timeout=300,
+    require_evidence=True,
+    safety_mode="passive",
 )
 
 server = ArtemisMCPServer(
-    # Model settings
     default_model="gpt-4o",
-    api_keys={
-        "openai": "sk-...",
-        "anthropic": "sk-ant-...",
-    },
-
-    # Session settings
     max_sessions=100,
-    session_timeout=3600,
-
-    # Debate settings
     config=config,
-
-    # Server settings
-    enable_logging=True,
-    log_level="INFO",
 )
 ```
 
@@ -312,32 +299,36 @@ async with httpx.AsyncClient() as client:
 └─────────────────┘
 ```
 
-### Session Persistence
+### Session Management
 
-Sessions can be persisted:
+Sessions are managed via the `SessionManager`:
 
 ```python
-from artemis.mcp import ArtemisMCPServer
-from artemis.mcp.sessions import FileSessionStore
+from artemis.mcp import ArtemisMCPServer, create_session_manager
 
-server = ArtemisMCPServer(
-    session_store=FileSessionStore("./sessions"),
-)
+# Create server with session manager
+server = ArtemisMCPServer(default_model="gpt-4o")
 
-# Sessions survive server restarts
+# Sessions are automatically cleaned up after max_age_hours
+server.state.cleanup_old_sessions(max_age_hours=24)
 ```
 
 ## Safety Monitoring
 
-Enable safety monitoring in the server:
+Enable safety monitoring via the debate configuration:
 
 ```python
 from artemis.mcp import ArtemisMCPServer
-from artemis.safety import CompositeMonitor
+from artemis.core.types import DebateConfig
+
+config = DebateConfig(
+    safety_mode="active",
+    halt_on_safety_violation=True,
+)
 
 server = ArtemisMCPServer(
-    safety_monitor=CompositeMonitor.default(),
-    halt_on_safety_violation=False,
+    default_model="gpt-4o",
+    config=config,
 )
 ```
 

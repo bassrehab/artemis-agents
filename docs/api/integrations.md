@@ -66,9 +66,11 @@ Runs an asynchronous debate.
 
 ```python
 {
-    "topic": str,           # Required: debate topic
-    "rounds": int,          # Optional: number of rounds
-    "positions": dict,      # Optional: agent positions
+    "topic": str,                  # Required: debate topic
+    "rounds": int,                 # Optional: number of rounds
+    "agents": list[AgentConfig],   # Optional: agent configurations
+    "pro_position": str,           # Optional: pro-side position (simple mode)
+    "con_position": str,           # Optional: con-side position (simple mode)
 }
 ```
 
@@ -86,10 +88,10 @@ from artemis.integrations import ArtemisDebateNode
 
 ```python
 ArtemisDebateNode(
-    model: str,
-    rounds: int = 3,
-    config: DebateConfig | None = None,
-    safety_monitor: SafetyMonitor | None = None,
+    model: str = "gpt-4o",
+    agents: list[Agent] | None = None,
+    config: DebateNodeConfig | None = None,
+    debate_config: DebateConfig | None = None,
 )
 ```
 
@@ -97,29 +99,31 @@ ArtemisDebateNode(
 
 ```python
 from langgraph.graph import StateGraph
-from artemis.integrations import ArtemisDebateNode, DebateState
+from artemis.integrations import ArtemisDebateNode, DebateNodeState
 
-workflow = StateGraph(DebateState)
-workflow.add_node("debate", ArtemisDebateNode(model="gpt-4o"))
+workflow = StateGraph(DebateNodeState)
+workflow.add_node("debate", ArtemisDebateNode(model="gpt-4o").run_debate)
 ```
 
-### DebateState
+### DebateNodeState
 
 ```python
-from artemis.integrations import DebateState
+from artemis.integrations import DebateNodeState
 ```
 
 #### Class Definition
 
 ```python
-class DebateState(TypedDict):
+class DebateNodeState(TypedDict, total=False):
     topic: str
+    agents: list[AgentStateConfig]
     positions: dict[str, str]
     rounds: int
     current_round: int
-    transcript: list[Turn]
-    verdict: Verdict | None
-    safety_alerts: list[SafetyAlert]
+    phase: str
+    transcript: list[dict]
+    verdict: dict | None
+    scores: dict[str, float]
     metadata: dict
 ```
 
@@ -133,32 +137,15 @@ from artemis.integrations import create_debate_workflow
 
 ```python
 def create_debate_workflow(
-    model: str,
-    rounds: int = 3,
-    enable_safety: bool = True,
+    model: str = "gpt-4o",
+    step_by_step: bool = False,
+    agents: list[Agent] | None = None,
 ) -> CompiledStateGraph
 ```
 
 Creates a complete debate workflow.
 
 **Returns:** Compiled LangGraph workflow.
-
-### create_decision_workflow
-
-```python
-from artemis.integrations import create_decision_workflow
-```
-
-#### Signature
-
-```python
-def create_decision_workflow(
-    model: str,
-    decision_threshold: float = 0.7,
-) -> CompiledStateGraph
-```
-
-Creates a decision-making workflow using debate.
 
 ---
 
@@ -174,12 +161,11 @@ from artemis.integrations import ArtemisCrewTool
 
 ```python
 ArtemisCrewTool(
-    model: str,
+    model: str = "gpt-4o",
     default_rounds: int = 3,
+    agents: list[Agent] | None = None,
     config: DebateConfig | None = None,
-    safety_monitor: SafetyMonitor | None = None,
-    name: str = "Debate Tool",
-    description: str = "...",
+    verbose: bool = False,
 )
 ```
 
@@ -191,12 +177,14 @@ ArtemisCrewTool(
 def run(
     self,
     topic: str,
+    agents: list[dict] | None = None,
+    pro_position: str | None = None,
+    con_position: str | None = None,
     rounds: int | None = None,
-    positions: dict[str, str] | None = None,
-) -> dict
+) -> str
 ```
 
-Runs a synchronous debate.
+Runs a synchronous debate and returns formatted string.
 
 ##### arun
 
@@ -204,9 +192,11 @@ Runs a synchronous debate.
 async def arun(
     self,
     topic: str,
+    agents: list[dict] | None = None,
+    pro_position: str | None = None,
+    con_position: str | None = None,
     rounds: int | None = None,
-    positions: dict[str, str] | None = None,
-) -> dict
+) -> str
 ```
 
 Runs an asynchronous debate.
@@ -239,12 +229,8 @@ from artemis.mcp import ArtemisMCPServer
 ```python
 ArtemisMCPServer(
     default_model: str = "gpt-4o",
-    api_keys: dict[str, str] | None = None,
     max_sessions: int = 100,
-    session_timeout: int = 3600,
     config: DebateConfig | None = None,
-    safety_monitor: SafetyMonitor | None = None,
-    enable_logging: bool = True,
 )
 ```
 
@@ -253,12 +239,8 @@ ArtemisMCPServer(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `default_model` | str | "gpt-4o" | Default LLM model |
-| `api_keys` | dict | None | Provider API keys |
 | `max_sessions` | int | 100 | Max concurrent sessions |
-| `session_timeout` | int | 3600 | Session timeout (seconds) |
 | `config` | DebateConfig | None | Debate configuration |
-| `safety_monitor` | SafetyMonitor | None | Safety monitor |
-| `enable_logging` | bool | True | Enable logging |
 
 #### Methods
 

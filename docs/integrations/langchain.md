@@ -39,17 +39,16 @@ from artemis.integrations import ArtemisDebateTool
 from artemis.core.types import DebateConfig
 
 config = DebateConfig(
-    max_round_time_seconds=300,
-    jury_size=3,
-    enable_safety_monitoring=True,
+    turn_timeout=60,
+    round_timeout=300,
+    require_evidence=True,
+    safety_mode="passive",
 )
 
 tool = ArtemisDebateTool(
     model="gpt-4o",
     default_rounds=3,
     config=config,
-    name="debate_tool",
-    description="Run a structured debate on a topic",
 )
 ```
 
@@ -132,17 +131,17 @@ for alert in result.safety_alerts:
     print(f"Alert: {alert.type}")
 ```
 
-## Multiple Debate Positions
+## Multiple Debate Agents
 
-You can specify custom positions:
+You can specify custom agents with positions:
 
 ```python
 result = debate_tool.invoke({
     "topic": "Which database should we use?",
-    "positions": {
-        "pro_sql": "advocates for SQL databases",
-        "pro_nosql": "advocates for NoSQL databases",
-    },
+    "agents": [
+        {"name": "sql_advocate", "role": "Database expert", "position": "advocates for SQL databases"},
+        {"name": "nosql_advocate", "role": "Database expert", "position": "advocates for NoSQL databases"},
+    ],
     "rounds": 3,
 })
 ```
@@ -153,13 +152,13 @@ Enable safety monitoring in debates:
 
 ```python
 from artemis.integrations import ArtemisDebateTool
-from artemis.safety import SandbagDetector, DeceptionMonitor
+from artemis.safety import SandbagDetector, DeceptionMonitor, MonitorMode
 
 tool = ArtemisDebateTool(
     model="gpt-4o",
     safety_monitors=[
-        SandbagDetector(sensitivity=0.7),
-        DeceptionMonitor(sensitivity=0.6),
+        SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7),
+        DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6),
     ],
 )
 ```

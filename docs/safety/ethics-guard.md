@@ -17,24 +17,30 @@ The Ethics Guard detects:
 ### Basic Setup
 
 ```python
-from artemis.safety import EthicsGuard
+from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
 guard = EthicsGuard(
-    sensitivity=0.6,
-    principles=["fairness", "transparency", "non-harm"],
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(
+        sensitivity=0.6,
+        principles=["fairness", "transparency", "non-harm"],
+    ),
 )
 
-safety.add_monitor(guard)
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[guard.process],
+)
 ```
 
-### Full Configuration
+### Configuration Options
 
 ```python
-guard = EthicsGuard(
-    # Core settings
-    sensitivity=0.6,
+from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
-    # Principles to enforce
+config = EthicsConfig(
+    sensitivity=0.6,
     principles=[
         "fairness",
         "transparency",
@@ -42,18 +48,20 @@ guard = EthicsGuard(
         "respect",
         "accuracy",
     ],
+)
 
-    # Detection settings
-    detect_discrimination=True,
-    detect_manipulation=True,
-    detect_privacy_violation=True,
-    detect_harmful_content=True,
-
-    # Response settings
-    mode="warn",  # warn, block, or remediate
-    violation_threshold=0.7,
+guard = EthicsGuard(
+    mode=MonitorMode.PASSIVE,
+    config=config,
 )
 ```
+
+### EthicsConfig Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `principles` | list[str] | default set | Ethical principles to enforce |
 
 ## Ethical Principles
 
@@ -69,23 +77,12 @@ guard = EthicsGuard(
 
 ### Custom Principles
 
+You can specify which principles to enforce:
+
 ```python
-from artemis.safety.ethics import EthicalPrinciple
-
-sustainability = EthicalPrinciple(
-    name="sustainability",
-    description="Arguments should consider environmental impact",
-    keywords=["environment", "climate", "sustainable", "emissions"],
-    violation_patterns=[
-        r"ignores?\s+environmental",
-        r"climate\s+change\s+(is\s+)?(a\s+)?hoax",
-        r"pollution\s+doesn't\s+matter",
-    ],
-    weight=0.15,
-)
-
-guard = EthicsGuard(
-    principles=["fairness", "non-harm", sustainability],
+config = EthicsConfig(
+    sensitivity=0.7,
+    principles=["fairness", "non-harm"],  # Only these two
 )
 ```
 
@@ -95,205 +92,124 @@ guard = EthicsGuard(
 
 Content that promotes or glorifies harm:
 
-```python
-# Detected patterns:
-# - Violence advocacy
-# - Self-harm promotion
-# - Dangerous activities
-# - Harmful advice
-
-result = guard.check_harmful_content(argument)
-
-if result.detected:
-    print(f"Harm type: {result.harm_type}")
-    print(f"Severity: {result.severity}")
-    print(f"Quote: {result.quote}")
-```
+- Violence advocacy
+- Self-harm promotion
+- Dangerous activities
+- Harmful advice
 
 ### Discrimination
 
 Unfair treatment based on protected characteristics:
 
-```python
-# Checks for:
-# - Racial discrimination
-# - Gender discrimination
-# - Religious discrimination
-# - Age discrimination
-# - Disability discrimination
-
-result = guard.check_discrimination(argument)
-
-if result.detected:
-    print(f"Discrimination type: {result.type}")
-    print(f"Target group: {result.target}")
-    print(f"Quote: {result.quote}")
-```
+- Racial discrimination
+- Gender discrimination
+- Religious discrimination
+- Age discrimination
+- Disability discrimination
 
 ### Manipulation
 
 Psychological manipulation tactics:
 
-```python
-# Detects:
-# - Fear mongering
-# - Guilt tripping
-# - Gaslighting language
-# - Coercion
-# - Emotional exploitation
-
-result = guard.check_manipulation(argument)
-
-if result.detected:
-    print(f"Manipulation type: {result.type}")
-    print(f"Tactic: {result.tactic}")
-    print(f"Severity: {result.severity}")
-```
+- Fear mongering
+- Guilt tripping
+- Gaslighting language
+- Coercion
+- Emotional exploitation
 
 ### Privacy Violations
 
 Exposure of private information:
 
-```python
-# Detects:
-# - Personal identification
-# - Location disclosure
-# - Financial information
-# - Health information
-# - Private communications
+- Personal identification
+- Location disclosure
+- Financial information
+- Health information
 
-result = guard.check_privacy(argument)
+## Results
 
-if result.detected:
-    print(f"Privacy violation: {result.type}")
-    print(f"Data type: {result.data_type}")
-    print(f"Severity: {result.severity}")
-```
-
-## Analysis Results
-
-The Ethics Guard returns detailed results:
+The Ethics Guard contributes to debate safety alerts:
 
 ```python
-result = await guard.analyze(turn, context)
+result = await debate.run()
 
-print(f"Is Safe: {result.is_safe}")
-print(f"Ethics Score: {result.score}")
-
-# Principle-by-principle breakdown
-for principle, score in result.principle_scores.items():
-    print(f"{principle}: {score:.2f}")
-
-# Violations found
-for violation in result.violations:
-    print(f"Type: {violation.type}")
-    print(f"Principle: {violation.principle}")
-    print(f"Severity: {violation.severity}")
-    print(f"Quote: {violation.quote}")
-    print(f"Explanation: {violation.explanation}")
+# Check for ethics alerts
+for alert in result.safety_alerts:
+    if "ethics" in alert.type.lower():
+        print(f"Agent: {alert.agent}")
+        print(f"Severity: {alert.severity:.0%}")
 ```
-
-## Response Modes
-
-### Warn Mode
-
-```python
-guard = EthicsGuard(mode="warn")
-
-# Violations are flagged but argument continues
-# Alert is raised for human review
-```
-
-### Block Mode
-
-```python
-guard = EthicsGuard(
-    mode="block",
-    violation_threshold=0.8,
-)
-
-# Arguments exceeding threshold are blocked
-# Debate may be paused for review
-```
-
-### Remediate Mode
-
-```python
-guard = EthicsGuard(mode="remediate")
-
-# Guard attempts to fix violations
-# Modified argument continues
-```
-
-## Remediation
-
-When in remediate mode, the guard can fix some violations:
-
-```python
-if result.has_violation:
-    remediated = await guard.remediate(argument, result)
-
-    print(f"Original: {argument.content}")
-    print(f"Remediated: {remediated.content}")
-    print(f"Changes: {remediated.changes}")
-```
-
-### What Can Be Remediated
-
-| Violation | Remediation |
-|-----------|-------------|
-| Mild insults | Remove offensive language |
-| Exaggeration | Tone down claims |
-| Bias indicators | Add balancing language |
-| Minor privacy | Redact identifying info |
-
-### What Cannot Be Remediated
-
-- Fundamental position changes
-- Core argument restructuring
-- Extensive harmful content
-- Deliberate deception
 
 ## Integration
 
 ### With Debate
 
 ```python
+from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.safety import EthicsGuard, SafetyManager
+from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
-safety = SafetyManager()
-safety.add_monitor(EthicsGuard(sensitivity=0.6))
+agents = [
+    Agent(name="pro", role="Advocate for the proposition", model="gpt-4o"),
+    Agent(name="con", role="Advocate against the proposition", model="gpt-4o"),
+]
+
+guard = EthicsGuard(
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(sensitivity=0.6),
+)
 
 debate = Debate(
     topic="Your topic",
     agents=agents,
-    safety_manager=safety,
+    safety_monitors=[guard.process],
 )
+
+debate.assign_positions({
+    "pro": "supports the proposition",
+    "con": "opposes the proposition",
+})
 
 result = await debate.run()
 
 # Check for ethics violations
 ethics_alerts = [
     a for a in result.safety_alerts
-    if a.type == "ethics"
+    if "ethics" in a.type.lower()
 ]
+
+for alert in ethics_alerts:
+    print(f"Agent: {alert.agent}")
+    print(f"Severity: {alert.severity:.0%}")
 ```
 
-### With Jury
-
-Ethics can influence jury evaluation:
+### With Other Monitors
 
 ```python
-from artemis.core.jury import JuryMember, PERSPECTIVES
-
-# Juror with ethical focus
-ethical_juror = JuryMember(
-    name="ethicist",
-    perspective=PERSPECTIVES["ethical"],
+from artemis.safety import (
+    EthicsGuard,
+    DeceptionMonitor,
+    BehaviorTracker,
+    MonitorMode,
+    EthicsConfig,
 )
 
-# Ethics violations affect juror's scoring
+ethics = EthicsGuard(
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(sensitivity=0.6),
+)
+deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
+behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5)
+
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[
+        ethics.process,
+        deception.process,
+        behavior.process,
+    ],
+)
 ```
 
 ## Sensitivity Tuning
@@ -316,54 +232,17 @@ ethical_juror = JuryMember(
 - More false positives
 - For sensitive contexts
 
-## Context-Aware Detection
-
-The guard considers context:
-
-```python
-guard = EthicsGuard(
-    context_aware=True,
-    topic_sensitivity={
-        "medical": 0.8,    # Higher sensitivity for medical topics
-        "political": 0.7,   # Higher for political topics
-        "technical": 0.5,   # Lower for technical topics
-    },
-)
-```
-
-## Audit Trail
-
-All ethics decisions are logged:
-
-```python
-# Get ethics audit for debate
-audit = guard.get_audit_trail(debate_id)
-
-for entry in audit:
-    print(f"Turn: {entry.turn}")
-    print(f"Agent: {entry.agent}")
-    print(f"Decision: {entry.decision}")
-    print(f"Reasoning: {entry.reasoning}")
-    print(f"Timestamp: {entry.timestamp}")
-```
-
-## Best Practices
-
-1. **Set appropriate sensitivity**: Match to debate context
-2. **Define clear principles**: Be explicit about boundaries
-3. **Use warn mode initially**: Understand patterns before blocking
-4. **Review edge cases**: Some content needs human judgment
-5. **Document decisions**: Maintain audit trail for review
-
-## Common Patterns
+## Common Configurations
 
 ### Academic Debate
 
 ```python
 guard = EthicsGuard(
-    sensitivity=0.5,
-    principles=["accuracy", "fairness", "transparency"],
-    mode="warn",
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(
+        sensitivity=0.5,
+        principles=["accuracy", "fairness", "transparency"],
+    ),
 )
 ```
 
@@ -371,10 +250,11 @@ guard = EthicsGuard(
 
 ```python
 guard = EthicsGuard(
-    sensitivity=0.8,
-    principles=["non-harm", "respect", "fairness"],
-    mode="block",
-    violation_threshold=0.6,
+    mode=MonitorMode.ACTIVE,  # Can halt debate
+    config=EthicsConfig(
+        sensitivity=0.8,
+        principles=["non-harm", "respect", "fairness"],
+    ),
 )
 ```
 
@@ -382,12 +262,21 @@ guard = EthicsGuard(
 
 ```python
 guard = EthicsGuard(
-    sensitivity=0.6,
-    principles=["accuracy", "transparency", "fairness"],
-    detect_manipulation=True,
-    mode="warn",
+    mode=MonitorMode.PASSIVE,
+    config=EthicsConfig(
+        sensitivity=0.6,
+        principles=["accuracy", "transparency", "fairness"],
+    ),
 )
 ```
+
+## Best Practices
+
+1. **Set appropriate sensitivity**: Match to debate context
+2. **Define clear principles**: Be explicit about boundaries
+3. **Use passive mode initially**: Understand patterns before blocking
+4. **Review edge cases**: Some content needs human judgment
+5. **Document decisions**: Track why alerts were generated
 
 ## Next Steps
 

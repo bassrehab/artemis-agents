@@ -53,21 +53,23 @@ print(result["verdict"])
 
 ## Debate State
 
-The `DebateState` tracks debate progress:
+The `DebateNodeState` tracks debate progress:
 
 ```python
-from artemis.integrations import DebateState
+from artemis.integrations import DebateNodeState
 
 # State structure
-class DebateState(TypedDict):
-    topic: str                    # Debate topic
-    positions: dict[str, str]     # Agent positions
-    rounds: int                   # Number of rounds
-    current_round: int            # Current round
-    transcript: list[Turn]        # Debate transcript
-    verdict: Verdict | None       # Final verdict
-    safety_alerts: list[Alert]    # Safety alerts
-    metadata: dict                # Additional metadata
+class DebateNodeState(TypedDict, total=False):
+    topic: str                       # Debate topic
+    agents: list[AgentStateConfig]   # Agent configurations
+    positions: dict[str, str]        # Agent positions
+    rounds: int                      # Number of rounds
+    current_round: int               # Current round
+    phase: str                       # Current debate phase
+    transcript: list[dict]           # Debate transcript
+    verdict: dict | None             # Final verdict
+    scores: dict[str, float]         # Agent scores
+    metadata: dict                   # Additional metadata
 ```
 
 ## Pre-built Workflows
@@ -79,40 +81,43 @@ A complete debate workflow:
 ```python
 from artemis.integrations import create_debate_workflow
 
-# Create the workflow
-workflow = create_debate_workflow(
-    model="gpt-4o",
-    rounds=3,
-    enable_safety=True,
-)
+# Create the workflow (single-node by default)
+workflow = create_debate_workflow(model="gpt-4o")
 
 # Run
 result = await workflow.ainvoke({
     "topic": "Is functional programming better than OOP?",
+    "rounds": 3,
 })
 
-print(f"Verdict: {result['verdict'].decision}")
+print(f"Verdict: {result['verdict']['decision']}")
 ```
 
-### create_decision_workflow
+### Step-by-Step Workflow
 
-A workflow that uses debate for decision-making:
+For more control, use step-by-step mode:
 
 ```python
-from artemis.integrations import create_decision_workflow
+from artemis.integrations import create_debate_workflow
 
-workflow = create_decision_workflow(
+# Create step-by-step workflow
+workflow = create_debate_workflow(
     model="gpt-4o",
-    decision_threshold=0.7,  # Confidence threshold for decisions
+    step_by_step=True,
 )
 
+# Run with multi-agent support
 result = await workflow.ainvoke({
-    "question": "Should we migrate to cloud?",
-    "context": "Current on-prem infrastructure is aging...",
+    "topic": "Should we migrate to cloud?",
+    "agents": [
+        {"name": "tech_lead", "role": "Technical Lead", "position": "supports migration"},
+        {"name": "finance", "role": "Finance Director", "position": "concerned about costs"},
+    ],
+    "rounds": 3,
 })
 
-print(f"Decision: {result['decision']}")
-print(f"Reasoning: {result['reasoning']}")
+print(f"Decision: {result['verdict']['decision']}")
+print(f"Confidence: {result['verdict']['confidence']}")
 ```
 
 ## Custom Workflows
@@ -298,19 +303,26 @@ history = app.get_state_history(
 
 ## Integration with Safety
 
+Safety monitoring is configured via the `DebateConfig`:
+
 ```python
 from artemis.integrations import ArtemisDebateNode
-from artemis.safety import CompositeMonitor
+from artemis.core.types import DebateConfig
 
-# Create node with safety monitoring
+# Create node with safety monitoring enabled
+config = DebateConfig(
+    safety_mode="active",
+    halt_on_safety_violation=True,
+)
+
 debate_node = ArtemisDebateNode(
     model="gpt-4o",
-    safety_monitor=CompositeMonitor.default(),
+    debate_config=config,
 )
 
 def check_safety(state):
-    alerts = state["safety_alerts"]
-    if any(a.severity > 0.8 for a in alerts):
+    # Check for safety alerts in the debate result
+    if state.get("phase") == "error":
         return "halt"
     return "continue"
 
