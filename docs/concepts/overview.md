@@ -142,6 +142,7 @@ Arguments are structured data with hierarchy:
 from artemis.core.types import Argument, ArgumentLevel
 
 argument = Argument(
+    agent="pro_agent",
     content="The main argument text...",
     level=ArgumentLevel.STRATEGIC,
     evidence=[...],

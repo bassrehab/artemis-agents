@@ -90,7 +90,7 @@ agent_with_reasoning = Agent(
     name="reasoning_agent",
     role="Deep analyst with extended thinking",
     model="deepseek-reasoner",
-    reasoning=reasoning_config,
+    reasoning_config=reasoning_config,
 )
 
 # Agent with persona
@@ -108,10 +108,9 @@ persona_agent = Agent(
 |--------|------|---------|-------------|
 | `name` | str | required | Unique agent identifier |
 | `role` | str | required | Agent's role description |
-| `model` | str | required | LLM model to use |
+| `model` | str | "gpt-4o" | LLM model to use |
 | `position` | str | None | Agent's debate position |
-| `persona` | str | None | Persona description |
-| `reasoning` | ReasoningConfig | None | Reasoning model config |
+| `reasoning_config` | ReasoningConfig | None | Reasoning model config |
 
 ### Reasoning Configuration
 
@@ -142,12 +141,6 @@ model = create_model(
 # DeepSeek with reasoning
 model = create_model(
     "deepseek-reasoner",
-    api_key="your-key",
-)
-
-# Anthropic
-model = create_model(
-    "claude-3-sonnet",
     api_key="your-key",
 )
 ```
@@ -187,8 +180,10 @@ behavior = BehaviorTracker(
 )
 
 ethics_config = EthicsConfig(
-    sensitivity=0.7,
-    principles=["fairness", "transparency", "non-harm"],
+    harmful_content_threshold=0.3,
+    bias_threshold=0.4,
+    fairness_threshold=0.3,
+    enabled_checks=["harmful_content", "bias", "fairness"],
 )
 
 ethics = EthicsGuard(

@@ -10,38 +10,35 @@ from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 from artemis.safety import (
     MonitorMode,
-    SafetyManager,
     SandbagDetector,
     DeceptionMonitor,
     BehaviorTracker,
     EthicsGuard,
+    EthicsConfig,
 )
 
 async def run_safe_debate():
-    # Create safety manager
-    safety = SafetyManager(mode=MonitorMode.PASSIVE)
-
-    # Add monitors with actual API parameters
-    safety.add_monitor(SandbagDetector(
+    # Create individual monitors with actual API parameters
+    sandbag = SandbagDetector(
         mode=MonitorMode.PASSIVE,
         sensitivity=0.7,
         baseline_turns=3,
         drop_threshold=0.3,
-    ))
-    safety.add_monitor(DeceptionMonitor(
+    )
+    deception = DeceptionMonitor(
         mode=MonitorMode.PASSIVE,
         sensitivity=0.6,
-    ))
-    safety.add_monitor(BehaviorTracker(
+    )
+    behavior = BehaviorTracker(
         mode=MonitorMode.PASSIVE,
         sensitivity=0.5,
-        baseline_turns=3,
+        window_size=5,
         drift_threshold=0.25,
-    ))
-    safety.add_monitor(EthicsGuard(
+    )
+    ethics = EthicsGuard(
         mode=MonitorMode.PASSIVE,
-        sensitivity=0.5,
-    ))
+        config=EthicsConfig(harmful_content_threshold=0.5),
+    )
 
     # Create agents (role is required)
     agents = [
@@ -58,12 +55,17 @@ async def run_safe_debate():
     ]
 
     # Create debate with safety monitors
-    # Note: We pass monitor callbacks to safety_monitors parameter
+    # Pass monitor.process methods to safety_monitors parameter
     debate = Debate(
         topic="Should facial recognition be used in public spaces?",
         agents=agents,
         rounds=3,
-        safety_monitors=[m.process for m in safety.monitors],
+        safety_monitors=[
+            sandbag.process,
+            deception.process,
+            behavior.process,
+            ethics.process,
+        ],
     )
 
     debate.assign_positions({
@@ -87,37 +89,32 @@ async def run_safe_debate():
     else:
         print("No safety alerts detected.")
 
-    # Get risk summary from manager
-    risk_summary = safety.get_risk_summary()
-    print("\nRisk Summary by Agent:")
-    for agent, stats in risk_summary.items():
-        print(f"  {agent}: avg_risk={stats.get('avg_risk', 0):.2f}")
-
 asyncio.run(run_safe_debate())
 ```
 
-## Using Composite Monitor
+## Using Multiple Monitors
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
 from artemis.safety import (
-    CompositeMonitor,
     MonitorMode,
     SandbagDetector,
     DeceptionMonitor,
+    BehaviorTracker,
+    EthicsGuard,
+    EthicsConfig,
 )
 
-async def run_with_composite():
-    # Create composite monitor with multiple sub-monitors
-    composite = CompositeMonitor(
-        monitors=[
-            SandbagDetector(sensitivity=0.6),
-            DeceptionMonitor(sensitivity=0.6),
-        ],
-        aggregation="max",  # Options: "max", "mean", "sum"
-    )
+async def run_with_all_monitors():
+    # Create all monitors
+    monitors = [
+        SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.6),
+        DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6),
+        BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5, window_size=5),
+        EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(harmful_content_threshold=0.5)),
+    ]
 
     agents = [
         Agent(name="pro", role="Advocate for the topic", model="gpt-4o"),
@@ -128,7 +125,7 @@ async def run_with_composite():
         topic="Is genetic engineering of humans ethical?",
         agents=agents,
         rounds=3,
-        safety_monitors=[composite.process],
+        safety_monitors=[m.process for m in monitors],
     )
 
     debate.assign_positions({
@@ -150,7 +147,7 @@ async def run_with_composite():
         for alert in alerts:
             print(f"  Agent {alert.agent}: severity={alert.severity:.2f}")
 
-asyncio.run(run_with_composite())
+asyncio.run(run_with_all_monitors())
 ```
 
 ## Sandbagging Detection
@@ -193,7 +190,7 @@ async def detect_sandbagging():
     print("SANDBAGGING ANALYSIS")
     print("=" * 60)
 
-    sandbagging_alerts = [a for a in result.safety_alerts if a.type == "sandbagging"]
+    sandbagging_alerts = [a for a in result.safety_alerts if "sandbag" in a.type.lower()]
 
     if sandbagging_alerts:
         for alert in sandbagging_alerts:
@@ -204,15 +201,6 @@ async def detect_sandbagging():
                 print(f"  Evidence: {indicator.evidence}")
     else:
         print("No sandbagging detected.")
-
-    # Get baseline info
-    for agent_name in ["agent_a", "agent_b"]:
-        baseline = detector.get_agent_baseline(agent_name)
-        if baseline:
-            print(f"\n{agent_name} Baseline:")
-            print(f"  Turns analyzed: {baseline.turn_count}")
-            print(f"  Avg complexity: {baseline.avg_complexity:.2f}")
-            print(f"  Max complexity: {baseline.max_complexity:.2f}")
 
 asyncio.run(detect_sandbagging())
 ```
@@ -230,9 +218,6 @@ async def detect_deception():
     monitor = DeceptionMonitor(
         mode=MonitorMode.PASSIVE,
         sensitivity=0.7,
-        fallacy_weight=0.3,  # Weight for logical fallacy detection
-        manipulation_weight=0.4,  # Weight for manipulation detection
-        contradiction_weight=0.5,  # Weight for self-contradiction detection
     )
 
     agents = [
@@ -258,7 +243,7 @@ async def detect_deception():
     print("DECEPTION ANALYSIS")
     print("=" * 60)
 
-    deception_alerts = [a for a in result.safety_alerts if a.type == "deception"]
+    deception_alerts = [a for a in result.safety_alerts if "deception" in a.type.lower()]
 
     for alert in deception_alerts:
         print(f"\nAgent: {alert.agent}")
@@ -267,16 +252,6 @@ async def detect_deception():
         for indicator in alert.indicators:
             print(f"  Type: {indicator.type.value}")
             print(f"  Evidence: {indicator.evidence}")
-            if indicator.metadata:
-                print(f"  Signal: {indicator.metadata.get('signal', 'N/A')}")
-
-    # Get deception summary per agent
-    for agent_name in ["claimant", "challenger"]:
-        summary = monitor.get_deception_summary(agent_name)
-        print(f"\n{agent_name} Summary:")
-        print(f"  Fallacies detected: {summary['fallacies']}")
-        print(f"  Contradictions: {summary['contradictions']}")
-        print(f"  Total claims tracked: {summary['claims']}")
 
 asyncio.run(detect_deception())
 ```
@@ -296,23 +271,15 @@ from artemis.safety import (
 async def run_with_ethics():
     # Configure ethics enforcement
     ethics_config = EthicsConfig(
-        harmful_content_threshold=0.5,
+        harmful_content_threshold=0.3,
         bias_threshold=0.4,
         fairness_threshold=0.3,
-        enabled_checks=[
-            "harmful_content",
-            "bias",
-            "fairness",
-            "privacy",
-            "manipulation",
-        ],
+        enabled_checks=["harmful_content", "bias", "fairness", "privacy"],
     )
 
     guard = EthicsGuard(
         mode=MonitorMode.ACTIVE,  # Can halt on severe violations
-        sensitivity=0.7,
-        ethics_config=ethics_config,
-        halt_on_violation=True,  # Halt on severe ethics violations
+        config=ethics_config,
     )
 
     agents = [
@@ -332,32 +299,19 @@ async def run_with_ethics():
         "privacy": "opposes employer monitoring for privacy",
     })
 
-    try:
-        result = await debate.run()
+    result = await debate.run()
 
-        # Analyze ethics alerts
-        print("ETHICS ANALYSIS")
-        print("=" * 60)
+    # Analyze ethics alerts
+    print("ETHICS ANALYSIS")
+    print("=" * 60)
 
-        ethics_alerts = [a for a in result.safety_alerts if "ethics" in a.type]
+    ethics_alerts = [a for a in result.safety_alerts if "ethics" in a.type.lower()]
 
-        for alert in ethics_alerts:
-            print(f"\nAgent: {alert.agent}")
-            print(f"Severity: {alert.severity:.2f}")
-            for indicator in alert.indicators:
-                print(f"  Violation: {indicator.metadata.get('violation', 'N/A')}")
-                print(f"  Evidence: {indicator.evidence}")
-
-        # Get ethics summary
-        for agent_name in ["security", "privacy"]:
-            summary = guard.get_agent_ethics_summary(agent_name)
-            print(f"\n{agent_name} Ethics Summary:")
-            print(f"  Total violations: {summary['total_violations']}")
-            print(f"  Max severity: {summary['max_severity']:.2f}")
-            print(f"  Violation types: {summary['violation_types']}")
-
-    except Exception as e:
-        print(f"Debate halted: {e}")
+    for alert in ethics_alerts:
+        print(f"\nAgent: {alert.agent}")
+        print(f"Severity: {alert.severity:.2f}")
+        for indicator in alert.indicators:
+            print(f"  Evidence: {indicator.evidence}")
 
 asyncio.run(run_with_ethics())
 ```
@@ -375,9 +329,8 @@ async def track_behavior():
     tracker = BehaviorTracker(
         mode=MonitorMode.PASSIVE,
         sensitivity=0.6,
-        baseline_turns=3,
+        window_size=5,
         drift_threshold=0.25,  # Threshold for style drift detection
-        aggression_threshold=0.6,  # Threshold for aggression alerts
     )
 
     agents = [
@@ -399,65 +352,44 @@ async def track_behavior():
 
     result = await debate.run()
 
-    # Get behavior summaries
+    # Get behavior tracking results
     print("BEHAVIOR TRACKING")
     print("=" * 60)
 
-    for agent in agents:
-        print(f"\n{agent.name.upper()} Behavior Profile:")
-        summary = tracker.get_drift_summary(agent.name)
-
-        print(f"  Snapshots collected: {summary['snapshots']}")
-        print(f"  Drift events detected: {summary['drift_events']}")
-        print(f"  Avg aggression: {summary['avg_aggression']:.2f}")
-        print(f"  Avg cooperation: {summary['avg_cooperation']:.2f}")
-        print(f"  Avg formality: {summary.get('avg_formality', 0.5):.2f}")
-
-        # Get detailed profile if available
-        profile = tracker.get_agent_profile(agent.name)
-        if profile and profile.drift_events:
-            print("  Drift Events:")
-            for round_num, signal, severity in profile.drift_events:
-                print(f"    Round {round_num}: {signal} (severity: {severity:.2f})")
-
     # Show drift alerts
-    drift_alerts = [a for a in result.safety_alerts if "drift" in a.type]
+    drift_alerts = [a for a in result.safety_alerts if "drift" in a.type.lower() or "behavior" in a.type.lower()]
     if drift_alerts:
         print("\nDrift Alerts:")
         for alert in drift_alerts:
             print(f"  Agent {alert.agent}: severity={alert.severity:.2f}")
+    else:
+        print("\nNo behavior drift detected.")
 
 asyncio.run(track_behavior())
 ```
 
-## Active Mode with Halt Capability
+## Active Mode with Safety Config
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
-from artemis.core.debate import Debate, DebateConfig, DebateHaltedError
+from artemis.core.debate import Debate
+from artemis.core.types import DebateConfig
 from artemis.safety import (
     MonitorMode,
     SandbagDetector,
     DeceptionMonitor,
-    CompositeMonitor,
 )
 
 async def run_with_active_monitoring():
-    # Create monitors in active mode - they can halt the debate
-    composite = CompositeMonitor(
-        monitors=[
-            SandbagDetector(
-                mode=MonitorMode.ACTIVE,
-                sensitivity=0.8,
-            ),
-            DeceptionMonitor(
-                mode=MonitorMode.ACTIVE,
-                sensitivity=0.7,
-            ),
-        ],
-        aggregation="max",
-        mode=MonitorMode.ACTIVE,  # Composite is also active
+    # Create monitors in active mode - they can contribute to halt decisions
+    sandbag = SandbagDetector(
+        mode=MonitorMode.ACTIVE,
+        sensitivity=0.8,
+    )
+    deception = DeceptionMonitor(
+        mode=MonitorMode.ACTIVE,
+        sensitivity=0.7,
     )
 
     agents = [
@@ -467,6 +399,7 @@ async def run_with_active_monitoring():
 
     # Enable halt on safety violation in config
     config = DebateConfig(
+        safety_mode="active",
         halt_on_safety_violation=True,
     )
 
@@ -475,7 +408,7 @@ async def run_with_active_monitoring():
         agents=agents,
         rounds=3,
         config=config,
-        safety_monitors=[composite.process],
+        safety_monitors=[sandbag.process, deception.process],
     )
 
     debate.assign_positions({
@@ -483,64 +416,80 @@ async def run_with_active_monitoring():
         "critic": "opposes AI medical diagnosis",
     })
 
-    try:
-        result = await debate.run()
-        print(f"Debate completed. Verdict: {result.verdict.decision}")
+    result = await debate.run()
+    print(f"Debate completed. Verdict: {result.verdict.decision}")
 
-        # Show any alerts that didn't cause halt
-        if result.safety_alerts:
-            print(f"\nWarnings raised: {len(result.safety_alerts)}")
-            for alert in result.safety_alerts:
-                print(f"  - {alert.type}: {alert.severity:.2f}")
-
-    except DebateHaltedError as e:
-        print(f"Debate was halted!")
-        print(f"Reason: {e}")
-        print(f"Alert details: {e.alert}")
+    # Show any alerts
+    if result.safety_alerts:
+        print(f"\nSafety warnings raised: {len(result.safety_alerts)}")
+        for alert in result.safety_alerts:
+            print(f"  - {alert.type}: {alert.severity:.2f}")
 
 asyncio.run(run_with_active_monitoring())
 ```
 
-## Monitor Registry Pattern
+## Comprehensive Safety Setup
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
+from artemis.core.types import DebateConfig
 from artemis.safety import (
     MonitorMode,
-    MonitorRegistry,
     SandbagDetector,
     DeceptionMonitor,
     BehaviorTracker,
     EthicsGuard,
+    EthicsConfig,
 )
 
-async def run_with_registry():
-    # Use registry for centralized monitor management
-    registry = MonitorRegistry()
-
-    # Register all monitors
-    registry.register(SandbagDetector(sensitivity=0.6))
-    registry.register(DeceptionMonitor(sensitivity=0.6))
-    registry.register(BehaviorTracker(sensitivity=0.5))
-    registry.register(EthicsGuard(sensitivity=0.5))
-
-    print(f"Registered {len(registry)} monitors:")
-    for monitor in registry:
-        print(f"  - {monitor.name} ({monitor.monitor_type})")
+async def run_comprehensive_safety():
+    # Create all safety monitors
+    sandbag = SandbagDetector(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.7,
+        baseline_turns=3,
+    )
+    deception = DeceptionMonitor(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.6,
+    )
+    behavior = BehaviorTracker(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.5,
+        window_size=5,
+    )
+    ethics = EthicsGuard(
+        mode=MonitorMode.PASSIVE,
+        config=EthicsConfig(
+            harmful_content_threshold=0.4,
+            bias_threshold=0.4,
+            fairness_threshold=0.3,
+            enabled_checks=["harmful_content", "bias", "fairness"],
+        ),
+    )
 
     agents = [
         Agent(name="pro", role="Proposition advocate", model="gpt-4o"),
         Agent(name="con", role="Opposition advocate", model="gpt-4o"),
     ]
 
-    # Create debate with all registered monitors
+    config = DebateConfig(
+        safety_mode="passive",
+    )
+
     debate = Debate(
         topic="Should programming be taught in elementary schools?",
         agents=agents,
         rounds=3,
-        safety_monitors=[m.process for m in registry.get_enabled()],
+        config=config,
+        safety_monitors=[
+            sandbag.process,
+            deception.process,
+            behavior.process,
+            ethics.process,
+        ],
     )
 
     debate.assign_positions({
@@ -565,10 +514,7 @@ async def run_with_registry():
         for alert in alerts[:3]:  # Show first 3
             print(f"  - {alert.type}: severity={alert.severity:.2f}")
 
-    # Reset all monitors for next debate
-    registry.reset_all()
-
-asyncio.run(run_with_registry())
+asyncio.run(run_comprehensive_safety())
 ```
 
 ## Next Steps

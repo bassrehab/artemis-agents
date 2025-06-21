@@ -280,8 +280,7 @@ async def run_reorg_debate():
 
     ethics_guard = EthicsGuard(
         mode=MonitorMode.PASSIVE,
-        sensitivity=0.7,
-        ethics_config=ethics_config,
+        config=ethics_config,
     )
 
     # Leadership jury

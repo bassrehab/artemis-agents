@@ -170,7 +170,7 @@ deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
 sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
 ethics = EthicsGuard(
     mode=MonitorMode.PASSIVE,
-    config=EthicsConfig(sensitivity=0.5),
+    config=EthicsConfig(harmful_content_threshold=0.5),
 )
 
 debate = Debate(
