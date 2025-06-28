@@ -1,13 +1,4 @@
-"""
-ARTEMIS Deception Detection Monitor
-
-Detects potential deceptive behavior in debate agents including:
-- Factual inconsistencies between statements
-- Logical fallacies and misleading reasoning
-- Emotional manipulation tactics
-- Citation fabrication or misrepresentation
-- Contradiction detection within and across turns
-"""
+"""Deception detection - fallacies, manipulation, contradictions."""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -27,31 +18,14 @@ logger = get_logger(__name__)
 
 
 class DeceptionSignal(str, Enum):
-    """Types of deception signals detected."""
-
     FACTUAL_INCONSISTENCY = "factual_inconsistency"
-    """Contradictory factual claims."""
-
     LOGICAL_FALLACY = "logical_fallacy"
-    """Use of fallacious reasoning."""
-
     EMOTIONAL_MANIPULATION = "emotional_manipulation"
-    """Appeal to emotion over logic."""
-
     CITATION_FABRICATION = "citation_fabrication"
-    """Invented or misrepresented sources."""
-
     SELF_CONTRADICTION = "self_contradiction"
-    """Agent contradicts own previous statements."""
-
     STRAWMAN_ARGUMENT = "strawman_argument"
-    """Misrepresenting opponent's position."""
-
     GOALPOST_MOVING = "goalpost_moving"
-    """Shifting criteria when challenged."""
-
     CHERRY_PICKING = "cherry_picking"
-    """Selective use of evidence."""
 
 
 # Common logical fallacy patterns (simplified keyword detection)
@@ -117,45 +91,23 @@ MANIPULATION_PATTERNS: list[str] = [
 
 @dataclass
 class ClaimRecord:
-    """Record of a claim made by an agent."""
-
     agent: str
     round: int
     claim: str
-    """The core claim text."""
     keywords: set[str] = field(default_factory=set)
-    """Key terms in the claim."""
     polarity: str = "neutral"
-    """Positive, negative, or neutral stance."""
 
 
 @dataclass
 class AgentClaimHistory:
-    """History of claims made by an agent."""
-
     claims: list[ClaimRecord] = field(default_factory=list)
     positions: dict[str, str] = field(default_factory=dict)
-    """Topic -> stance mapping."""
     contradiction_count: int = 0
     fallacy_count: int = 0
 
 
 class DeceptionMonitor(SafetyMonitor):
-    """
-    Detects potential deceptive behavior in debate agents.
-
-    Monitors for logical fallacies, factual inconsistencies,
-    emotional manipulation, and self-contradictions.
-
-    Example:
-        >>> monitor = DeceptionMonitor(
-        ...     mode=MonitorMode.ACTIVE,
-        ...     sensitivity=0.7,
-        ... )
-        >>> result = await monitor.analyze(turn, context)
-        >>> if result.should_alert:
-        ...     print(f"Deception detected: {result.analysis_notes}")
-    """
+    """Detects fallacies, manipulation, inconsistencies, contradictions."""
 
     def __init__(
         self,
@@ -166,19 +118,7 @@ class DeceptionMonitor(SafetyMonitor):
         manipulation_weight: float = 0.4,
         contradiction_weight: float = 0.5,
         **kwargs,
-    ) -> None:
-        """
-        Initialize the deception monitor.
-
-        Args:
-            config: Monitor configuration.
-            mode: Operating mode.
-            sensitivity: Detection sensitivity (0-1).
-            fallacy_weight: Weight for fallacy detection (0-1).
-            manipulation_weight: Weight for manipulation detection (0-1).
-            contradiction_weight: Weight for contradiction detection (0-1).
-            **kwargs: Additional configuration.
-        """
+    ):
         self._sensitivity = min(1.0, max(0.0, sensitivity))
         self._fallacy_weight = fallacy_weight
         self._manipulation_weight = manipulation_weight
@@ -200,21 +140,8 @@ class DeceptionMonitor(SafetyMonitor):
     def monitor_type(self) -> str:
         return "deception"
 
-    async def analyze(
-        self,
-        turn: Turn,
-        context: DebateContext,
-    ) -> SafetyResult:
-        """
-        Analyze a turn for deception indicators.
-
-        Args:
-            turn: The turn to analyze.
-            context: Current debate context.
-
-        Returns:
-            SafetyResult with deception severity and indicators.
-        """
+    async def analyze(self, turn: Turn, context: DebateContext) -> SafetyResult:
+        """Analyze a turn for deception indicators."""
         agent = turn.agent
         argument = turn.argument
 

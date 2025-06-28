@@ -1,9 +1,4 @@
-"""
-ARTEMIS MCP Session Management
-
-Manages debate sessions for the MCP server with
-persistence, caching, and cleanup capabilities.
-"""
+"""MCP session management with persistence and caching."""
 
 import asyncio
 import contextlib
@@ -96,32 +91,9 @@ class SessionSnapshot:
 
 
 class SessionStore:
-    """
-    Persistent storage for debate sessions.
+    """Persistent storage for debate sessions with caching."""
 
-    Provides file-based persistence with optional
-    in-memory caching for performance.
-
-    Example:
-        >>> store = SessionStore("/path/to/sessions")
-        >>> await store.save(snapshot)
-        >>> restored = await store.load(session_id)
-    """
-
-    def __init__(
-        self,
-        storage_path: str | Path | None = None,
-        cache_enabled: bool = True,
-        max_cache_size: int = 100,
-    ) -> None:
-        """
-        Initialize the session store.
-
-        Args:
-            storage_path: Directory for session files.
-            cache_enabled: Whether to cache sessions in memory.
-            max_cache_size: Maximum cached sessions.
-        """
+    def __init__(self, storage_path=None, cache_enabled=True, max_cache_size=100):
         self.storage_path = Path(storage_path) if storage_path else None
         self.cache_enabled = cache_enabled
         self.max_cache_size = max_cache_size
@@ -136,13 +108,8 @@ class SessionStore:
             cache_enabled=cache_enabled,
         )
 
-    async def save(self, snapshot: SessionSnapshot) -> None:
-        """
-        Save a session snapshot.
-
-        Args:
-            snapshot: Session snapshot to save.
-        """
+    async def save(self, snapshot: SessionSnapshot):
+        """Save a session snapshot."""
         session_id = snapshot.metadata.session_id
 
         # Update cache
@@ -160,16 +127,8 @@ class SessionStore:
 
         logger.debug("Session saved", session_id=session_id)
 
-    async def load(self, session_id: str) -> SessionSnapshot | None:
-        """
-        Load a session snapshot.
-
-        Args:
-            session_id: Session to load.
-
-        Returns:
-            Session snapshot or None if not found.
-        """
+    async def load(self, session_id: str):
+        """Load a session snapshot."""
         # Check cache first
         if self.cache_enabled and session_id in self._cache:
             return self._cache[session_id]
@@ -191,16 +150,8 @@ class SessionStore:
 
         return None
 
-    async def delete(self, session_id: str) -> bool:
-        """
-        Delete a session.
-
-        Args:
-            session_id: Session to delete.
-
-        Returns:
-            True if deleted, False if not found.
-        """
+    async def delete(self, session_id: str):
+        """Delete a session."""
         deleted = False
 
         # Remove from cache
@@ -218,23 +169,8 @@ class SessionStore:
         logger.debug("Session deleted", session_id=session_id, found=deleted)
         return deleted
 
-    async def list_sessions(
-        self,
-        status: str | None = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> list[SessionMetadata]:
-        """
-        List session metadata.
-
-        Args:
-            status: Filter by status.
-            limit: Maximum sessions to return.
-            offset: Offset for pagination.
-
-        Returns:
-            List of session metadata.
-        """
+    async def list_sessions(self, status=None, limit=100, offset=0):
+        """List session metadata with optional filtering."""
         sessions = []
 
         # List from storage
@@ -269,21 +205,8 @@ class SessionStore:
         # Apply pagination
         return sessions[offset:offset + limit]
 
-    async def cleanup(
-        self,
-        max_age_hours: int = 24,
-        status: str | None = None,
-    ) -> int:
-        """
-        Clean up old sessions.
-
-        Args:
-            max_age_hours: Maximum session age in hours.
-            status: Only clean sessions with this status.
-
-        Returns:
-            Number of sessions cleaned up.
-        """
+    async def cleanup(self, max_age_hours=24, status=None):
+        """Clean up old sessions."""
         now = datetime.now()
         cutoff = now - timedelta(hours=max_age_hours)
         cleaned = 0
@@ -312,38 +235,15 @@ class SessionStore:
 
 
 class SessionManager:
-    """
-    High-level session management for the MCP server.
-
-    Handles session lifecycle, state transitions,
-    and coordination with the session store.
-
-    Example:
-        >>> manager = SessionManager()
-        >>> session_id = await manager.create_session(
-        ...     topic="AI ethics",
-        ...     model="gpt-4o",
-        ... )
-        >>> await manager.update_round(session_id, transcript_data)
-        >>> await manager.complete_session(session_id, verdict)
-    """
+    """High-level session management for MCP server."""
 
     def __init__(
         self,
-        store: SessionStore | None = None,
-        auto_cleanup: bool = True,
-        cleanup_interval_hours: int = 1,
-        max_session_age_hours: int = 24,
-    ) -> None:
-        """
-        Initialize the session manager.
-
-        Args:
-            store: Session store (creates default if not provided).
-            auto_cleanup: Whether to run automatic cleanup.
-            cleanup_interval_hours: Hours between cleanups.
-            max_session_age_hours: Maximum session age.
-        """
+        store=None,
+        auto_cleanup=True,
+        cleanup_interval_hours=1,
+        max_session_age_hours=24,
+    ):
         self.store = store or SessionStore()
         self.auto_cleanup = auto_cleanup
         self.cleanup_interval_hours = cleanup_interval_hours
@@ -368,28 +268,12 @@ class SessionManager:
             logger.info("Session cleanup task stopped")
 
     async def create_session(
-        self,
-        topic: str,
-        model: str,
-        rounds: int = 3,
-        pro_position: str = "supports the proposition",
-        con_position: str = "opposes the proposition",
-        tags: list[str] | None = None,
-    ) -> str:
-        """
-        Create a new session.
-
-        Args:
-            topic: Debate topic.
-            model: LLM model.
-            rounds: Number of rounds.
-            pro_position: Pro-side position.
-            con_position: Con-side position.
-            tags: Optional tags.
-
-        Returns:
-            New session ID.
-        """
+        self, topic, model, rounds=3,
+        pro_position="supports the proposition",
+        con_position="opposes the proposition",
+        tags=None,
+    ):
+        """Create a new session."""
         session_id = str(uuid.uuid4())[:8]
         now = datetime.now()
 
@@ -427,18 +311,8 @@ class SessionManager:
         """Get a session by ID."""
         return await self.store.load(session_id)
 
-    async def update_round(
-        self,
-        session_id: str,
-        round_data: list[dict[str, Any]],
-    ) -> None:
-        """
-        Update session with round data.
-
-        Args:
-            session_id: Session to update.
-            round_data: New round transcript entries.
-        """
+    async def update_round(self, session_id, round_data):
+        """Update session with round data."""
         snapshot = await self.store.load(session_id)
         if not snapshot:
             raise ValueError(f"Session {session_id} not found")
@@ -455,18 +329,8 @@ class SessionManager:
             rounds_completed=snapshot.metadata.rounds_completed,
         )
 
-    async def complete_session(
-        self,
-        session_id: str,
-        verdict: dict[str, Any],
-    ) -> None:
-        """
-        Mark a session as completed with verdict.
-
-        Args:
-            session_id: Session to complete.
-            verdict: Verdict data.
-        """
+    async def complete_session(self, session_id, verdict):
+        """Mark session as completed with verdict."""
         snapshot = await self.store.load(session_id)
         if not snapshot:
             raise ValueError(f"Session {session_id} not found")
@@ -483,13 +347,8 @@ class SessionManager:
             verdict=verdict.get("decision"),
         )
 
-    async def archive_session(self, session_id: str) -> None:
-        """
-        Archive a completed session.
-
-        Args:
-            session_id: Session to archive.
-        """
+    async def archive_session(self, session_id):
+        """Archive a completed session."""
         snapshot = await self.store.load(session_id)
         if not snapshot:
             raise ValueError(f"Session {session_id} not found")
@@ -530,20 +389,8 @@ def generate_session_id() -> str:
     return str(uuid.uuid4())[:8]
 
 
-async def create_session_manager(
-    storage_path: str | Path | None = None,
-    **kwargs: Any,
-) -> SessionManager:
-    """
-    Factory function to create and start a session manager.
-
-    Args:
-        storage_path: Path for persistent storage.
-        **kwargs: Additional configuration.
-
-    Returns:
-        Started session manager.
-    """
+async def create_session_manager(storage_path=None, **kwargs):
+    """Factory to create and start a session manager."""
     store = SessionStore(storage_path=storage_path)
     manager = SessionManager(store=store, **kwargs)
     await manager.start()

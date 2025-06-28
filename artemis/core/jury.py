@@ -1,9 +1,4 @@
-"""
-ARTEMIS Jury Panel
-
-Implements the multi-perspective jury scoring mechanism for debate evaluation.
-Provides independent evaluation, consensus building, and verdict generation.
-"""
+"""Multi-perspective jury scoring for debate evaluation."""
 
 import asyncio
 from dataclasses import dataclass, field
@@ -37,49 +32,26 @@ DEFAULT_JURY_CRITERIA = [
 
 @dataclass
 class JurorEvaluation:
-    """Evaluation result from a single juror."""
-
     juror_id: str
     perspective: JuryPerspective
     agent_scores: dict[str, float]
-    """Scores for each agent in the debate."""
     criterion_scores: dict[str, dict[str, float]]
-    """Scores by criterion for each agent."""
     winner: str
-    """The juror's choice for winner."""
     confidence: float
-    """Confidence in the evaluation."""
     reasoning: str
-    """Explanation of the evaluation."""
 
 
 @dataclass
 class ConsensusResult:
-    """Result of consensus building among jurors."""
-
     decision: str
-    agreement_score: float
-    """How much jurors agreed (0-1)."""
+    agreement_score: float  # 0-1
     supporting_jurors: list[str]
     dissenting_jurors: list[str]
     reasoning: str
 
 
 class JuryMember:
-    """
-    A single jury member with a specific evaluation perspective.
-
-    Each juror evaluates debates from their assigned perspective,
-    providing independent scores and reasoning.
-
-    Example:
-        >>> juror = JuryMember(
-        ...     juror_id="juror_0",
-        ...     perspective=JuryPerspective.ANALYTICAL,
-        ...     model="gpt-4o",
-        ... )
-        >>> evaluation = await juror.evaluate(transcript, context)
-    """
+    """Single jury member with specific evaluation perspective."""
 
     # Perspective-specific evaluation focus
     PERSPECTIVE_PROMPTS = {
@@ -134,17 +106,6 @@ class JuryMember:
         api_key: str | None = None,
         **model_kwargs: Any,
     ) -> None:
-        """
-        Initialize a jury member.
-
-        Args:
-            juror_id: Unique identifier for this juror.
-            perspective: The evaluation perspective to use.
-            model: Model identifier or BaseModel instance.
-            criteria: Custom evaluation criteria.
-            api_key: Optional API key for the model provider.
-            **model_kwargs: Additional model arguments.
-        """
         self.juror_id = juror_id
         self.perspective = perspective
         self.criteria = criteria or DEFAULT_JURY_CRITERIA
@@ -170,16 +131,7 @@ class JuryMember:
         transcript: list[Turn],
         context: DebateContext,
     ) -> JurorEvaluation:
-        """
-        Evaluate a debate transcript from this juror's perspective.
-
-        Args:
-            transcript: List of debate turns.
-            context: Debate context.
-
-        Returns:
-            JurorEvaluation with scores and reasoning.
-        """
+        """Evaluate debate transcript from this juror's perspective."""
         logger.info(
             "Juror evaluating debate",
             juror_id=self.juror_id,
@@ -241,12 +193,8 @@ class JuryMember:
             reasoning=reasoning,
         )
 
-    def _compute_agent_scores(
-        self,
-        evaluations: dict[str, list[ArgumentEvaluation]],
-    ) -> dict[str, float]:
-        """Compute overall scores for each agent."""
-        scores: dict[str, float] = {}
+    def _compute_agent_scores(self, evaluations):
+        scores = {}
 
         for agent, evals in evaluations.items():
             if not evals:
@@ -258,12 +206,8 @@ class JuryMember:
 
         return scores
 
-    def _compute_criterion_scores(
-        self,
-        evaluations: dict[str, list[ArgumentEvaluation]],
-    ) -> dict[str, dict[str, float]]:
-        """Compute criterion-level scores for each agent."""
-        result: dict[str, dict[str, float]] = {}
+    def _compute_criterion_scores(self, evaluations):
+        result = {}
 
         for agent, evals in evaluations.items():
             if not evals:
@@ -285,27 +229,11 @@ class JuryMember:
 
         return result
 
-    def _apply_perspective_weighting(
-        self,
-        scores: dict[str, float],
-    ) -> dict[str, float]:
-        """
-        Apply perspective-based weighting to scores.
-
-        Different perspectives emphasize different criteria.
-        """
-        # For now, return unweighted scores
-        # Could be enhanced to weight by perspective focus
+    def _apply_perspective_weighting(self, scores):
+        # TODO: actually implement perspective weighting
         return scores
 
-    async def _generate_reasoning(
-        self,
-        transcript: list[Turn],
-        context: DebateContext,
-        scores: dict[str, float],
-        winner: str,
-    ) -> str:
-        """Generate reasoning explanation using LLM."""
+    async def _generate_reasoning(self, transcript, context, scores, winner):
         # Build prompt for reasoning
         perspective_prompt = self.PERSPECTIVE_PROMPTS.get(
             self.perspective,
@@ -359,17 +287,7 @@ Why did {winner} win according to your evaluation perspective?"""
 
 
 class JuryPanel:
-    """
-    Multi-perspective jury panel for debate evaluation.
-
-    Manages multiple jurors with different perspectives, coordinates
-    their evaluations, and builds consensus verdicts.
-
-    Example:
-        >>> panel = JuryPanel(evaluators=3, model="gpt-4o")
-        >>> verdict = await panel.deliberate(transcript, context)
-        >>> print(f"Winner: {verdict.decision}")
-    """
+    """Multi-perspective jury panel for debate evaluation."""
 
     def __init__(
         self,
@@ -380,17 +298,6 @@ class JuryPanel:
         api_key: str | None = None,
         **model_kwargs: Any,
     ) -> None:
-        """
-        Initialize a jury panel.
-
-        Args:
-            evaluators: Number of jury members.
-            criteria: Custom evaluation criteria.
-            model: Model identifier for jurors.
-            consensus_threshold: Required agreement for consensus (0-1).
-            api_key: Optional API key for model provider.
-            **model_kwargs: Additional model arguments.
-        """
         self.criteria = criteria or DEFAULT_JURY_CRITERIA
         self.consensus_threshold = consensus_threshold
 
@@ -414,8 +321,7 @@ class JuryPanel:
             consensus_threshold=consensus_threshold,
         )
 
-    def _assign_perspective(self, index: int) -> JuryPerspective:
-        """Assign diverse perspectives to jurors."""
+    def _assign_perspective(self, index):
         perspectives = list(JuryPerspective)
         return perspectives[index % len(perspectives)]
 
@@ -424,16 +330,7 @@ class JuryPanel:
         transcript: list[Turn],
         context: DebateContext,
     ) -> Verdict:
-        """
-        Conduct jury deliberation and reach a verdict.
-
-        Args:
-            transcript: Complete debate transcript.
-            context: Debate context.
-
-        Returns:
-            Final Verdict with decision and reasoning.
-        """
+        """Conduct jury deliberation and reach verdict."""
         logger.info(
             "Jury deliberation started",
             jurors=len(self.jurors),
@@ -481,16 +378,8 @@ class JuryPanel:
 
         return verdict
 
-    def _build_consensus(
-        self,
-        evaluations: list[JurorEvaluation],
-    ) -> ConsensusResult:
-        """
-        Build consensus from individual evaluations.
-
-        Uses weighted voting based on juror confidence.
-        """
-        # Count votes weighted by confidence
+    def _build_consensus(self, evaluations):
+        # weighted voting by confidence
         vote_scores: dict[str, float] = {}
         for evaluation in evaluations:
             winner = evaluation.winner
@@ -538,12 +427,7 @@ class JuryPanel:
             reasoning=f"{len(supporting)} of {len(evaluations)} jurors support this decision.",
         )
 
-    def _calculate_confidence(
-        self,
-        evaluations: list[JurorEvaluation],
-        consensus: ConsensusResult,
-    ) -> float:
-        """Calculate overall confidence in the verdict."""
+    def _calculate_confidence(self, evaluations, consensus):
         if not evaluations:
             return 0.0
 
@@ -558,13 +442,8 @@ class JuryPanel:
 
         return min(1.0, combined)
 
-    def _collect_dissents(
-        self,
-        evaluations: list[JurorEvaluation],
-        consensus: ConsensusResult,
-    ) -> list[DissentingOpinion]:
-        """Collect dissenting opinions from jurors who disagreed."""
-        dissents: list[DissentingOpinion] = []
+    def _collect_dissents(self, evaluations, consensus):
+        dissents = []
 
         for evaluation in evaluations:
             if evaluation.winner != consensus.decision:
@@ -595,11 +474,7 @@ class JuryPanel:
 
         return dissents
 
-    def _aggregate_scores(
-        self,
-        evaluations: list[JurorEvaluation],
-    ) -> dict[str, float]:
-        """Aggregate scores across all jurors."""
+    def _aggregate_scores(self, evaluations):
         if not evaluations:
             return {}
 
@@ -621,13 +496,7 @@ class JuryPanel:
 
         return aggregated
 
-    def _generate_verdict_reasoning(
-        self,
-        evaluations: list[JurorEvaluation],
-        consensus: ConsensusResult,
-        scores: dict[str, float],
-    ) -> str:
-        """Generate comprehensive verdict reasoning."""
+    def _generate_verdict_reasoning(self, evaluations, consensus, scores):
         parts = []
 
         # Overall decision
@@ -666,15 +535,13 @@ class JuryPanel:
 
         return " ".join(parts)
 
-    def get_juror(self, juror_id: str) -> JuryMember | None:
-        """Get a specific juror by ID."""
+    def get_juror(self, juror_id: str):
         for juror in self.jurors:
             if juror.juror_id == juror_id:
                 return juror
         return None
 
-    def get_perspectives(self) -> list[JuryPerspective]:
-        """Get list of perspectives represented in the panel."""
+    def get_perspectives(self):
         return [juror.perspective for juror in self.jurors]
 
     def __len__(self) -> int:
@@ -689,15 +556,8 @@ class JuryPanel:
 
 @dataclass
 class JuryConfig:
-    """Configuration for jury panel creation."""
-
     evaluators: int = 3
-    """Number of jury members."""
     model: str = "gpt-4o"
-    """Model to use for jurors."""
     consensus_threshold: float = 0.7
-    """Required agreement for consensus."""
     criteria: list[str] = field(default_factory=lambda: DEFAULT_JURY_CRITERIA)
-    """Evaluation criteria."""
     require_reasoning: bool = True
-    """Whether to generate detailed reasoning."""

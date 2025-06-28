@@ -1,9 +1,4 @@
-"""
-ARTEMIS Safety Monitor Base
-
-Abstract base class and infrastructure for safety monitoring in debates.
-Provides the foundation for detecting sandbagging, deception, and behavioral drift.
-"""
+"""Safety monitor base classes and infrastructure."""
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -25,16 +20,9 @@ logger = get_logger(__name__)
 
 
 class MonitorMode(str, Enum):
-    """Operating mode for safety monitors."""
-
     PASSIVE = "passive"
-    """Observe and report only."""
-
     ACTIVE = "active"
-    """Can trigger alerts and halt debate."""
-
     LEARNING = "learning"
-    """Collect data without reporting."""
 
 
 class MonitorPriority(str, Enum):
@@ -48,57 +36,29 @@ class MonitorPriority(str, Enum):
 
 @dataclass
 class MonitorConfig:
-    """Configuration for a safety monitor."""
-
     mode: MonitorMode = MonitorMode.PASSIVE
     priority: MonitorPriority = MonitorPriority.MEDIUM
     alert_threshold: float = 0.7
-    """Severity threshold for raising alerts."""
     halt_threshold: float = 0.9
-    """Severity threshold for halting debate."""
     enabled: bool = True
     window_size: int = 5
-    """Number of recent turns to analyze."""
     cooldown_turns: int = 2
-    """Minimum turns between alerts for same issue."""
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class MonitorState:
-    """Internal state tracking for a monitor."""
-
     turn_count: int = 0
     alert_count: int = 0
     last_alert_turn: int = -100
     severity_history: list[float] = field(default_factory=list)
     indicator_history: list[SafetyIndicator] = field(default_factory=list)
     agent_stats: dict[str, dict[str, float]] = field(default_factory=dict)
-    """Per-agent statistics: {agent: {metric: value}}."""
     custom_data: dict[str, Any] = field(default_factory=dict)
 
 
 class SafetyMonitor(ABC):
-    """
-    Abstract base class for safety monitors.
-
-    Safety monitors analyze debate turns for concerning patterns like
-    sandbagging, deception, or behavioral drift. They can operate in
-    passive (observe only) or active (can halt debate) mode.
-
-    Example:
-        >>> class CustomMonitor(SafetyMonitor):
-        ...     @property
-        ...     def name(self) -> str:
-        ...         return "custom_monitor"
-        ...
-        ...     async def analyze(self, turn, context):
-        ...         # Custom analysis logic
-        ...         return SafetyResult(monitor=self.name, severity=0.0)
-        ...
-        >>> monitor = CustomMonitor(mode=MonitorMode.ACTIVE)
-        >>> result = await monitor.analyze(turn, context)
-    """
+    """Base class for safety monitors."""
 
     def __init__(
         self,
@@ -106,14 +66,6 @@ class SafetyMonitor(ABC):
         mode: MonitorMode | None = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize a safety monitor.
-
-        Args:
-            config: Monitor configuration.
-            mode: Operating mode (overrides config if provided).
-            **kwargs: Additional configuration options.
-        """
         self.config = config or MonitorConfig()
 
         if mode is not None:
@@ -166,16 +118,7 @@ class SafetyMonitor(ABC):
         turn: Turn,
         context: DebateContext,
     ) -> SafetyResult:
-        """
-        Analyze a turn for safety concerns.
-
-        Args:
-            turn: The turn to analyze.
-            context: Current debate context.
-
-        Returns:
-            SafetyResult with severity and indicators.
-        """
+        """Analyze a turn for safety concerns."""
         pass
 
     async def process(
@@ -183,18 +126,7 @@ class SafetyMonitor(ABC):
         turn: Turn,
         context: DebateContext,
     ) -> SafetyResult:
-        """
-        Process a turn with full monitoring pipeline.
-
-        Handles state updates, threshold checking, and alert generation.
-
-        Args:
-            turn: The turn to process.
-            context: Current debate context.
-
-        Returns:
-            SafetyResult with severity and indicators.
-        """
+        """Process turn with full monitoring pipeline."""
         if not self.is_enabled:
             return SafetyResult(monitor=self.name, severity=0.0)
 
@@ -232,8 +164,7 @@ class SafetyMonitor(ABC):
 
         return result
 
-    def _apply_thresholds(self, result: SafetyResult) -> SafetyResult:
-        """Apply alert and halt thresholds to result."""
+    def _apply_thresholds(self, result):
         should_alert = result.severity >= self.config.alert_threshold
         should_halt = (
             result.severity >= self.config.halt_threshold
@@ -258,8 +189,7 @@ class SafetyMonitor(ABC):
             analysis_notes=result.analysis_notes,
         )
 
-    def _update_agent_stats(self, agent: str, result: SafetyResult) -> None:
-        """Update per-agent statistics."""
+    def _update_agent_stats(self, agent, result):
         if agent not in self._state.agent_stats:
             self._state.agent_stats[agent] = {
                 "total_severity": 0.0,
@@ -277,15 +207,7 @@ class SafetyMonitor(ABC):
             stats["alert_count"] += 1
 
     def get_agent_risk_score(self, agent: str) -> float:
-        """
-        Get cumulative risk score for an agent.
-
-        Args:
-            agent: Agent name.
-
-        Returns:
-            Risk score from 0-1.
-        """
+        """Get cumulative risk score for an agent (0-1)."""
         if agent not in self._state.agent_stats:
             return 0.0
 
@@ -299,16 +221,15 @@ class SafetyMonitor(ABC):
 
         return min(1.0, avg_severity * 0.5 + max_factor + alert_factor)
 
-    def get_recent_severity(self) -> float:
-        """Get average severity over recent turns."""
+    def get_recent_severity(self):
         if not self._state.severity_history:
             return 0.0
 
         recent = self._state.severity_history[-self.config.window_size:]
         return sum(recent) / len(recent)
 
-    def get_severity_trend(self) -> str:
-        """Get trend in severity over time."""
+    def get_severity_trend(self):
+        # NOTE: returns "stable", "increasing", or "decreasing"
         if len(self._state.severity_history) < 4:
             return "stable"
 
@@ -330,30 +251,11 @@ class SafetyMonitor(ABC):
             return "decreasing"
         return "stable"
 
-    def reset_state(self) -> None:
-        """Reset monitor state."""
+    def reset_state(self):
         self._state = MonitorState()
         logger.debug("Monitor state reset", monitor=self.name)
 
-    def create_indicator(
-        self,
-        indicator_type: SafetyIndicatorType,
-        severity: float,
-        evidence: str | list[str],
-        **metadata: Any,
-    ) -> SafetyIndicator:
-        """
-        Create a safety indicator.
-
-        Args:
-            indicator_type: Type of indicator.
-            severity: Severity score (0-1).
-            evidence: Evidence supporting the indicator.
-            **metadata: Additional metadata.
-
-        Returns:
-            SafetyIndicator instance.
-        """
+    def create_indicator(self, indicator_type, severity, evidence, **metadata):
         return SafetyIndicator(
             type=indicator_type,
             severity=min(1.0, max(0.0, severity)),
@@ -370,18 +272,7 @@ class SafetyMonitor(ABC):
 
 
 class CompositeMonitor(SafetyMonitor):
-    """
-    A monitor that combines multiple sub-monitors.
-
-    Aggregates results from multiple monitors into a single result.
-
-    Example:
-        >>> composite = CompositeMonitor([
-        ...     SandbagDetector(),
-        ...     DeceptionMonitor(),
-        ... ])
-        >>> result = await composite.analyze(turn, context)
-    """
+    """Combines multiple sub-monitors into one."""
 
     def __init__(
         self,
@@ -389,14 +280,6 @@ class CompositeMonitor(SafetyMonitor):
         aggregation: str = "max",
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize a composite monitor.
-
-        Args:
-            monitors: List of sub-monitors.
-            aggregation: How to aggregate severities ('max', 'mean', 'sum').
-            **kwargs: Additional configuration.
-        """
         super().__init__(**kwargs)
         self.monitors = monitors
         self.aggregation = aggregation
@@ -409,13 +292,8 @@ class CompositeMonitor(SafetyMonitor):
     def monitor_type(self) -> str:
         return "composite"
 
-    async def analyze(
-        self,
-        turn: Turn,
-        context: DebateContext,
-    ) -> SafetyResult:
-        """Analyze using all sub-monitors."""
-        results: list[SafetyResult] = []
+    async def analyze(self, turn: Turn, context: DebateContext) -> SafetyResult:
+        results = []
 
         for monitor in self.monitors:
             if monitor.is_enabled:
@@ -458,92 +336,60 @@ class CompositeMonitor(SafetyMonitor):
 
 
 class MonitorRegistry:
-    """
-    Registry for managing safety monitors.
+    """Registry for managing safety monitors."""
 
-    Provides centralized monitor management with lookup and lifecycle control.
-    """
-
-    def __init__(self) -> None:
-        """Initialize the registry."""
+    def __init__(self):
         self._monitors: dict[str, SafetyMonitor] = {}
         self._created_at = datetime.utcnow()
 
         logger.debug("MonitorRegistry initialized")
 
     def register(self, monitor: SafetyMonitor) -> None:
-        """
-        Register a monitor.
-
-        Args:
-            monitor: Monitor to register.
-
-        Raises:
-            ValueError: If monitor with same name already registered.
-        """
         if monitor.name in self._monitors:
             raise ValueError(f"Monitor '{monitor.name}' already registered")
 
         self._monitors[monitor.name] = monitor
         logger.info("Monitor registered", monitor=monitor.name)
 
-    def unregister(self, name: str) -> SafetyMonitor | None:
-        """
-        Unregister a monitor by name.
-
-        Args:
-            name: Monitor name.
-
-        Returns:
-            The unregistered monitor or None.
-        """
+    def unregister(self, name: str):
         monitor = self._monitors.pop(name, None)
         if monitor:
             logger.info("Monitor unregistered", monitor=name)
         return monitor
 
-    def get(self, name: str) -> SafetyMonitor | None:
-        """Get a monitor by name."""
+    def get(self, name: str):
         return self._monitors.get(name)
 
-    def get_all(self) -> list[SafetyMonitor]:
-        """Get all registered monitors."""
+    def get_all(self):
         return list(self._monitors.values())
 
-    def get_by_type(self, monitor_type: str) -> list[SafetyMonitor]:
-        """Get monitors by type."""
+    def get_by_type(self, monitor_type: str):
         return [
             m for m in self._monitors.values()
             if m.monitor_type == monitor_type
         ]
 
-    def get_by_priority(self, priority: MonitorPriority) -> list[SafetyMonitor]:
-        """Get monitors by priority."""
+    def get_by_priority(self, priority):
         return [
             m for m in self._monitors.values()
             if m.config.priority == priority
         ]
 
-    def get_active(self) -> list[SafetyMonitor]:
-        """Get all active (non-passive) monitors."""
+    def get_active(self):
         return [m for m in self._monitors.values() if m.is_active]
 
-    def get_enabled(self) -> list[SafetyMonitor]:
-        """Get all enabled monitors."""
+    def get_enabled(self):
         return [m for m in self._monitors.values() if m.is_enabled]
 
-    def enable_all(self) -> None:
-        """Enable all monitors."""
+    def enable_all(self):
         for monitor in self._monitors.values():
             monitor.config.enabled = True
 
-    def disable_all(self) -> None:
-        """Disable all monitors."""
+    def disable_all(self):
         for monitor in self._monitors.values():
             monitor.config.enabled = False
 
-    def reset_all(self) -> None:
-        """Reset state of all monitors."""
+    def reset_all(self):
         for monitor in self._monitors.values():
             monitor.reset_state()
 
@@ -558,30 +404,13 @@ class MonitorRegistry:
 
 
 class SafetyManager:
-    """
-    High-level manager for safety monitoring.
-
-    Coordinates multiple monitors and provides aggregate analysis.
-
-    Example:
-        >>> manager = SafetyManager()
-        >>> manager.add_monitor(SandbagDetector())
-        >>> manager.add_monitor(DeceptionMonitor())
-        >>> results = await manager.analyze_turn(turn, context)
-    """
+    """High-level manager for coordinating safety monitors."""
 
     def __init__(
         self,
         mode: MonitorMode = MonitorMode.PASSIVE,
         halt_on_critical: bool = False,
     ) -> None:
-        """
-        Initialize the safety manager.
-
-        Args:
-            mode: Default mode for added monitors.
-            halt_on_critical: Whether to halt on critical severity.
-        """
         self.default_mode = mode
         self.halt_on_critical = halt_on_critical
         self._registry = MonitorRegistry()
@@ -593,38 +422,21 @@ class SafetyManager:
         )
 
     @property
-    def monitors(self) -> list[SafetyMonitor]:
-        """Get all registered monitors."""
+    def monitors(self):
         return self._registry.get_all()
 
-    def add_monitor(self, monitor: SafetyMonitor) -> None:
-        """Add a monitor to management."""
+    def add_monitor(self, monitor):
         self._registry.register(monitor)
 
-    def remove_monitor(self, name: str) -> SafetyMonitor | None:
-        """Remove a monitor by name."""
+    def remove_monitor(self, name: str):
         return self._registry.unregister(name)
 
-    def get_monitor(self, name: str) -> SafetyMonitor | None:
-        """Get a monitor by name."""
+    def get_monitor(self, name: str):
         return self._registry.get(name)
 
-    async def analyze_turn(
-        self,
-        turn: Turn,
-        context: DebateContext,
-    ) -> list[SafetyResult]:
-        """
-        Analyze a turn with all enabled monitors.
-
-        Args:
-            turn: Turn to analyze.
-            context: Debate context.
-
-        Returns:
-            List of results from all monitors.
-        """
-        results: list[SafetyResult] = []
+    async def analyze_turn(self, turn: Turn, context: DebateContext):
+        """Analyze a turn with all enabled monitors."""
+        results = []
 
         for monitor in self._registry.get_enabled():
             result = await monitor.process(turn, context)
@@ -632,23 +444,20 @@ class SafetyManager:
 
         return results
 
-    def get_aggregate_severity(self, results: list[SafetyResult]) -> float:
-        """Get maximum severity from results."""
+    def get_aggregate_severity(self, results):
         if not results:
             return 0.0
         return max(r.severity for r in results)
 
-    def should_halt(self, results: list[SafetyResult]) -> bool:
-        """Check if any result indicates debate should halt."""
+    def should_halt(self, results):
         return any(r.should_halt for r in results)
 
-    def get_all_alerts(self, results: list[SafetyResult]) -> list[SafetyResult]:
-        """Get all results that triggered alerts."""
+    def get_all_alerts(self, results):
         return [r for r in results if r.should_alert]
 
-    def get_risk_summary(self) -> dict[str, dict[str, float]]:
-        """Get risk summary for all agents across all monitors."""
-        summary: dict[str, dict[str, float]] = {}
+    def get_risk_summary(self):
+        # FIXME: this could be more efficient
+        summary = {}
 
         for monitor in self._registry.get_all():
             for agent, _stats in monitor.state.agent_stats.items():
@@ -669,8 +478,7 @@ class SafetyManager:
 
         return summary
 
-    def reset_all(self) -> None:
-        """Reset all monitor states."""
+    def reset_all(self):
         self._registry.reset_all()
 
     def __len__(self) -> int:

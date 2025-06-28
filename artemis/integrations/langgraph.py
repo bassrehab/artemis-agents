@@ -1,9 +1,4 @@
-"""
-ARTEMIS LangGraph Integration
-
-Provides LangGraph node for ARTEMIS debates.
-Enables using structured multi-agent debates within LangGraph state machines.
-"""
+"""LangGraph node for ARTEMIS debates."""
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -21,28 +16,13 @@ logger = get_logger(__name__)
 
 
 class DebatePhase(str, Enum):
-    """Phases of a LangGraph debate workflow."""
-
     SETUP = "setup"
-    """Initial setup phase."""
-
     OPENING = "opening"
-    """Opening statements."""
-
     DEBATE = "debate"
-    """Main debate rounds."""
-
     CLOSING = "closing"
-    """Closing arguments."""
-
     DELIBERATION = "deliberation"
-    """Jury deliberation."""
-
     COMPLETE = "complete"
-    """Debate finished."""
-
     ERROR = "error"
-    """Error state."""
 
 
 class AgentStateConfig(TypedDict, total=False):
@@ -58,41 +38,17 @@ class DebateNodeState(TypedDict, total=False):
     """State schema for LangGraph debate node."""
 
     topic: str
-    """The debate topic."""
-
     agents: list[AgentStateConfig]
-    """Agent configurations (for multi-agent support)."""
-
     positions: dict[str, str]
-    """Position mapping for agents."""
-
     rounds: int
-    """Total rounds."""
-
     current_round: int
-    """Current round number."""
-
     phase: str
-    """Current debate phase."""
-
     transcript: list[dict]
-    """Debate transcript."""
-
     verdict: dict | None
-    """Final verdict."""
-
     scores: dict[str, float]
-    """Agent scores."""
-
     metadata: dict
-    """Additional metadata."""
-
-    # Backward compatibility for simple pro/con
-    pro_position: str
-    """Pro agent's position (legacy)."""
-
-    con_position: str
-    """Con agent's position (legacy)."""
+    pro_position: str  # legacy
+    con_position: str  # legacy
 
 
 class DebateNodeConfig(BaseModel):
@@ -114,40 +70,7 @@ class DebateContext:
 
 
 class ArtemisDebateNode:
-    """
-    LangGraph node for running ARTEMIS debates.
-
-    Designed for integration with LangGraph state machines, providing
-    flexible debate execution as nodes in a larger workflow.
-
-    Supports configurable agents - either pre-configured, from state,
-    or default pro/con agents.
-
-    Example (simple pro/con):
-        >>> from langgraph.graph import StateGraph
-        >>> from artemis.integrations.langgraph import ArtemisDebateNode
-        >>>
-        >>> node = ArtemisDebateNode(model="gpt-4o")
-        >>> workflow = StateGraph(DebateNodeState)
-        >>> workflow.add_node("debate", node.run_debate)
-        >>> workflow.add_edge("start", "debate")
-
-    Example (multi-agent):
-        >>> initial_state = {
-        ...     "topic": "How should we approach AI safety?",
-        ...     "agents": [
-        ...         {"name": "researcher", "role": "AI Safety Researcher", "position": "focus on alignment"},
-        ...         {"name": "ethicist", "role": "AI Ethicist", "position": "focus on ethics"},
-        ...         {"name": "policymaker", "role": "Policy Expert", "position": "focus on regulation"},
-        ...     ],
-        ... }
-        >>> result = await app.ainvoke(initial_state)
-
-    Step-by-step execution:
-        >>> workflow.add_node("setup", node.setup)
-        >>> workflow.add_node("run_round", node.run_round)
-        >>> workflow.add_node("finalize", node.finalize)
-    """
+    """LangGraph node for running ARTEMIS debates."""
 
     def __init__(
         self,
@@ -156,17 +79,7 @@ class ArtemisDebateNode:
         config: DebateNodeConfig | None = None,
         debate_config: DebateConfig | None = None,
         **kwargs: Any,
-    ) -> None:
-        """
-        Initialize the debate node.
-
-        Args:
-            model: LLM model to use.
-            agents: Pre-configured agents (optional).
-            config: Node configuration.
-            debate_config: Debate configuration.
-            **kwargs: Additional configuration.
-        """
+    ):
         self.model = model
         self.default_agents = agents
         self.node_config = config or DebateNodeConfig(model=model)
@@ -238,18 +151,7 @@ class ArtemisDebateNode:
         }
 
     async def run_debate(self, state: DebateNodeState) -> DebateNodeState:
-        """
-        Run a complete debate as a single node.
-
-        This is the simplest integration - runs the entire debate
-        and returns updated state.
-
-        Args:
-            state: Current node state.
-
-        Returns:
-            Updated state with debate results.
-        """
+        """Run a complete debate as a single node."""
         topic = state.get("topic", "")
         if not topic:
             return {
@@ -287,17 +189,7 @@ class ArtemisDebateNode:
             }
 
     async def setup(self, state: DebateNodeState) -> DebateNodeState:
-        """
-        Setup phase - initialize debate.
-
-        For step-by-step execution workflows.
-
-        Args:
-            state: Current node state.
-
-        Returns:
-            Updated state with debate initialized.
-        """
+        """Setup phase - initialize debate."""
         topic = state.get("topic", "")
         debate_id = f"debate_{id(state)}"
 
@@ -333,17 +225,7 @@ class ArtemisDebateNode:
         }
 
     async def run_round(self, state: DebateNodeState) -> DebateNodeState:
-        """
-        Run a single debate round.
-
-        For step-by-step execution workflows.
-
-        Args:
-            state: Current node state.
-
-        Returns:
-            Updated state with round results.
-        """
+        """Run a single debate round."""
         debate_id = state.get("metadata", {}).get("debate_id")
         if not debate_id or debate_id not in self._contexts:
             return {
@@ -389,17 +271,7 @@ class ArtemisDebateNode:
         }
 
     async def finalize(self, state: DebateNodeState) -> DebateNodeState:
-        """
-        Finalize the debate and get verdict.
-
-        For step-by-step execution workflows.
-
-        Args:
-            state: Current node state.
-
-        Returns:
-            Updated state with final verdict.
-        """
+        """Finalize the debate and get verdict."""
         debate_id = state.get("metadata", {}).get("debate_id")
         if not debate_id or debate_id not in self._contexts:
             return {
@@ -488,23 +360,8 @@ class ArtemisDebateNode:
             "timestamp": turn.timestamp.isoformat(),
         }
 
-    def get_routing_function(self) -> Callable[[DebateNodeState], str]:
-        """
-        Get a routing function for conditional edges.
-
-        Returns:
-            Function that returns next node based on state.
-
-        Example:
-            >>> workflow.add_conditional_edges(
-            ...     "run_round",
-            ...     node.get_routing_function(),
-            ...     {
-            ...         "continue": "run_round",
-            ...         "finalize": "finalize",
-            ...     }
-            ... )
-        """
+    def get_routing_function(self):
+        """Get routing function for conditional edges."""
         def router(state: DebateNodeState) -> str:
             current = state.get("current_round", 0)
             total = state.get("rounds", 3)
@@ -519,53 +376,16 @@ class ArtemisDebateNode:
 
         return router
 
-    def as_langgraph_node(self) -> Callable:
-        """
-        Get the main node function for LangGraph.
-
-        Returns:
-            Async function suitable for LangGraph node.
-        """
+    def as_langgraph_node(self):
+        """Get main node function for LangGraph."""
         return self.run_debate
 
     def __repr__(self) -> str:
         return f"ArtemisDebateNode(model={self.model!r})"
 
 
-def create_debate_workflow(
-    model: str = "gpt-4o",
-    step_by_step: bool = False,
-    agents: list[Agent] | None = None,
-) -> Any:
-    """
-    Create a LangGraph workflow for ARTEMIS debates.
-
-    Args:
-        model: LLM model to use.
-        step_by_step: Whether to create step-by-step workflow.
-        agents: Pre-configured agents (optional).
-
-    Returns:
-        Compiled LangGraph workflow.
-
-    Raises:
-        ImportError: If langgraph is not installed.
-
-    Example (simple):
-        >>> workflow = create_debate_workflow(model="gpt-4o")
-        >>> app = workflow
-        >>> result = await app.ainvoke({"topic": "Should we adopt microservices?"})
-
-    Example (multi-agent):
-        >>> result = await app.ainvoke({
-        ...     "topic": "How should we approach climate change?",
-        ...     "agents": [
-        ...         {"name": "scientist", "role": "Climate Scientist", "position": "focus on data"},
-        ...         {"name": "economist", "role": "Economist", "position": "focus on costs"},
-        ...         {"name": "activist", "role": "Activist", "position": "focus on urgency"},
-        ...     ],
-        ... })
-    """
+def create_debate_workflow(model="gpt-4o", step_by_step=False, agents=None):
+    """Create a LangGraph workflow for ARTEMIS debates."""
     try:
         from langgraph.graph import END, StateGraph
     except ImportError as e:
