@@ -477,6 +477,26 @@ class Debate:
             for agent, s in scores.items()
         }
 
+    def get_analytics(self, include_jury_pulse: bool = False):
+        """Compute analytics for this debate.
+
+        Args:
+            include_jury_pulse: If True, includes per-round jury sentiment
+                               (requires additional LLM calls if not cached)
+
+        Returns:
+            DebateAnalytics object with momentum, metrics, and turning points
+        """
+        from artemis.analytics import DebateAnalyzer
+
+        analyzer = DebateAnalyzer(
+            transcript=self._transcript,
+            agents=[a.name for a in self.agents],
+            debate_id=self.debate_id,
+            topic=self.topic,
+        )
+        return analyzer.analyze()
+
     def __repr__(self) -> str:
         return (
             f"Debate(topic={self.topic[:30]!r}..., "
