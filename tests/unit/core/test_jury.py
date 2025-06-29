@@ -12,6 +12,7 @@ from artemis.core.jury import (
     JuryConfig,
     JuryMember,
     JuryPanel,
+    PERSPECTIVE_PROMPTS,
 )
 from artemis.core.types import (
     Argument,
@@ -223,8 +224,8 @@ class TestJuryMember:
     def test_perspective_prompts_defined(self) -> None:
         """Test that all perspectives have prompts."""
         for perspective in JuryPerspective:
-            assert perspective in JuryMember.PERSPECTIVE_PROMPTS
-            assert len(JuryMember.PERSPECTIVE_PROMPTS[perspective]) > 0
+            assert perspective in PERSPECTIVE_PROMPTS
+            assert len(PERSPECTIVE_PROMPTS[perspective]) > 0
 
     @pytest.mark.asyncio
     async def test_evaluate_transcript(
