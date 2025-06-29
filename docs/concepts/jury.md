@@ -35,9 +35,74 @@ panel = JuryPanel(
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `evaluators` | int | 3 | Number of jury members |
-| `model` | str | "gpt-4o" | Model for jurors |
+| `model` | str | "gpt-4o" | Default model for jurors |
+| `models` | list[str] | None | Per-juror model list |
+| `jurors` | list[JurorConfig] | None | Full juror configuration |
 | `consensus_threshold` | float | 0.7 | Required agreement |
 | `criteria` | list[str] | default | Evaluation criteria |
+
+### Per-Juror Model Configuration
+
+You can assign different models to each juror for diverse evaluation perspectives:
+
+**Option A: Model List**
+
+A simple list of models distributed across jurors:
+
+```python
+jury = JuryPanel(
+    evaluators=3,
+    models=["gpt-4o", "claude-sonnet-4-20250514", "gemini-2.0-flash"],
+)
+```
+
+If fewer models than evaluators, they cycle:
+
+```python
+# 5 jurors with 2 models = gpt-4o, claude, gpt-4o, claude, gpt-4o
+jury = JuryPanel(
+    evaluators=5,
+    models=["gpt-4o", "claude-sonnet-4-20250514"],
+)
+```
+
+**Option B: JurorConfig Objects**
+
+Full control over each juror's perspective, model, and criteria:
+
+```python
+from artemis.core.types import JurorConfig, JuryPerspective
+
+jury = JuryPanel(
+    jurors=[
+        JurorConfig(
+            perspective=JuryPerspective.ANALYTICAL,
+            model="gpt-4o",
+            criteria=["logical_consistency", "evidence_strength"],
+        ),
+        JurorConfig(
+            perspective=JuryPerspective.ETHICAL,
+            model="claude-sonnet-4-20250514",
+            criteria=["ethical_alignment", "fairness"],
+        ),
+        JurorConfig(
+            perspective=JuryPerspective.PRACTICAL,
+            model="gemini-2.0-flash",
+            criteria=["feasibility", "real_world_impact"],
+        ),
+    ],
+    consensus_threshold=0.7,
+)
+```
+
+### JurorConfig Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `perspective` | JuryPerspective | Yes | Juror's evaluation perspective |
+| `model` | str | Yes | Model identifier |
+| `criteria` | list[str] | No | Custom criteria for this juror |
+| `api_key` | str | No | API key override for this juror |
 
 ## Jury Perspectives
 

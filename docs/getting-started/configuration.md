@@ -143,6 +143,53 @@ model = create_model(
     "deepseek-reasoner",
     api_key="your-key",
 )
+
+# Google/Gemini via AI Studio
+model = create_model(
+    "gemini-2.0-flash",
+    # Uses GOOGLE_API_KEY or GEMINI_API_KEY env var
+)
+
+# Google/Gemini via Vertex AI (higher rate limits)
+model = create_model(
+    "gemini-2.0-flash",
+    provider="google",
+    # Uses GOOGLE_CLOUD_PROJECT env var for auto-detection
+)
+
+# Anthropic/Claude
+model = create_model(
+    "claude-sonnet-4-20250514",
+    # Uses ANTHROPIC_API_KEY env var
+)
+```
+
+### Google Backend Selection
+
+GoogleModel supports two backends that are auto-detected:
+
+| Backend | When Used | Authentication |
+|---------|-----------|----------------|
+| **AI Studio** | Default when no project set | `GOOGLE_API_KEY` or `GEMINI_API_KEY` |
+| **Vertex AI** | When `GOOGLE_CLOUD_PROJECT` is set | Application Default Credentials |
+
+```python
+from artemis.models import GoogleModel
+
+# Force AI Studio (explicit)
+model = GoogleModel(
+    model="gemini-2.0-flash",
+    api_key="your-api-key",
+    use_vertex_ai=False,
+)
+
+# Force Vertex AI (explicit)
+model = GoogleModel(
+    model="gemini-2.0-flash",
+    project="my-gcp-project",
+    location="us-central1",
+    use_vertex_ai=True,
+)
 ```
 
 ## Safety Configuration
@@ -225,6 +272,53 @@ debate = Debate(
 )
 ```
 
+### Per-Juror Model Configuration
+
+You can configure different models for each juror using two approaches:
+
+**Option A: Simple Model List**
+
+```python
+jury = JuryPanel(
+    evaluators=3,
+    models=["gpt-4o", "claude-sonnet-4-20250514", "gemini-2.0-flash"],
+)
+```
+
+**Option B: Full JurorConfig Objects**
+
+```python
+from artemis.core.types import JurorConfig, JuryPerspective
+
+jury = JuryPanel(
+    jurors=[
+        JurorConfig(
+            perspective=JuryPerspective.ANALYTICAL,
+            model="gpt-4o",
+        ),
+        JurorConfig(
+            perspective=JuryPerspective.ETHICAL,
+            model="claude-sonnet-4-20250514",
+        ),
+        JurorConfig(
+            perspective=JuryPerspective.PRACTICAL,
+            model="gemini-2.0-flash",
+        ),
+    ],
+    consensus_threshold=0.7,
+)
+```
+
+### Jury Perspectives
+
+| Perspective | Focus |
+|-------------|-------|
+| `ANALYTICAL` | Logic, evidence quality, reasoning coherence |
+| `ETHICAL` | Moral implications, fairness, values alignment |
+| `PRACTICAL` | Real-world applicability, feasibility |
+| `CREATIVE` | Novel approaches, unconventional solutions |
+| `SKEPTICAL` | Critical analysis, identifying weaknesses |
+
 ## MCP Server Configuration
 
 Configure the MCP server:
@@ -261,12 +355,30 @@ artemis-mcp --http --host 0.0.0.0 --port 9000
 
 ARTEMIS respects these environment variables:
 
+### API Keys
+
 | Variable | Description |
 |----------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key |
-| `ANTHROPIC_API_KEY` | Anthropic API key |
-| `GOOGLE_API_KEY` | Google AI API key |
+| `OPENAI_API_KEY` | OpenAI API key for GPT models |
+| `ANTHROPIC_API_KEY` | Anthropic API key for Claude models |
 | `DEEPSEEK_API_KEY` | DeepSeek API key |
+| `GOOGLE_API_KEY` | Google AI Studio API key (for Gemini) |
+| `GEMINI_API_KEY` | Alternative to `GOOGLE_API_KEY` |
+
+### Google Cloud / Vertex AI
+
+| Variable | Description |
+|----------|-------------|
+| `GOOGLE_CLOUD_PROJECT` | GCP project ID (enables Vertex AI backend) |
+| `GCP_PROJECT` | Alternative to `GOOGLE_CLOUD_PROJECT` |
+| `GOOGLE_CLOUD_LOCATION` | GCP region (default: `us-central1`) |
+
+When `GOOGLE_CLOUD_PROJECT` is set, GoogleModel automatically uses Vertex AI with Application Default Credentials instead of AI Studio.
+
+### ARTEMIS Settings
+
+| Variable | Description |
+|----------|-------------|
 | `ARTEMIS_LOG_LEVEL` | Logging level (DEBUG, INFO, WARNING, ERROR) |
 | `ARTEMIS_DEFAULT_MODEL` | Default model for debates |
 

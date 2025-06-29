@@ -178,6 +178,125 @@ DeepSeekModel(
 
 ---
 
+## GoogleModel
+
+Google/Gemini model provider with Vertex AI support.
+
+```python
+from artemis.models import GoogleModel
+```
+
+### Constructor
+
+```python
+GoogleModel(
+    model: str = "gemini-2.0-flash",
+    api_key: str | None = None,
+    project: str | None = None,
+    location: str = "us-central1",
+    use_vertex_ai: bool | None = None,
+    timeout: float = 120.0,
+    max_retries: int = 3,
+    **kwargs,
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | str | "gemini-2.0-flash" | Model identifier |
+| `api_key` | str \| None | None | API key for AI Studio (reads from GOOGLE_API_KEY or GEMINI_API_KEY) |
+| `project` | str \| None | None | GCP project ID for Vertex AI |
+| `location` | str | "us-central1" | GCP region for Vertex AI |
+| `use_vertex_ai` | bool \| None | None | Force Vertex AI (auto-detected if project is set) |
+| `timeout` | float | 120.0 | Request timeout in seconds |
+| `max_retries` | int | 3 | Maximum retry attempts |
+
+### Backend Selection
+
+GoogleModel supports two backends:
+
+| Backend | When Used | Authentication |
+|---------|-----------|----------------|
+| **AI Studio** | Default when no project set | `GOOGLE_API_KEY` env var |
+| **Vertex AI** | When `GOOGLE_CLOUD_PROJECT` is set | Application Default Credentials |
+
+**Example:**
+
+```python
+# AI Studio (simple setup)
+model = GoogleModel(model="gemini-2.0-flash")
+
+# Vertex AI (higher rate limits)
+model = GoogleModel(
+    model="gemini-2.0-flash",
+    project="my-gcp-project",
+    location="us-central1",
+)
+```
+
+### Supported Models
+
+| Model | Reasoning | Description |
+|-------|-----------|-------------|
+| `gemini-2.0-flash` | No | Fast, efficient model |
+| `gemini-2.0-flash-exp` | No | Experimental flash variant |
+| `gemini-1.5-pro` | No | High capability model |
+| `gemini-1.5-flash` | No | Fast 1.5 variant |
+| `gemini-2.5-pro` | Yes | Extended thinking support |
+| `gemini-2.5-flash` | Yes | Fast reasoning model |
+
+---
+
+## AnthropicModel
+
+Anthropic/Claude model provider.
+
+```python
+from artemis.models import AnthropicModel
+```
+
+### Constructor
+
+```python
+AnthropicModel(
+    model: str = "claude-sonnet-4-20250514",
+    api_key: str | None = None,
+    timeout: float = 120.0,
+    max_retries: int = 3,
+    **kwargs,
+)
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | str | "claude-sonnet-4-20250514" | Model identifier |
+| `api_key` | str \| None | None | API key (reads from ANTHROPIC_API_KEY) |
+| `timeout` | float | 120.0 | Request timeout in seconds |
+| `max_retries` | int | 3 | Maximum retry attempts |
+
+**Example:**
+
+```python
+from artemis.models import AnthropicModel
+
+model = AnthropicModel(model="claude-sonnet-4-20250514")
+```
+
+### Supported Models
+
+| Model | Reasoning | Description |
+|-------|-----------|-------------|
+| `claude-sonnet-4-20250514` | Yes | Claude Sonnet 4 with extended thinking |
+| `claude-3-5-sonnet-20241022` | Yes | Claude 3.5 Sonnet |
+| `claude-3-opus-20240229` | No | Claude 3 Opus |
+| `claude-3-haiku-20240307` | No | Claude 3 Haiku (fast) |
+
+---
+
 ## ReasoningConfig
 
 Configuration for reasoning models.
@@ -316,7 +435,7 @@ List available model providers.
 from artemis.models import list_providers
 
 providers = list_providers()
-# ['openai', 'deepseek']
+# ['openai', 'deepseek', 'google', 'anthropic']
 ```
 
 ---

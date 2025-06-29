@@ -105,6 +105,7 @@ nav:
     - Ethical Dilemmas: examples/ethical-dilemmas.md
     - Enterprise Decisions: examples/enterprise-decisions.md
     - With Safety Monitors: examples/safety-monitors.md
+    - Audit Log Export: examples/audit-logs.md
     - LangGraph Workflow: examples/langgraph-workflow.md
     - CrewAI Workflow: examples/crewai-workflow.md
     - Streaming Output: examples/streaming.md
