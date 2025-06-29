@@ -1,8 +1,10 @@
 """Multi-perspective jury scoring for debate evaluation."""
 
+from __future__ import annotations
+
 import asyncio
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from artemis.core.evaluation import AdaptiveEvaluator
 from artemis.core.types import (
@@ -15,8 +17,10 @@ from artemis.core.types import (
     Turn,
     Verdict,
 )
-from artemis.models import BaseModel, create_model
 from artemis.utils.logging import get_logger
+
+if TYPE_CHECKING:
+    from artemis.models.base import BaseModel
 
 logger = get_logger(__name__)
 
@@ -111,11 +115,14 @@ class JuryMember:
         self.perspective = perspective
         self.criteria = criteria or DEFAULT_JURY_CRITERIA
 
-        # Initialize model
-        if isinstance(model, BaseModel):
+        # Initialize model (lazy import to avoid circular dependency)
+        from artemis.models.base import BaseModel as ModelBase
+        from artemis.models.base import ModelRegistry
+
+        if isinstance(model, ModelBase):
             self._model = model
         else:
-            self._model = create_model(model, api_key=api_key, **model_kwargs)
+            self._model = ModelRegistry.create(model, api_key=api_key, **model_kwargs)
 
         # Internal evaluator for scoring
         self._evaluator = AdaptiveEvaluator()

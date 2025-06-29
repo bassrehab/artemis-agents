@@ -1,8 +1,10 @@
 """Debate agent with H-L-DAG argument generation."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from artemis.core.argument import ArgumentParser
 from artemis.core.causal import CausalExtractor, CausalGraph
@@ -21,8 +23,10 @@ from artemis.core.types import (
     ReasoningConfig,
 )
 from artemis.exceptions import ArgumentGenerationError
-from artemis.models import BaseModel, create_model
 from artemis.utils.logging import get_logger
+
+if TYPE_CHECKING:
+    from artemis.models.base import BaseModel
 
 logger = get_logger(__name__)
 
@@ -97,11 +101,14 @@ class Agent:
         self.persona = persona
         self.reasoning = reasoning or ReasoningConfig(enabled=False)
 
-        # Initialize the model
-        if isinstance(model, BaseModel):
+        # Initialize the model (lazy import to avoid circular dependency)
+        from artemis.models.base import BaseModel as ModelBase
+        from artemis.models.base import ModelRegistry
+
+        if isinstance(model, ModelBase):
             self._model = model
         else:
-            self._model = create_model(model, api_key=api_key, **model_kwargs)
+            self._model = ModelRegistry.create(model, api_key=api_key, **model_kwargs)
 
         # Argument parser for extracting structure
         self._parser = ArgumentParser()

@@ -1,7 +1,7 @@
-"""ARTEMIS Google/Gemini Provider."""
+"""ARTEMIS Google/Gemini Provider with Vertex AI support."""
 
 import os
-from collections.abc import AsyncIterator, Callable, Coroutine
+from collections.abc import AsyncIterator
 from typing import Any, TypeVar
 
 from artemis.core.types import Message, ModelResponse, ReasoningResponse
@@ -33,18 +33,42 @@ class GoogleModel(BaseModel):
     """
     Google/Gemini model provider.
 
-    Supports Gemini 1.5, 2.0, and 2.5 models including reasoning capabilities.
+    Supports both Google AI Studio and Vertex AI backends.
+    Use Vertex AI for higher rate limits and enterprise features.
     """
 
     def __init__(
         self,
         model: str = "gemini-2.0-flash",
         api_key: str | None = None,
+        project: str | None = None,
+        location: str = "us-central1",
+        use_vertex_ai: bool | None = None,
         timeout: float = 120.0,
         max_retries: int = 3,
         **kwargs: Any,
     ):
-        api_key = api_key or os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        """
+        Initialize Google model.
+
+        For Vertex AI, set use_vertex_ai=True and provide project ID.
+        For AI Studio, provide api_key or set GOOGLE_API_KEY env var.
+        """
+        # Determine which backend to use
+        self.project = project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        self.location = location or os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
+
+        # Auto-detect: use Vertex AI if project is set, otherwise AI Studio
+        if use_vertex_ai is None:
+            use_vertex_ai = bool(self.project)
+
+        self.use_vertex_ai = use_vertex_ai
+
+        if use_vertex_ai:
+            api_key = None  # Vertex AI uses ADC, not API key
+        else:
+            api_key = api_key or os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
         super().__init__(
             model=model,
             api_key=api_key,
@@ -53,33 +77,70 @@ class GoogleModel(BaseModel):
             **kwargs,
         )
 
-        # Import here to allow graceful failure if not installed
+        if use_vertex_ai:
+            self._init_vertex_ai()
+        else:
+            self._init_ai_studio()
+
+    def _init_vertex_ai(self):
+        """Initialize Vertex AI client."""
+        try:
+            import vertexai
+            from vertexai.generative_models import GenerativeModel
+        except ImportError as e:
+            raise ImportError(
+                "google-cloud-aiplatform is required for Vertex AI. "
+                "Install with: pip install google-cloud-aiplatform"
+            ) from e
+
+        if not self.project:
+            raise ValueError(
+                "project is required for Vertex AI. "
+                "Set GOOGLE_CLOUD_PROJECT env var or pass project parameter."
+            )
+
+        vertexai.init(project=self.project, location=self.location)
+        self._vertex_model_class = GenerativeModel
+        self._genai = None
+
+    def _init_ai_studio(self):
+        """Initialize Google AI Studio client."""
         try:
             import google.generativeai as genai
         except ImportError as e:
             raise ImportError(
-                "google-generativeai is required for Google provider. "
+                "google-generativeai is required for Google AI Studio. "
                 "Install with: pip install google-generativeai"
             ) from e
 
-        genai.configure(api_key=api_key)
+        if not self.api_key:
+            raise ValueError(
+                "api_key is required for Google AI Studio. "
+                "Set GOOGLE_API_KEY env var or pass api_key parameter."
+            )
+
+        genai.configure(api_key=self.api_key)
         self._genai = genai
-        self._model_instance = None  # Lazy initialization
+        self._vertex_model_class = None
 
     def _get_model(self, system_instruction: str | None = None):
-        """Get or create model instance."""
-        import google.generativeai as genai
-
-        # XXX: genai doesn't support changing system_instruction after init
-        # so we create a new instance each time if system prompt changes
-        return genai.GenerativeModel(
-            model_name=self.model,
-            system_instruction=system_instruction,
-        )
+        """Get model instance."""
+        if self.use_vertex_ai:
+            from vertexai.generative_models import GenerativeModel
+            return GenerativeModel(
+                model_name=self.model,
+                system_instruction=system_instruction,
+            )
+        else:
+            import google.generativeai as genai
+            return genai.GenerativeModel(
+                model_name=self.model,
+                system_instruction=system_instruction,
+            )
 
     @property
     def provider(self) -> str:
-        return "google"
+        return "vertex_ai" if self.use_vertex_ai else "google"
 
     @property
     def supports_reasoning(self) -> bool:
@@ -98,9 +159,6 @@ class GoogleModel(BaseModel):
         **kwargs: Any,
     ) -> ModelResponse:
         """Generate a response using Gemini API."""
-        import google.generativeai as genai
-        from google.api_core import exceptions as google_exceptions
-
         # Extract system message if present
         system_instruction = None
         chat_messages = []
@@ -114,10 +172,10 @@ class GoogleModel(BaseModel):
             model = self._get_model(system_instruction)
 
             # Build generation config
-            generation_config = genai.GenerationConfig(
+            generation_config = self._build_generation_config(
                 temperature=temperature,
-                max_output_tokens=max_tokens,
-                stop_sequences=stop,
+                max_tokens=max_tokens,
+                stop=stop,
             )
 
             # Convert messages to Gemini format
@@ -147,25 +205,8 @@ class GoogleModel(BaseModel):
                 finish_reason=self._get_finish_reason(response),
             )
 
-        except google_exceptions.ResourceExhausted as e:
-            raise RateLimitError(
-                message=str(e),
-                provider=self.provider,
-            ) from e
-        except google_exceptions.InvalidArgument as e:
-            if "token" in str(e).lower():
-                raise TokenLimitError(
-                    message=str(e),
-                    provider=self.provider,
-                ) from e
-            raise ModelError(message=str(e), provider=self.provider) from e
-        except google_exceptions.GoogleAPIError as e:
-            raise ProviderConnectionError(
-                message=f"Failed to connect to Google AI: {e}",
-                provider=self.provider,
-            ) from e
         except Exception as e:
-            raise ModelError(message=str(e), provider=self.provider) from e
+            self._handle_error(e)
 
     async def generate_with_reasoning(
         self,
@@ -176,9 +217,6 @@ class GoogleModel(BaseModel):
         **kwargs: Any,
     ) -> ReasoningResponse:
         """Generate with extended thinking for Gemini 2.5 models."""
-        import google.generativeai as genai
-        from google.api_core import exceptions as google_exceptions
-
         if not self.supports_reasoning:
             raise NotImplementedError(
                 f"Model {self.model} does not support extended reasoning. "
@@ -197,11 +235,11 @@ class GoogleModel(BaseModel):
         try:
             model = self._get_model(system_instruction)
 
-            # Gemini 2.5 uses thinking_config for extended reasoning
-            generation_config = genai.GenerationConfig(
+            # Build config with thinking budget
+            generation_config = self._build_generation_config(
                 temperature=temperature,
-                max_output_tokens=max_tokens,
-                thinking_config={"thinking_budget": thinking_budget},
+                max_tokens=max_tokens,
+                thinking_budget=thinking_budget,
             )
 
             contents = self._convert_messages(chat_messages)
@@ -250,25 +288,8 @@ class GoogleModel(BaseModel):
                 thinking_tokens=thinking_tokens,
             )
 
-        except google_exceptions.ResourceExhausted as e:
-            raise RateLimitError(
-                message=str(e),
-                provider=self.provider,
-            ) from e
-        except google_exceptions.InvalidArgument as e:
-            if "token" in str(e).lower():
-                raise TokenLimitError(
-                    message=str(e),
-                    provider=self.provider,
-                ) from e
-            raise ModelError(message=str(e), provider=self.provider) from e
-        except google_exceptions.GoogleAPIError as e:
-            raise ProviderConnectionError(
-                message=f"Failed to connect to Google AI: {e}",
-                provider=self.provider,
-            ) from e
         except Exception as e:
-            raise ModelError(message=str(e), provider=self.provider) from e
+            self._handle_error(e)
 
     async def generate_stream(
         self,
@@ -279,9 +300,6 @@ class GoogleModel(BaseModel):
         **kwargs: Any,
     ) -> AsyncIterator[str]:
         """Generate a streaming response."""
-        import google.generativeai as genai
-        from google.api_core import exceptions as google_exceptions
-
         # Extract system message
         system_instruction = None
         chat_messages = []
@@ -294,10 +312,10 @@ class GoogleModel(BaseModel):
         try:
             model = self._get_model(system_instruction)
 
-            generation_config = genai.GenerationConfig(
+            generation_config = self._build_generation_config(
                 temperature=temperature,
-                max_output_tokens=max_tokens,
-                stop_sequences=stop,
+                max_tokens=max_tokens,
+                stop=stop,
             )
 
             contents = self._convert_messages(chat_messages)
@@ -313,18 +331,8 @@ class GoogleModel(BaseModel):
                 if chunk.text:
                     yield chunk.text
 
-        except google_exceptions.ResourceExhausted as e:
-            raise RateLimitError(
-                message=str(e),
-                provider=self.provider,
-            ) from e
-        except google_exceptions.GoogleAPIError as e:
-            raise ProviderConnectionError(
-                message=f"Failed to connect to Google AI: {e}",
-                provider=self.provider,
-            ) from e
         except Exception as e:
-            raise ModelError(message=str(e), provider=self.provider) from e
+            self._handle_error(e)
 
     async def count_tokens(self, messages: list[Message]) -> int:
         """Count tokens using Gemini's token counting API."""
@@ -338,14 +346,51 @@ class GoogleModel(BaseModel):
             total_chars = sum(len(m.content) for m in messages)
             return total_chars // 4
 
-    def _convert_messages(self, messages: list[Message]) -> list[dict[str, Any]]:
+    def _build_generation_config(
+        self,
+        temperature: float = 0.7,
+        max_tokens: int | None = None,
+        stop: list[str] | None = None,
+        thinking_budget: int | None = None,
+    ):
+        """Build generation config for either backend."""
+        if self.use_vertex_ai:
+            from vertexai.generative_models import GenerationConfig
+            config_cls = GenerationConfig
+        else:
+            import google.generativeai as genai
+            config_cls = genai.GenerationConfig
+
+        config_kwargs = {
+            "temperature": temperature,
+        }
+
+        if max_tokens:
+            config_kwargs["max_output_tokens"] = max_tokens
+        if stop:
+            config_kwargs["stop_sequences"] = stop
+        if thinking_budget:
+            config_kwargs["thinking_config"] = {"thinking_budget": thinking_budget}
+
+        return config_cls(**config_kwargs)
+
+    def _convert_messages(self, messages: list[Message]) -> list:
         """Convert ARTEMIS messages to Gemini format."""
-        contents = []
-        for msg in messages:
-            # Gemini uses 'user' and 'model' roles
-            role = "model" if msg.role == "assistant" else "user"
-            contents.append({"role": role, "parts": [msg.content]})
-        return contents
+        if self.use_vertex_ai:
+            from vertexai.generative_models import Content, Part
+
+            contents = []
+            for msg in messages:
+                role = "model" if msg.role == "assistant" else "user"
+                contents.append(Content(role=role, parts=[Part.from_text(msg.content)]))
+            return contents
+        else:
+            # AI Studio format
+            contents = []
+            for msg in messages:
+                role = "model" if msg.role == "assistant" else "user"
+                contents.append({"role": role, "parts": [msg.content]})
+            return contents
 
     def _get_finish_reason(self, response) -> str | None:
         """Extract finish reason from response."""
@@ -354,6 +399,30 @@ class GoogleModel(BaseModel):
             if hasattr(candidate, "finish_reason"):
                 return str(candidate.finish_reason)
         return None
+
+    def _handle_error(self, e: Exception):
+        """Handle and re-raise errors with appropriate types."""
+        from google.api_core import exceptions as google_exceptions
+
+        if isinstance(e, google_exceptions.ResourceExhausted):
+            raise RateLimitError(
+                message=str(e),
+                provider=self.provider,
+            ) from e
+        elif isinstance(e, google_exceptions.InvalidArgument):
+            if "token" in str(e).lower():
+                raise TokenLimitError(
+                    message=str(e),
+                    provider=self.provider,
+                ) from e
+            raise ModelError(message=str(e), provider=self.provider) from e
+        elif isinstance(e, google_exceptions.GoogleAPIError):
+            raise ProviderConnectionError(
+                message=f"Failed to connect to {self.provider}: {e}",
+                provider=self.provider,
+            ) from e
+        else:
+            raise ModelError(message=str(e), provider=self.provider) from e
 
 
 # Register the provider
