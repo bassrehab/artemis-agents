@@ -1,6 +1,8 @@
 """Audit log exporter for ARTEMIS debates."""
 
+import html
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -10,6 +12,44 @@ from artemis.core.types import DebateResult, SafetyAlert, Turn
 from artemis.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+def _md_to_html(text: str) -> str:
+    """Convert basic markdown to HTML."""
+    if not text:
+        return ""
+
+    # Escape HTML entities first
+    text = html.escape(text)
+
+    # Headers: ## Header -> <h4>Header</h4>
+    text = re.sub(r'^## (.+)$', r'<h4>\1</h4>', text, flags=re.MULTILINE)
+    text = re.sub(r'^### (.+)$', r'<h5>\1</h5>', text, flags=re.MULTILINE)
+
+    # Bold: **text** -> <strong>text</strong>
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+
+    # Italic: *text* -> <em>text</em>
+    text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+
+    # Bullet points: - item -> <li>item</li>
+    text = re.sub(r'^- (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+
+    # Wrap consecutive <li> in <ul>
+    text = re.sub(r'((?:<li>.*?</li>\n?)+)', r'<ul>\1</ul>', text)
+
+    # Numbered lists: 1. item -> <li>item</li>
+    text = re.sub(r'^\d+\. (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+
+    # Line breaks for paragraphs
+    text = re.sub(r'\n\n+', '</p><p>', text)
+    text = re.sub(r'\n', '<br>', text)
+
+    # Wrap in paragraph if not already structured
+    if not text.startswith('<'):
+        text = f'<p>{text}</p>'
+
+    return text
 
 
 @dataclass
@@ -389,9 +429,10 @@ class AuditLog:
                     html_parts.append(f"<h3>{round_label}</h3>")
 
                 agent_class = "pro" if "pro" in (entry.agent or "").lower() else "con"
+                content_html = _md_to_html(entry.details.get('content_preview', ''))
                 html_parts.append(f"<div class='turn {agent_class}'>")
                 html_parts.append(f"<div class='turn-header'>{entry.agent} ({entry.details.get('level', 'N/A')})</div>")
-                html_parts.append(f"<div class='turn-content'>{entry.details.get('content_preview', '')}</div>")
+                html_parts.append(f"<div class='turn-content'>{content_html}</div>")
 
                 evidence = entry.details.get('evidence', [])
                 if evidence:
