@@ -9,6 +9,7 @@ from artemis.core.types import (
     ArgumentEvaluation,
     DebateContext,
     DissentingOpinion,
+    JurorConfig,
     JuryPerspective,
     Message,
     Turn,
@@ -294,29 +295,59 @@ class JuryPanel:
         evaluators: int = 3,
         criteria: list[str] | None = None,
         model: str = "gpt-4o",
+        models: list[str | BaseModel] | None = None,
+        jurors: list[JurorConfig] | None = None,
         consensus_threshold: float = 0.7,
         api_key: str | None = None,
         **model_kwargs: Any,
-    ) -> None:
+    ):
         self.criteria = criteria or DEFAULT_JURY_CRITERIA
         self.consensus_threshold = consensus_threshold
 
-        # Create jurors with different perspectives
-        self.jurors = [
-            JuryMember(
-                juror_id=f"juror_{i}",
-                perspective=self._assign_perspective(i),
-                model=model,
-                criteria=self.criteria,
-                api_key=api_key,
-                **model_kwargs,
-            )
-            for i in range(evaluators)
-        ]
+        # Create jurors based on configuration style
+        if jurors:
+            # Full control: use JurorConfig objects
+            self.jurors = [
+                JuryMember(
+                    juror_id=f"juror_{i}",
+                    perspective=cfg.perspective,
+                    model=cfg.model,
+                    criteria=cfg.criteria or self.criteria,
+                    api_key=cfg.api_key or api_key,
+                    **model_kwargs,
+                )
+                for i, cfg in enumerate(jurors)
+            ]
+        elif models:
+            # Simple: use list of models (cycles if fewer than evaluators)
+            self.jurors = [
+                JuryMember(
+                    juror_id=f"juror_{i}",
+                    perspective=self._assign_perspective(i),
+                    model=models[i % len(models)],
+                    criteria=self.criteria,
+                    api_key=api_key,
+                    **model_kwargs,
+                )
+                for i in range(evaluators)
+            ]
+        else:
+            # Default: same model for all jurors
+            self.jurors = [
+                JuryMember(
+                    juror_id=f"juror_{i}",
+                    perspective=self._assign_perspective(i),
+                    model=model,
+                    criteria=self.criteria,
+                    api_key=api_key,
+                    **model_kwargs,
+                )
+                for i in range(evaluators)
+            ]
 
         logger.debug(
             "JuryPanel initialized",
-            evaluators=evaluators,
+            evaluators=len(self.jurors),
             perspectives=[j.perspective.value for j in self.jurors],
             consensus_threshold=consensus_threshold,
         )
