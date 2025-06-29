@@ -57,4 +57,4 @@ htmlcov/
 .ruff_cache/
 
 # MkDocs build output
-site/
+site/examples/audit_output/
