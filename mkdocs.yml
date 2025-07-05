@@ -106,6 +106,7 @@ nav:
     - Enterprise Decisions: examples/enterprise-decisions.md
     - With Safety Monitors: examples/safety-monitors.md
     - Audit Log Export: examples/audit-logs.md
+    - Debate Analytics: examples/analytics.md
     - LangGraph Workflow: examples/langgraph-workflow.md
     - CrewAI Workflow: examples/crewai-workflow.md
     - Streaming Output: examples/streaming.md
