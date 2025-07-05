@@ -58,9 +58,13 @@ print(json_string)
 {
   "debate_id": "debate_abc123",
   "topic": "Should we adopt renewable energy?",
-  "started_at": "2025-06-28T14:30:00Z",
-  "ended_at": "2025-06-28T14:35:00Z",
-  "agents": ["pro", "con"],
+  "metadata": {
+    "started_at": "2025-06-28T14:30:00Z",
+    "ended_at": "2025-06-28T14:35:00Z",
+    "agents": ["pro", "con"],
+    "jury_size": 3,
+    "safety_monitors": ["SandbagDetector", "DeceptionMonitor"]
+  },
   "entries": [
     {
       "timestamp": "2025-06-28T14:30:05Z",
@@ -68,17 +72,53 @@ print(json_string)
       "agent": "pro",
       "round": 1,
       "details": {
+        "turn_id": "turn_pro_1",
         "level": "strategic",
-        "content": "Renewable energy is essential...",
-        "evidence_count": 2
+        "content": "Full argument content here...",
+        "evidence": [
+          {
+            "type": "study",
+            "content": "Full evidence content",
+            "source": "Nature 2024",
+            "confidence": 0.92,
+            "verified": true
+          }
+        ],
+        "causal_links": [
+          {"cause": "renewable adoption", "effect": "reduced emissions", "strength": 0.85}
+        ],
+        "rebuts": [],
+        "supports": ["turn_pro_0"],
+        "ethical_score": 0.87
+      }
+    },
+    {
+      "timestamp": "2025-06-28T14:30:10Z",
+      "event_type": "argument_evaluated",
+      "agent": "pro",
+      "round": 1,
+      "details": {
+        "total_score": 0.82,
+        "scores": {
+          "logical_coherence": 0.85,
+          "evidence_quality": 0.80,
+          "causal_reasoning": 0.78,
+          "ethical_alignment": 0.88,
+          "persuasiveness": 0.82
+        },
+        "weights": {
+          "logical_coherence": 0.25,
+          "evidence_quality": 0.25,
+          "causal_reasoning": 0.20,
+          "ethical_alignment": 0.15,
+          "persuasiveness": 0.15
+        },
+        "feedback": "Strong argument with credible evidence",
+        "strengths": ["Clear thesis", "Well-sourced claims"],
+        "weaknesses": ["Could address counterarguments"]
       }
     }
-  ],
-  "verdict": {
-    "decision": "pro",
-    "confidence": 0.85,
-    "reasoning": "..."
-  }
+  ]
 }
 ```
 
@@ -144,7 +184,7 @@ No safety alerts recorded.
 
 ### HTML Export
 
-Styled report with interactive elements:
+Comprehensive styled report with full content:
 
 ```python
 # Export to file
@@ -156,11 +196,16 @@ html_string = audit.to_html()
 
 The HTML export includes:
 
-- Styled headers and sections
-- Color-coded severity levels for safety alerts
-- Collapsible transcript sections
-- Score visualizations
-- Responsive layout
+- **Table of contents** with navigation links
+- **Full argument content** (not truncated)
+- **Color-coded agents** with distinct border colors
+- **Complete evidence** with source, confidence, and verification status
+- **Causal links** visualization (cause → effect)
+- **Expandable evaluation details** with criteria breakdown
+- **Strengths and weaknesses** for each argument
+- **Inline safety warnings** with severity indicators
+- **Verdict section** with score cards and reasoning
+- **Safety analysis section** with all alerts
 
 ## Working with Entries
 

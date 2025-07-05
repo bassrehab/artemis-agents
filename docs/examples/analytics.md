@@ -170,29 +170,43 @@ svg = chart.render(coverage, agents=["Advocate", "Skeptic"])
 
 ## HTML Report Generation
 
-Generate a complete HTML report with all visualizations:
+Generate a comprehensive HTML report with analytics and full transcript:
 
 ```python
 from artemis.analytics import export_analytics_report
 
-# Export with default settings
+# Export comprehensive report (default - includes full transcript)
 export_analytics_report(result, "report.html")
 
-# Customize
-export_analytics_report(
-    result,
-    "report.html",
-    include_charts=True,  # Include SVG visualizations
-)
+# Charts only (no transcript)
+export_analytics_report(result, "report.html", include_transcript=False)
+
+# No charts
+export_analytics_report(result, "report.html", include_charts=False)
 ```
 
-The generated report includes:
-- Debate metadata (topic, agents, rounds)
-- Key metrics summary (turning points, lead changes, sway events)
-- Score progression chart
-- Momentum over time chart
-- Final scores bar chart
+The comprehensive report includes:
+
+**Analytics Section:**
+- Table of contents with navigation
+- Key metrics (turning points, lead changes, sway events)
+- Score progression chart (SVG)
+- Momentum over time chart (SVG)
+- Final scores bar chart (SVG)
 - Turning point analysis
+
+**Full Transcript Section:**
+- Complete argument content for each turn
+- Evidence with source, confidence, verification status
+- Causal links (cause → effect)
+- Rebuts/supports relationships
+- Expandable evaluation details per turn
+- Inline safety warnings
+
+**Verdict Section:**
+- Winner with confidence score
+- Jury reasoning
+- Final score cards per agent
 
 ## Using with Debate.get_analytics()
 
