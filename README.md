@@ -1,4 +1,4 @@
-# 🏛️ ARTEMIS Agents
+#  ARTEMIS Agents
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -49,7 +49,7 @@ cd artemis-agents
 pip install -e ".[dev]"
 ```
 
-## 🏃 Quick Start
+##  Quick Start
 
 ### Basic Debate
 
