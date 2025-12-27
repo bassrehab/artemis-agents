@@ -41,6 +41,18 @@ class DebatePhase(str, Enum):
     COMPLETE = "complete"
     """Debate finished."""
 
+    ERROR = "error"
+    """Error state."""
+
+
+class AgentStateConfig(TypedDict, total=False):
+    """Configuration for an agent in the state."""
+
+    name: str
+    role: str
+    position: str
+    model: str | None
+
 
 class DebateNodeState(TypedDict, total=False):
     """State schema for LangGraph debate node."""
@@ -48,11 +60,11 @@ class DebateNodeState(TypedDict, total=False):
     topic: str
     """The debate topic."""
 
-    pro_position: str
-    """Pro agent's position."""
+    agents: list[AgentStateConfig]
+    """Agent configurations (for multi-agent support)."""
 
-    con_position: str
-    """Con agent's position."""
+    positions: dict[str, str]
+    """Position mapping for agents."""
 
     rounds: int
     """Total rounds."""
@@ -75,6 +87,13 @@ class DebateNodeState(TypedDict, total=False):
     metadata: dict
     """Additional metadata."""
 
+    # Backward compatibility for simple pro/con
+    pro_position: str
+    """Pro agent's position (legacy)."""
+
+    con_position: str
+    """Con agent's position (legacy)."""
+
 
 class DebateNodeConfig(BaseModel):
     """Configuration for debate node."""
@@ -90,7 +109,7 @@ class DebateContext:
     """Context maintained across node executions."""
 
     debate: Debate | None = None
-    agents: dict[str, Agent] = field(default_factory=dict)
+    agents: list[Agent] = field(default_factory=list)
     result: DebateResult | None = None
 
 
@@ -101,7 +120,10 @@ class ArtemisDebateNode:
     Designed for integration with LangGraph state machines, providing
     flexible debate execution as nodes in a larger workflow.
 
-    Example:
+    Supports configurable agents - either pre-configured, from state,
+    or default pro/con agents.
+
+    Example (simple pro/con):
         >>> from langgraph.graph import StateGraph
         >>> from artemis.integrations.langgraph import ArtemisDebateNode
         >>>
@@ -109,6 +131,17 @@ class ArtemisDebateNode:
         >>> workflow = StateGraph(DebateNodeState)
         >>> workflow.add_node("debate", node.run_debate)
         >>> workflow.add_edge("start", "debate")
+
+    Example (multi-agent):
+        >>> initial_state = {
+        ...     "topic": "How should we approach AI safety?",
+        ...     "agents": [
+        ...         {"name": "researcher", "role": "AI Safety Researcher", "position": "focus on alignment"},
+        ...         {"name": "ethicist", "role": "AI Ethicist", "position": "focus on ethics"},
+        ...         {"name": "policymaker", "role": "Policy Expert", "position": "focus on regulation"},
+        ...     ],
+        ... }
+        >>> result = await app.ainvoke(initial_state)
 
     Step-by-step execution:
         >>> workflow.add_node("setup", node.setup)
@@ -119,6 +152,7 @@ class ArtemisDebateNode:
     def __init__(
         self,
         model: str = "gpt-4o",
+        agents: list[Agent] | None = None,
         config: DebateNodeConfig | None = None,
         debate_config: DebateConfig | None = None,
         **kwargs: Any,
@@ -128,11 +162,13 @@ class ArtemisDebateNode:
 
         Args:
             model: LLM model to use.
+            agents: Pre-configured agents (optional).
             config: Node configuration.
             debate_config: Debate configuration.
             **kwargs: Additional configuration.
         """
         self.model = model
+        self.default_agents = agents
         self.node_config = config or DebateNodeConfig(model=model)
         self.debate_config = debate_config or DebateConfig()
         self.extra_config = kwargs
@@ -143,7 +179,63 @@ class ArtemisDebateNode:
         logger.info(
             "ArtemisDebateNode initialized",
             model=model,
+            pre_configured_agents=len(agents) if agents else 0,
         )
+
+    def _create_agents(self, state: DebateNodeState) -> list[Agent]:
+        """Create agents from state or use defaults."""
+        # Use pre-configured agents if available
+        if self.default_agents:
+            return self.default_agents
+
+        # Create from state agent configs
+        state_agents = state.get("agents")
+        if state_agents:
+            return [
+                Agent(
+                    name=agent_config["name"],
+                    role=agent_config["role"],
+                    model=agent_config.get("model") or self.model,
+                )
+                for agent_config in state_agents
+            ]
+
+        # Fall back to default pro/con agents
+        return [
+            Agent(
+                name="pro_agent",
+                role="Debate advocate for the proposition",
+                model=self.model,
+            ),
+            Agent(
+                name="con_agent",
+                role="Debate advocate against the proposition",
+                model=self.model,
+            ),
+        ]
+
+    def _get_positions(
+        self, state: DebateNodeState, agents: list[Agent]
+    ) -> dict[str, str]:
+        """Get positions mapping for agents."""
+        # From explicit positions in state
+        if state.get("positions"):
+            return state["positions"]
+
+        # From agent configs in state
+        state_agents = state.get("agents")
+        if state_agents:
+            return {
+                agent_config["name"]: agent_config.get("position", "")
+                for agent_config in state_agents
+                if agent_config.get("position")
+            }
+
+        # From simple pro/con positions (backward compatibility)
+        return {
+            "pro_agent": state.get("pro_position", "supports the topic"),
+            "con_agent": state.get("con_position", "opposes the topic"),
+        }
 
     async def run_debate(self, state: DebateNodeState) -> DebateNodeState:
         """
@@ -162,42 +254,37 @@ class ArtemisDebateNode:
         if not topic:
             return {
                 **state,
-                "phase": DebatePhase.COMPLETE.value,
+                "phase": DebatePhase.ERROR.value,
                 "verdict": {"decision": "error", "reasoning": "No topic provided"},
             }
 
         logger.info("Running complete debate", topic=topic[:50])
 
-        # Create agents
-        pro_agent = Agent(
-            name="pro_agent",
-            model=self.model,
-            position=state.get("pro_position", "supports the topic"),
-        )
-        con_agent = Agent(
-            name="con_agent",
-            model=self.model,
-            position=state.get("con_position", "opposes the topic"),
-        )
+        # Create agents from state or use defaults
+        agents = self._create_agents(state)
+        positions = self._get_positions(state, agents)
+        rounds = state.get("rounds", self.node_config.default_rounds)
 
         # Create and run debate
-        rounds = state.get("rounds", self.node_config.default_rounds)
         debate = Debate(
             topic=topic,
-            agents=[pro_agent, con_agent],
+            agents=agents,
             rounds=rounds,
             config=self.debate_config,
         )
 
-        debate.assign_positions({
-            "pro_agent": state.get("pro_position", "supports the topic"),
-            "con_agent": state.get("con_position", "opposes the topic"),
-        })
+        debate.assign_positions(positions)
 
-        result = await debate.run()
-
-        # Format output
-        return self._format_state(state, result)
+        try:
+            result = await debate.run()
+            return self._format_state(state, result)
+        except Exception as e:
+            logger.error("Debate failed", error=str(e))
+            return {
+                **state,
+                "phase": DebatePhase.ERROR.value,
+                "verdict": {"decision": "error", "reasoning": str(e)},
+            }
 
     async def setup(self, state: DebateNodeState) -> DebateNodeState:
         """
@@ -216,36 +303,25 @@ class ArtemisDebateNode:
 
         logger.debug("Setting up debate", debate_id=debate_id, topic=topic[:50])
 
-        # Create agents
-        pro_agent = Agent(
-            name="pro_agent",
-            model=self.model,
-            position=state.get("pro_position", "supports the topic"),
-        )
-        con_agent = Agent(
-            name="con_agent",
-            model=self.model,
-            position=state.get("con_position", "opposes the topic"),
-        )
+        # Create agents from state or use defaults
+        agents = self._create_agents(state)
+        positions = self._get_positions(state, agents)
+        rounds = state.get("rounds", self.node_config.default_rounds)
 
         # Create debate
-        rounds = state.get("rounds", self.node_config.default_rounds)
         debate = Debate(
             topic=topic,
-            agents=[pro_agent, con_agent],
+            agents=agents,
             rounds=rounds,
             config=self.debate_config,
         )
 
-        debate.assign_positions({
-            "pro_agent": state.get("pro_position", "supports the topic"),
-            "con_agent": state.get("con_position", "opposes the topic"),
-        })
+        debate.assign_positions(positions)
 
         # Store context
         self._contexts[debate_id] = DebateContext(
             debate=debate,
-            agents={"pro": pro_agent, "con": con_agent},
+            agents=agents,
         )
 
         return {
@@ -272,7 +348,7 @@ class ArtemisDebateNode:
         if not debate_id or debate_id not in self._contexts:
             return {
                 **state,
-                "phase": DebatePhase.COMPLETE.value,
+                "phase": DebatePhase.ERROR.value,
                 "verdict": {"decision": "error", "reasoning": "No active debate"},
             }
 
@@ -432,6 +508,10 @@ class ArtemisDebateNode:
         def router(state: DebateNodeState) -> str:
             current = state.get("current_round", 0)
             total = state.get("rounds", 3)
+            phase = state.get("phase", "")
+
+            if phase == DebatePhase.ERROR.value:
+                return "error"
 
             if current >= total:
                 return "finalize"
@@ -455,6 +535,7 @@ class ArtemisDebateNode:
 def create_debate_workflow(
     model: str = "gpt-4o",
     step_by_step: bool = False,
+    agents: list[Agent] | None = None,
 ) -> Any:
     """
     Create a LangGraph workflow for ARTEMIS debates.
@@ -462,12 +543,28 @@ def create_debate_workflow(
     Args:
         model: LLM model to use.
         step_by_step: Whether to create step-by-step workflow.
+        agents: Pre-configured agents (optional).
 
     Returns:
         Compiled LangGraph workflow.
 
     Raises:
         ImportError: If langgraph is not installed.
+
+    Example (simple):
+        >>> workflow = create_debate_workflow(model="gpt-4o")
+        >>> app = workflow
+        >>> result = await app.ainvoke({"topic": "Should we adopt microservices?"})
+
+    Example (multi-agent):
+        >>> result = await app.ainvoke({
+        ...     "topic": "How should we approach climate change?",
+        ...     "agents": [
+        ...         {"name": "scientist", "role": "Climate Scientist", "position": "focus on data"},
+        ...         {"name": "economist", "role": "Economist", "position": "focus on costs"},
+        ...         {"name": "activist", "role": "Activist", "position": "focus on urgency"},
+        ...     ],
+        ... })
     """
     try:
         from langgraph.graph import END, StateGraph
@@ -477,7 +574,7 @@ def create_debate_workflow(
             "Install with: pip install langgraph"
         ) from e
 
-    node = ArtemisDebateNode(model=model)
+    node = ArtemisDebateNode(model=model, agents=agents)
     workflow = StateGraph(DebateNodeState)
 
     if step_by_step:

@@ -11,22 +11,23 @@ from artemis.core.debate import Debate
 
 async def run_three_perspective_debate():
     # Create agents with distinct perspectives
+    # Note: 'role' is required for all agents
     economic_agent = Agent(
         name="economist",
+        role="Economic policy analyst",
         model="gpt-4o",
-        temperature=0.7,
     )
 
     technical_agent = Agent(
         name="technologist",
+        role="Technology and AI researcher",
         model="gpt-4o",
-        temperature=0.7,
     )
 
     social_agent = Agent(
         name="sociologist",
+        role="Social impact researcher",
         model="gpt-4o",
-        temperature=0.7,
     )
 
     debate = Debate(
@@ -73,7 +74,8 @@ async def run_three_perspective_debate():
         agent_turns = [t for t in result.transcript if t.agent == agent_name]
         print(f"\n{agent_name.upper()}:")
         for turn in agent_turns[:2]:  # First two turns
-            print(f"  Round {turn.round}: {turn.argument.content[:150]}...")
+            content = turn.argument.content
+            print(f"  Round {turn.round}: {content[:150]}...")
 
 asyncio.run(run_three_perspective_debate())
 ```
@@ -90,10 +92,26 @@ from artemis.core.debate import Debate
 async def run_stakeholder_debate():
     # Different stakeholders in a policy decision
     agents = [
-        Agent(name="business_leader", model="gpt-4o"),
-        Agent(name="labor_union", model="gpt-4o"),
-        Agent(name="government_regulator", model="gpt-4o"),
-        Agent(name="consumer_advocate", model="gpt-4o"),
+        Agent(
+            name="business_leader",
+            role="Business executive representing company interests",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="labor_union",
+            role="Labor union representative for worker rights",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="government_regulator",
+            role="Government regulator ensuring compliance",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="consumer_advocate",
+            role="Consumer rights advocate",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -131,7 +149,8 @@ async def run_stakeholder_debate():
     for turn in result.transcript:
         if turn.round == 1:  # Opening positions
             print(f"\n{turn.agent.upper()} POSITION:")
-            print(f"{turn.argument.content[:300]}...")
+            content = turn.argument.content
+            print(f"{content[:300]}...")
             print()
 
     print("\nFINAL SYNTHESIS:")
@@ -151,33 +170,34 @@ from artemis.core.debate import Debate
 from artemis.core.types import DebateConfig
 
 async def run_expert_panel():
+    # DebateConfig with actual supported fields
     config = DebateConfig(
-        argument_depth="deep",
-        require_evidence=True,
-        min_tactical_points=3,
+        turn_timeout=120,         # Allow longer turns for expert analysis
+        round_timeout=600,        # Allow longer rounds
+        safety_mode="passive",    # Monitor but don't interrupt
     )
 
     # Panel of domain experts
     experts = [
         Agent(
             name="ai_researcher",
+            role="AI/ML research scientist",
             model="gpt-4o",
-            temperature=0.6,
         ),
         Agent(
             name="ethicist",
+            role="AI ethics philosopher",
             model="gpt-4o",
-            temperature=0.7,
         ),
         Agent(
             name="policy_expert",
+            role="Technology policy analyst",
             model="gpt-4o",
-            temperature=0.6,
         ),
         Agent(
             name="industry_practitioner",
+            role="AI industry practitioner",
             model="gpt-4o",
-            temperature=0.7,
         ),
     ]
 
@@ -247,9 +267,21 @@ from artemis.core.debate import Debate
 
 async def run_mediated_debate():
     agents = [
-        Agent(name="advocate", model="gpt-4o"),
-        Agent(name="critic", model="gpt-4o"),
-        Agent(name="mediator", model="gpt-4o", temperature=0.5),
+        Agent(
+            name="advocate",
+            role="Strong proponent of platform liability",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="critic",
+            role="Strong opponent of platform liability",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="mediator",
+            role="Neutral mediator seeking common ground",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -286,9 +318,10 @@ async def run_mediated_debate():
         print(f"\n--- ROUND {round_num} ---")
         round_turns = [t for t in result.transcript if t.round == round_num]
         for turn in round_turns:
-            role = "🔵" if turn.agent == "advocate" else "🔴" if turn.agent == "critic" else "⚖️"
-            print(f"\n{role} {turn.agent.upper()}:")
-            print(f"{turn.argument.content[:200]}...")
+            role = "+" if turn.agent == "advocate" else "-" if turn.agent == "critic" else "="
+            print(f"\n[{role}] {turn.agent.upper()}:")
+            content = turn.argument.content
+            print(f"{content[:200]}...")
 
     print(f"\n\nMEDIATED CONCLUSION:\n{result.verdict.reasoning}")
 
@@ -310,14 +343,14 @@ async def run_dynamic_multi_agent(topic: str, perspectives: list[dict]):
 
     Args:
         topic: The debate topic
-        perspectives: List of dicts with 'name' and 'position' keys
+        perspectives: List of dicts with 'name', 'role', and 'position' keys
     """
     # Create agents for each perspective
     agents = [
         Agent(
             name=p["name"],
+            role=p["role"],  # Role is required
             model="gpt-4o",
-            temperature=0.7,
         )
         for p in perspectives
     ]
@@ -340,18 +373,22 @@ async def main():
     perspectives = [
         {
             "name": "optimist",
+            "role": "Technology optimist",
             "position": "Focuses on potential benefits and opportunities"
         },
         {
             "name": "pessimist",
+            "role": "Technology skeptic",
             "position": "Focuses on risks and potential downsides"
         },
         {
             "name": "pragmatist",
+            "role": "Practical implementer",
             "position": "Focuses on practical implementation challenges"
         },
         {
             "name": "visionary",
+            "role": "Long-term strategist",
             "position": "Focuses on long-term transformative potential"
         },
     ]

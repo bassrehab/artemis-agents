@@ -11,19 +11,23 @@ from artemis.core.debate import Debate
 
 async def run_basic_debate():
     # Create two agents with opposing positions
+    # Note: 'role' is a required parameter for all agents
     pro_agent = Agent(
         name="proponent",
+        role="Advocate arguing in favor of the proposition",
         model="gpt-4o",
         position="supports the proposition",
     )
 
     con_agent = Agent(
         name="opponent",
+        role="Advocate arguing against the proposition",
         model="gpt-4o",
         position="opposes the proposition",
     )
 
     # Create the debate
+    # Default rounds is 5, but we use 3 for quicker results
     debate = Debate(
         topic="Should AI development be regulated by governments?",
         agents=[pro_agent, con_agent],
@@ -50,7 +54,7 @@ async def run_basic_debate():
     print("-" * 60)
     for turn in result.transcript:
         print(f"\n[Round {turn.round}] {turn.agent.upper()}")
-        print(f"Level: {turn.argument.level}")
+        print(f"Level: {turn.argument.level.value}")
         print(f"\n{turn.argument.content}")
         if turn.argument.evidence:
             print("\nEvidence:")
@@ -78,28 +82,26 @@ from artemis.core.debate import Debate
 from artemis.core.types import DebateConfig
 
 async def run_configured_debate():
-    # Create configuration
+    # Create configuration with actual DebateConfig fields
     config = DebateConfig(
-        max_round_time_seconds=300,
-        max_total_time_seconds=1800,
-        jury_size=5,
-        require_unanimous=False,
-        evaluation_criteria=[
-            "logical_coherence",
-            "evidence_quality",
-            "argument_strength",
-            "ethical_considerations",
-        ],
-        argument_depth="deep",
-        require_evidence=True,
-        min_tactical_points=3,
-        min_operational_facts=5,
+        turn_timeout=60,          # Max seconds per turn
+        round_timeout=300,        # Max seconds per round
+        safety_mode="passive",    # "off", "passive", or "active"
+        halt_on_safety_violation=False,
     )
 
-    # Create agents
+    # Create agents - role is required
     agents = [
-        Agent(name="advocate", model="gpt-4o", temperature=0.7),
-        Agent(name="critic", model="gpt-4o", temperature=0.7),
+        Agent(
+            name="advocate",
+            role="Remote work advocate",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="critic",
+            role="Office work advocate",
+            model="gpt-4o",
+        ),
     ]
 
     # Create debate with config
@@ -119,35 +121,39 @@ async def run_configured_debate():
 
     print(f"Verdict: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
-    print(f"Duration: {result.duration_seconds:.1f}s")
+    print(f"Total turns: {len(result.transcript)}")
 
 asyncio.run(run_configured_debate())
 ```
 
-## With Custom Jury
+## With Custom Jury Panel
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, PERSPECTIVES
+from artemis.core.jury import JuryPanel
 
 async def run_debate_with_jury():
-    # Create a custom jury
-    jury = Jury(
-        members=[
-            JuryMember(name="logician", perspective=PERSPECTIVES["logical"]),
-            JuryMember(name="ethicist", perspective=PERSPECTIVES["ethical"]),
-            JuryMember(name="pragmatist", perspective=PERSPECTIVES["practical"]),
-            JuryMember(name="skeptic", perspective=PERSPECTIVES["skeptical"]),
-            JuryMember(name="analyst", perspective=PERSPECTIVES["analytical"]),
-        ],
-        voting="simple_majority",
+    # Create a custom jury panel
+    # JuryPanel automatically assigns perspectives (ANALYTICAL, ETHICAL, PRACTICAL, etc.)
+    jury = JuryPanel(
+        evaluators=5,            # Number of jury members
+        model="gpt-4o",          # Model for jury evaluation
+        consensus_threshold=0.7, # Required agreement for consensus
     )
 
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(
+            name="pro",
+            role="UBI supporter",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="con",
+            role="UBI skeptic",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -164,14 +170,28 @@ async def run_debate_with_jury():
 
     result = await debate.run()
 
-    # Show individual jury votes
-    print("JURY VOTES")
+    # Show verdict details
+    print("JURY VERDICT")
     print("-" * 40)
-    for vote in result.verdict.votes:
-        print(f"{vote.juror}: {vote.decision} (confidence: {vote.confidence:.0%})")
-        print(f"  Reasoning: {vote.reasoning[:100]}...")
-    print()
-    print(f"Final Verdict: {result.verdict.decision}")
+    print(f"Decision: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
+
+    # Show score breakdown if available
+    if result.verdict.score_breakdown:
+        print("\nScore Breakdown:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
+
+    # Show dissenting opinions if any
+    if result.verdict.dissenting_opinions:
+        print("\nDissenting Opinions:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"  {dissent.juror_id} ({dissent.perspective.value}):")
+            print(f"    Position: {dissent.position}")
+            print(f"    Reasoning: {dissent.reasoning[:100]}...")
+
+    print(f"\nFinal Reasoning:\n{result.verdict.reasoning}")
 
 asyncio.run(run_debate_with_jury())
 ```
@@ -188,18 +208,18 @@ async def run_multi_agent_debate():
     agents = [
         Agent(
             name="economist",
+            role="Economic policy analyst",
             model="gpt-4o",
-            temperature=0.6,
         ),
         Agent(
             name="technologist",
+            role="AI safety researcher",
             model="gpt-4o",
-            temperature=0.7,
         ),
         Agent(
             name="humanist",
+            role="Social impact advocate",
             model="gpt-4o",
-            temperature=0.8,
         ),
     ]
 
@@ -222,7 +242,8 @@ async def run_multi_agent_debate():
 
     for turn in result.transcript:
         print(f"\n[{turn.agent.upper()}]")
-        print(turn.argument.content[:500] + "...")
+        content = turn.argument.content
+        print(content[:500] + "..." if len(content) > 500 else content)
 
     print(f"\n\nSynthesis: {result.verdict.reasoning}")
 
@@ -238,8 +259,16 @@ from artemis.core.debate import Debate
 
 async def examine_argument_structure():
     agents = [
-        Agent(name="pro", model="gpt-4o"),
-        Agent(name="con", model="gpt-4o"),
+        Agent(
+            name="pro",
+            role="Advocate for early CS education",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="con",
+            role="Critic of mandatory CS curriculum",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -262,7 +291,7 @@ async def examine_argument_structure():
         print(f"\n{'='*60}")
         print(f"Agent: {turn.agent}")
         print(f"Round: {turn.round}")
-        print(f"Level: {arg.level}")
+        print(f"Level: {arg.level.value}")  # strategic, tactical, or operational
         print(f"{'='*60}")
 
         print(f"\nContent:\n{arg.content}")
@@ -270,10 +299,9 @@ async def examine_argument_structure():
         if arg.evidence:
             print("\nEvidence:")
             for e in arg.evidence:
-                print(f"  Type: {e.type}")
+                print(f"  Type: {e.type}")  # fact, statistic, quote, example, study, expert_opinion
                 print(f"  Source: {e.source}")
-                if e.quote:
-                    print(f"  Quote: \"{e.quote}\"")
+                print(f"  Content: {e.content}")
                 print()
 
         if arg.causal_links:
@@ -283,6 +311,50 @@ async def examine_argument_structure():
                 print(f"  Strength: {link.strength:.2f}")
 
 asyncio.run(examine_argument_structure())
+```
+
+## Using the Scores API
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+
+async def track_scores():
+    agents = [
+        Agent(name="pro", role="Proponent", model="gpt-4o"),
+        Agent(name="con", role="Opponent", model="gpt-4o"),
+    ]
+
+    debate = Debate(
+        topic="Should we invest in space exploration?",
+        agents=agents,
+        rounds=3,
+    )
+
+    debate.assign_positions({
+        "pro": "supports increased space exploration funding",
+        "con": "argues for redirecting funds to Earth-based priorities",
+    })
+
+    result = await debate.run()
+
+    # Use get_scores() to see aggregate scores
+    scores = debate.get_scores()
+    print("Agent Scores:")
+    for agent, score in scores.items():
+        print(f"  {agent}: {score:.2f}")
+
+    # Examine individual turn evaluations
+    print("\nTurn-by-Turn Scores:")
+    for turn in result.transcript:
+        if turn.evaluation:
+            print(f"  Round {turn.round} - {turn.agent}: {turn.evaluation.total_score:.2f}")
+            # Individual criteria scores
+            for criterion, score in turn.evaluation.scores.items():
+                print(f"    {criterion}: {score:.2f}")
+
+asyncio.run(track_scores())
 ```
 
 ## Next Steps
