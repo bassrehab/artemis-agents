@@ -1,9 +1,4 @@
-"""
-ARTEMIS CrewAI Integration
-
-Provides CrewAI Tool wrapper for ARTEMIS debates.
-Enables using structured multi-agent debates within CrewAI crews.
-"""
+"""CrewAI tool wrapper for ARTEMIS debates."""
 
 import asyncio
 from typing import Any
@@ -72,41 +67,7 @@ class DebateToolOutput(BaseModel):
 
 
 class ArtemisCrewTool:
-    """
-    CrewAI-compatible tool for running ARTEMIS debates.
-
-    Integrates structured multi-agent debates into CrewAI workflows,
-    enabling crews to leverage adversarial analysis for decision-making.
-
-    Supports configurable agents - either simple pro/con or multi-agent.
-
-    Example (simple pro/con):
-        >>> from crewai import Agent, Task, Crew
-        >>> from artemis.integrations.crewai import ArtemisCrewTool
-        >>>
-        >>> debate_tool = ArtemisCrewTool(model="gpt-4o")
-        >>>
-        >>> analyst = Agent(
-        ...     role="Decision Analyst",
-        ...     tools=[debate_tool.as_crewai_tool()],
-        ... )
-
-    Example (multi-agent):
-        >>> result = tool.run(
-        ...     topic="How should we approach AI safety?",
-        ...     agents=[
-        ...         {"name": "researcher", "role": "AI Researcher", "position": "focus on alignment"},
-        ...         {"name": "ethicist", "role": "Ethicist", "position": "focus on ethics"},
-        ...     ],
-        ... )
-
-    Direct usage:
-        >>> tool = ArtemisCrewTool()
-        >>> result = tool.run(
-        ...     topic="Should we adopt microservices architecture?",
-        ...     rounds=3,
-        ... )
-    """
+    """CrewAI-compatible tool for running ARTEMIS debates."""
 
     name: str = "artemis_structured_debate"
     description: str = (
@@ -126,18 +87,7 @@ class ArtemisCrewTool:
         config: DebateConfig | None = None,
         verbose: bool = False,
         **kwargs: Any,
-    ) -> None:
-        """
-        Initialize the ARTEMIS CrewAI tool.
-
-        Args:
-            model: LLM model to use for debate agents.
-            default_rounds: Default number of debate rounds.
-            agents: Pre-configured agents (optional).
-            config: Optional debate configuration.
-            verbose: Whether to log detailed progress.
-            **kwargs: Additional configuration.
-        """
+    ):
         self.model = model
         self.default_rounds = default_rounds
         self.default_agents = agents
@@ -152,55 +102,15 @@ class ArtemisCrewTool:
             pre_configured_agents=len(agents) if agents else 0,
         )
 
-    def run(
-        self,
-        topic: str,
-        agents: list[dict] | None = None,
-        pro_position: str | None = None,
-        con_position: str | None = None,
-        rounds: int | None = None,
-    ) -> str:
-        """
-        Run a debate and return formatted result string.
-
-        This is the main entry point for CrewAI tool execution.
-
-        Args:
-            topic: The debate topic.
-            agents: List of agent configurations (optional).
-            pro_position: Pro-side position (for simple pro/con, if agents not provided).
-            con_position: Con-side position (for simple pro/con, if agents not provided).
-            rounds: Number of rounds (uses default if not specified).
-
-        Returns:
-            Formatted string with debate results.
-        """
+    def run(self, topic, agents=None, pro_position=None, con_position=None, rounds=None):
+        """Run a debate and return formatted result string."""
         result = asyncio.run(
             self._run_debate(topic, agents, pro_position, con_position, rounds)
         )
         return self._format_result_string(result)
 
-    async def arun(
-        self,
-        topic: str,
-        agents: list[dict] | None = None,
-        pro_position: str | None = None,
-        con_position: str | None = None,
-        rounds: int | None = None,
-    ) -> str:
-        """
-        Run a debate asynchronously.
-
-        Args:
-            topic: The debate topic.
-            agents: List of agent configurations (optional).
-            pro_position: Pro-side position (for simple pro/con).
-            con_position: Con-side position (for simple pro/con).
-            rounds: Number of rounds.
-
-        Returns:
-            Formatted string with debate results.
-        """
+    async def arun(self, topic, agents=None, pro_position=None, con_position=None, rounds=None):
+        """Run a debate asynchronously."""
         result = await self._run_debate(topic, agents, pro_position, con_position, rounds)
         return self._format_result_string(result)
 
@@ -409,16 +319,8 @@ class ArtemisCrewTool:
 
         return "\n".join(lines)
 
-    def as_crewai_tool(self) -> Any:
-        """
-        Convert to a CrewAI Tool.
-
-        Returns:
-            CrewAI Tool instance.
-
-        Raises:
-            ImportError: If crewai is not installed.
-        """
+    def as_crewai_tool(self):
+        """Convert to a CrewAI Tool."""
         try:
             from crewai.tools import BaseTool
         except ImportError as e:
@@ -458,13 +360,8 @@ class ArtemisCrewTool:
 
         return ArtemisDebateTool()
 
-    def as_function(self) -> dict:
-        """
-        Export as a function definition for function calling.
-
-        Returns:
-            Function definition dict.
-        """
+    def as_function(self):
+        """Export as function definition for function calling."""
         return {
             "name": self.name,
             "description": self.description,
@@ -508,51 +405,15 @@ class ArtemisCrewTool:
 
 
 class DebateAnalyzer:
-    """
-    High-level analyzer for complex decisions using debates.
+    """High-level analyzer for complex decisions using debates."""
 
-    Provides a simplified interface for running multiple debates
-    to analyze complex multi-faceted decisions.
-
-    Example:
-        >>> analyzer = DebateAnalyzer()
-        >>> results = analyzer.analyze_decision(
-        ...     decision="Should we migrate to cloud infrastructure?",
-        ...     aspects=["cost", "security", "scalability"],
-        ... )
-    """
-
-    def __init__(
-        self,
-        model: str = "gpt-4o",
-        rounds_per_debate: int = 2,
-    ) -> None:
-        """
-        Initialize the analyzer.
-
-        Args:
-            model: LLM model to use.
-            rounds_per_debate: Rounds for each sub-debate.
-        """
+    def __init__(self, model="gpt-4o", rounds_per_debate=2):
         self.model = model
         self.rounds = rounds_per_debate
         self._tool = ArtemisCrewTool(model=model, default_rounds=rounds_per_debate)
 
-    def analyze_decision(
-        self,
-        decision: str,
-        aspects: list[str] | None = None,
-    ) -> dict[str, Any]:
-        """
-        Analyze a decision from multiple aspects.
-
-        Args:
-            decision: The main decision to analyze.
-            aspects: Specific aspects to debate (optional).
-
-        Returns:
-            Analysis results with verdicts per aspect.
-        """
+    def analyze_decision(self, decision, aspects=None):
+        """Analyze a decision from multiple aspects."""
         return asyncio.run(self._analyze_async(decision, aspects))
 
     async def _analyze_async(

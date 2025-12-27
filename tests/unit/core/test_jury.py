@@ -12,6 +12,7 @@ from artemis.core.jury import (
     JuryConfig,
     JuryMember,
     JuryPanel,
+    PERSPECTIVE_PROMPTS,
 )
 from artemis.core.types import (
     Argument,
@@ -206,7 +207,7 @@ class TestJuryMember:
         assert juror.perspective == JuryPerspective.ANALYTICAL
         assert juror._model == mock_model
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_juror_creation_with_model_string(
         self, mock_create_model: MagicMock, mock_model: MagicMock
     ) -> None:
@@ -223,8 +224,8 @@ class TestJuryMember:
     def test_perspective_prompts_defined(self) -> None:
         """Test that all perspectives have prompts."""
         for perspective in JuryPerspective:
-            assert perspective in JuryMember.PERSPECTIVE_PROMPTS
-            assert len(JuryMember.PERSPECTIVE_PROMPTS[perspective]) > 0
+            assert perspective in PERSPECTIVE_PROMPTS
+            assert len(PERSPECTIVE_PROMPTS[perspective]) > 0
 
     @pytest.mark.asyncio
     async def test_evaluate_transcript(
@@ -435,7 +436,7 @@ class TestJuryPanel:
             turn_in_round=0,
         )
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_panel_creation(self, mock_create_model: MagicMock) -> None:
         """Test creating a jury panel."""
         mock_model = MagicMock(spec=BaseModel)
@@ -447,7 +448,7 @@ class TestJuryPanel:
         assert len(panel.jurors) == 3
         assert panel.consensus_threshold == 0.7
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_panel_diverse_perspectives(self, mock_create_model: MagicMock) -> None:
         """Test that panel has diverse perspectives."""
         mock_model = MagicMock(spec=BaseModel)
@@ -462,7 +463,7 @@ class TestJuryPanel:
         assert JuryPerspective.ANALYTICAL in perspectives
         assert JuryPerspective.ETHICAL in perspectives
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_assign_perspective(self, mock_create_model: MagicMock) -> None:
         """Test perspective assignment logic."""
         mock_model = MagicMock(spec=BaseModel)
@@ -476,7 +477,7 @@ class TestJuryPanel:
         assert panel._assign_perspective(1) == JuryPerspective.ETHICAL
         assert panel._assign_perspective(5) == JuryPerspective.ANALYTICAL  # Cycle
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_get_juror(self, mock_create_model: MagicMock) -> None:
         """Test getting a specific juror."""
         mock_model = MagicMock(spec=BaseModel)
@@ -492,7 +493,7 @@ class TestJuryPanel:
         missing = panel.get_juror("juror_99")
         assert missing is None
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_panel_len(self, mock_create_model: MagicMock) -> None:
         """Test panel length."""
         mock_model = MagicMock(spec=BaseModel)
@@ -502,7 +503,7 @@ class TestJuryPanel:
         panel = JuryPanel(evaluators=5)
         assert len(panel) == 5
 
-    @patch("artemis.core.jury.create_model")
+    @patch("artemis.models.base.ModelRegistry.create")
     def test_panel_repr(self, mock_create_model: MagicMock) -> None:
         """Test panel string representation."""
         mock_model = MagicMock(spec=BaseModel)
@@ -550,7 +551,7 @@ class TestJuryPanelConsensus:
             ),
         ]
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
             panel.consensus_threshold = 0.7
 
@@ -593,7 +594,7 @@ class TestJuryPanelConsensus:
             ),
         ]
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
             panel.consensus_threshold = 0.7
 
@@ -605,7 +606,7 @@ class TestJuryPanelConsensus:
 
     def test_build_consensus_empty(self) -> None:
         """Test building consensus with no evaluations."""
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
             panel.consensus_threshold = 0.7
 
@@ -645,7 +646,7 @@ class TestJuryPanelConsensus:
             reasoning="",
         )
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         confidence = panel._calculate_confidence(evaluations, consensus)
@@ -655,7 +656,7 @@ class TestJuryPanelConsensus:
 
     def test_calculate_confidence_empty(self) -> None:
         """Test confidence with no evaluations."""
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         consensus = ConsensusResult(
@@ -704,7 +705,7 @@ class TestJuryPanelDissent:
             reasoning="",
         )
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         dissents = panel._collect_dissents(evaluations, consensus)
@@ -736,7 +737,7 @@ class TestJuryPanelDissent:
             reasoning="",
         )
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         dissents = panel._collect_dissents(evaluations, consensus)
@@ -769,7 +770,7 @@ class TestJuryPanelScoreAggregation:
             ),
         ]
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         aggregated = panel._aggregate_scores(evaluations)
@@ -779,7 +780,7 @@ class TestJuryPanelScoreAggregation:
 
     def test_aggregate_scores_empty(self) -> None:
         """Test aggregating with no evaluations."""
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         aggregated = panel._aggregate_scores([])
@@ -813,7 +814,7 @@ class TestJuryPanelVerdictReasoning:
 
         scores = {"Agent1": 0.9, "Agent2": 0.6}
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         reasoning = panel._generate_verdict_reasoning(evaluations, consensus, scores)
@@ -831,7 +832,7 @@ class TestJuryPanelVerdictReasoning:
             reasoning="",
         )
 
-        with patch("artemis.core.jury.create_model"):
+        with patch("artemis.models.base.ModelRegistry.create"):
             panel = JuryPanel.__new__(JuryPanel)
 
         reasoning = panel._generate_verdict_reasoning([], consensus, {})
@@ -895,7 +896,7 @@ class TestJuryPanelDeliberation:
             )
         )
 
-        with patch("artemis.core.jury.create_model") as mock_create:
+        with patch("artemis.models.base.ModelRegistry.create") as mock_create:
             mock_create.return_value = mock_model
             panel = JuryPanel(evaluators=3)
 
@@ -937,7 +938,7 @@ class TestJuryPanelDeliberation:
             )
         )
 
-        with patch("artemis.core.jury.create_model") as mock_create:
+        with patch("artemis.models.base.ModelRegistry.create") as mock_create:
             mock_create.return_value = mock_model
             panel = JuryPanel(evaluators=3)
 

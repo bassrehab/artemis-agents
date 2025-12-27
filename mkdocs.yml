@@ -10,14 +10,14 @@ theme:
   name: material
   palette:
     - scheme: default
-      primary: indigo
-      accent: amber
+      primary: pink
+      accent: pink
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: indigo
-      accent: amber
+      primary: pink
+      accent: pink
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -71,6 +71,7 @@ extra:
 
 nav:
   - Home: index.md
+  - Paper: https://www.tdcommons.org/dpubs_series/7729/
   - Getting Started:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md

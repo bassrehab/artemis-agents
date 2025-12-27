@@ -88,6 +88,15 @@ class JuryPerspective(str, Enum):
     """Find common ground."""
 
 
+class JurorConfig(BaseModel):
+    """Configuration for an individual juror."""
+
+    perspective: JuryPerspective = JuryPerspective.ANALYTICAL
+    model: str = "gpt-4o"
+    criteria: list[str] | None = None
+    api_key: str | None = None
+
+
 # =============================================================================
 # Evidence and Causal Models
 # =============================================================================

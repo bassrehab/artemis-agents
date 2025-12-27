@@ -1,9 +1,4 @@
-"""
-ARTEMIS Debate Orchestrator
-
-Manages the complete lifecycle of a structured multi-agent debate.
-Coordinates agents, evaluation, safety monitoring, and jury deliberation.
-"""
+"""Debate orchestrator for multi-agent debates."""
 
 import asyncio
 from collections.abc import Callable
@@ -50,27 +45,7 @@ class DebateHaltedError(DebateError):
 
 
 class Debate:
-    """
-    Orchestrates a structured multi-agent debate.
-
-    Manages the complete lifecycle including opening statements, main rounds,
-    closing arguments, and jury deliberation. Integrates with safety monitors
-    and adaptive evaluation.
-
-    Example:
-        >>> debate = Debate(
-        ...     topic="Should AI systems have rights?",
-        ...     agents=[agent_pro, agent_con],
-        ...     rounds=5,
-        ... )
-        >>> result = await debate.run()
-        >>> print(f"Winner: {result.verdict.decision}")
-
-    Attributes:
-        topic: The debate topic.
-        state: Current debate state.
-        transcript: List of all turns.
-    """
+    """Orchestrates a structured multi-agent debate."""
 
     def __init__(
         self,
@@ -83,21 +58,8 @@ class Debate:
         safety_monitors: list[SafetyMonitorCallback] | None = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize a debate.
-
-        Args:
-            topic: The debate topic.
-            agents: List of participating agents (typically 2).
-            rounds: Number of main debate rounds.
-            config: Debate configuration.
-            jury: Jury panel for verdict (created if not provided).
-            evaluator: Argument evaluator (created if not provided).
-            safety_monitors: Optional safety monitor callbacks.
-            **kwargs: Additional arguments passed to jury/evaluator creation.
-        """
         if len(agents) < 2:
-            raise ValueError("Debate requires at least 2 agents")
+            raise ValueError("need at least 2 agents for a debate")
 
         self.debate_id = str(uuid4())
         self.topic = topic
@@ -156,12 +118,7 @@ class Debate:
         return self._safety_alerts.copy()
 
     def assign_positions(self, positions: dict[str, str]) -> None:
-        """
-        Assign positions to agents.
-
-        Args:
-            positions: Mapping of agent names to their positions.
-        """
+        """Assign positions to agents."""
         for agent_name, position in positions.items():
             self._agent_positions[agent_name] = position
             # Also set on the agent
@@ -172,15 +129,7 @@ class Debate:
         logger.debug("Positions assigned", positions=positions)
 
     async def run(self) -> DebateResult:
-        """
-        Run the complete debate.
-
-        Returns:
-            DebateResult with verdict, transcript, and metadata.
-
-        Raises:
-            DebateHaltedError: If debate is halted due to safety violation.
-        """
+        """Run the complete debate and return results."""
         logger.info("Starting debate", debate_id=self.debate_id)
         self._started_at = datetime.utcnow()
 
@@ -223,14 +172,7 @@ class Debate:
         return result
 
     async def run_single_round(self) -> list[Turn]:
-        """
-        Run a single debate round.
-
-        Useful for step-by-step execution or testing.
-
-        Returns:
-            List of turns from this round.
-        """
+        """Run a single debate round (useful for step-by-step execution)."""
         if self._state == DebateState.SETUP:
             await self._run_opening()
             return self._get_round_turns(0)
@@ -247,8 +189,8 @@ class Debate:
 
         return round_turns
 
-    async def _run_opening(self) -> None:
-        """Run opening statements phase."""
+    async def _run_opening(self):
+        """Opening statements phase."""
         logger.info("Opening statements phase", debate_id=self.debate_id)
         self._state = DebateState.OPENING
 
@@ -274,8 +216,8 @@ class Debate:
 
         self._state = DebateState.DEBATE
 
-    async def _run_main_rounds(self) -> None:
-        """Run main debate rounds."""
+    async def _run_main_rounds(self):
+        # FIXME: consider adding timeout per round
         logger.info(
             "Main debate phase",
             debate_id=self.debate_id,
@@ -286,8 +228,7 @@ class Debate:
             self._current_round = round_num
             await self._execute_round(round_num)
 
-    async def _execute_round(self, round_num: int) -> list[Turn]:
-        """Execute a single debate round."""
+    async def _execute_round(self, round_num: int):
         logger.debug("Executing round", round=round_num)
         round_turns: list[Turn] = []
 
@@ -319,8 +260,7 @@ class Debate:
 
         return round_turns
 
-    async def _run_closing(self) -> None:
-        """Run closing arguments phase."""
+    async def _run_closing(self):
         logger.info("Closing arguments phase", debate_id=self.debate_id)
         self._state = DebateState.CLOSING
 
@@ -344,8 +284,7 @@ class Debate:
             await self._process_turn(turn, context)
             context = self._build_context()
 
-    async def _run_deliberation(self) -> Verdict:
-        """Run jury deliberation phase."""
+    async def _run_deliberation(self):
         logger.info("Jury deliberation phase", debate_id=self.debate_id)
         self._state = DebateState.DELIBERATION
 
@@ -354,9 +293,8 @@ class Debate:
 
         return verdict
 
-    async def _process_turn(self, turn: Turn, context: DebateContext) -> None:
-        """Process a turn: evaluate, check safety, record."""
-        # Evaluate argument
+    async def _process_turn(self, turn: Turn, context: DebateContext):
+        # evaluate, check safety, record
         evaluation = await self._evaluator.evaluate_argument(
             turn.argument, context
         )
@@ -397,10 +335,7 @@ class Debate:
             score=evaluation.total_score if evaluation else None,
         )
 
-    async def _run_safety_monitors(
-        self, turn: Turn, context: DebateContext
-    ) -> list[SafetyResult]:
-        """Run all safety monitors on a turn."""
+    async def _run_safety_monitors(self, turn, context):
         if not self._safety_monitors:
             return []
 
@@ -443,8 +378,8 @@ class Debate:
 
         return results
 
-    def _check_safety_halt(self, turn: Turn) -> None:
-        """Check if debate should be halted due to safety."""
+    def _check_safety_halt(self, turn):
+        # TODO: add configurable severity thresholds
         if not self.config.halt_on_safety_violation:
             return
 
@@ -469,14 +404,13 @@ class Debate:
                     f"Safety halt triggered by {result.monitor}", alert
                 )
 
-    def _update_opponent_models(self, agent: Agent) -> None:
-        """Update agent's model of opponents based on transcript."""
+    def _update_opponent_models(self, agent):
         for turn in self._transcript:
             if turn.agent != agent.name:
                 agent.observe_opponent(turn.argument)
 
-    def _get_round_level(self, round_num: int) -> ArgumentLevel:
-        """Determine argument level for a round."""
+    def _get_round_level(self, round_num):
+        # XXX: these thresholds are somewhat arbitrary
         progress = round_num / self.total_rounds
 
         if progress <= 0.3:
@@ -486,12 +420,10 @@ class Debate:
         else:
             return ArgumentLevel.OPERATIONAL
 
-    def _get_round_turns(self, round_num: int) -> list[Turn]:
-        """Get all turns from a specific round."""
+    def _get_round_turns(self, round_num):
         return [t for t in self._transcript if t.round == round_num]
 
-    def _build_context(self) -> DebateContext:
-        """Build current debate context."""
+    def _build_context(self):
         return DebateContext(
             topic=self.topic,
             current_round=self._current_round,
@@ -501,8 +433,7 @@ class Debate:
             agent_positions=self._agent_positions.copy(),
         )
 
-    def _build_result(self, verdict: Verdict) -> DebateResult:
-        """Build final debate result."""
+    def _build_result(self, verdict):
         metadata = DebateMetadata(
             started_at=self._started_at or datetime.utcnow(),
             ended_at=self._ended_at,
@@ -525,19 +456,16 @@ class Debate:
         )
 
     def add_safety_monitor(self, monitor: SafetyMonitorCallback) -> None:
-        """Add a safety monitor to the debate."""
         self._safety_monitors.append(monitor)
         logger.debug("Safety monitor added", monitor=str(monitor))
 
     def get_agent(self, name: str) -> Agent | None:
-        """Get an agent by name."""
         for agent in self.agents:
             if agent.name == name:
                 return agent
         return None
 
     def get_scores(self) -> dict[str, float]:
-        """Get current aggregate scores for each agent."""
         scores: dict[str, list[float]] = {a.name: [] for a in self.agents}
 
         for turn in self._transcript:

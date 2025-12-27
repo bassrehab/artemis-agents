@@ -25,9 +25,19 @@ from artemis.models.reasoning import (
     is_reasoning_model,
 )
 
-# Future providers (uncomment when implemented):
-# from artemis.models.anthropic import AnthropicModel
-# from artemis.models.google import GoogleModel
+# Lazy imports for providers with optional dependencies
+_lazy_imports = {
+    "AnthropicModel": "artemis.models.anthropic",
+    "GoogleModel": "artemis.models.google",
+}
+
+
+def __getattr__(name: str):
+    if name in _lazy_imports:
+        import importlib
+        module = importlib.import_module(_lazy_imports[name])
+        return getattr(module, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def create_model(
@@ -70,6 +80,8 @@ __all__ = [
     # Providers
     "OpenAIModel",
     "DeepSeekModel",
+    "AnthropicModel",
+    "GoogleModel",
     # Reasoning Configuration
     "ReasoningModel",
     "ReasoningStrategy",

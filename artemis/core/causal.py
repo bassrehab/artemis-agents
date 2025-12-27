@@ -1,9 +1,4 @@
-"""
-ARTEMIS Causal Reasoning
-
-Implements causal graph construction and analysis for argument evaluation.
-Supports causal link extraction, path finding, and reasoning chain validation.
-"""
+"""Causal graph construction and analysis for argument evaluation."""
 
 import re
 from collections import defaultdict
@@ -58,38 +53,16 @@ class CausalEdge:
 
 
 class CausalGraph:
-    """
-    Directed graph for representing causal relationships between concepts.
+    """Directed graph for causal relationships between concepts."""
 
-    Supports adding nodes and edges, finding causal paths, and computing
-    the overall strength of causal chains.
-
-    Example:
-        >>> graph = CausalGraph()
-        >>> graph.add_link(CausalLink(cause="AI", effect="Job Loss", strength=0.7))
-        >>> graph.add_link(CausalLink(cause="Job Loss", effect="Economic Impact", strength=0.8))
-        >>> paths = graph.find_paths("AI", "Economic Impact")
-        >>> for path in paths:
-        ...     print(graph.compute_path_strength(path))
-    """
-
-    def __init__(self) -> None:
+    def __init__(self):
         self._nodes: dict[str, CausalNode] = {}
         self._edges: dict[tuple[str, str], CausalEdge] = {}
         self._outgoing: dict[str, set[str]] = defaultdict(set)
         self._incoming: dict[str, set[str]] = defaultdict(set)
 
     def add_node(self, label: str, argument_id: str | None = None) -> str:
-        """
-        Add a node to the graph or update existing.
-
-        Args:
-            label: The concept/event label.
-            argument_id: Optional argument ID that mentions this concept.
-
-        Returns:
-            The node ID.
-        """
+        """Add a node to the graph or update existing."""
         node_id = self._normalize_label(label)
 
         if node_id in self._nodes:
@@ -109,15 +82,8 @@ class CausalGraph:
         link: CausalLink,
         link_type: LinkType = LinkType.CAUSES,
         argument_id: str | None = None,
-    ) -> None:
-        """
-        Add a causal link to the graph.
-
-        Args:
-            link: The causal link to add.
-            link_type: Type of causal relationship.
-            argument_id: Optional ID of the argument containing this link.
-        """
+    ):
+        """Add a causal link to the graph."""
         source_id = self.add_node(link.cause, argument_id)
         target_id = self.add_node(link.effect, argument_id)
 
@@ -169,23 +135,8 @@ class CausalGraph:
         source_ids = self._incoming.get(target_id, set())
         return [self._nodes[sid] for sid in source_ids if sid in self._nodes]
 
-    def find_paths(
-        self,
-        start: str,
-        end: str,
-        max_length: int = 5,
-    ) -> list[list[str]]:
-        """
-        Find all causal paths from start to end.
-
-        Args:
-            start: Starting concept label.
-            end: Ending concept label.
-            max_length: Maximum path length to consider.
-
-        Returns:
-            List of paths, where each path is a list of node IDs.
-        """
+    def find_paths(self, start: str, end: str, max_length: int = 5):
+        """Find all causal paths from start to end."""
         start_id = self._normalize_label(start)
         end_id = self._normalize_label(end)
 
@@ -196,16 +147,8 @@ class CausalGraph:
         self._find_paths_dfs(start_id, end_id, [start_id], set(), paths, max_length)
         return paths
 
-    def _find_paths_dfs(
-        self,
-        current: str,
-        end: str,
-        path: list[str],
-        visited: set[str],
-        paths: list[list[str]],
-        max_length: int,
-    ) -> None:
-        """Depth-first search for path finding."""
+    def _find_paths_dfs(self, current, end, path, visited, paths, max_length):
+        # DFS helper for path finding
         if len(path) > max_length:
             return
 
@@ -223,18 +166,8 @@ class CausalGraph:
 
         visited.remove(current)
 
-    def compute_path_strength(self, path: list[str]) -> float:
-        """
-        Compute the overall strength of a causal path.
-
-        Uses multiplicative combination of edge strengths.
-
-        Args:
-            path: List of node IDs representing the path.
-
-        Returns:
-            Combined strength (0.0 to 1.0).
-        """
+    def compute_path_strength(self, path):
+        """Compute combined strength of a causal path (multiplicative)."""
         if len(path) < 2:
             return 1.0
 
@@ -248,17 +181,8 @@ class CausalGraph:
 
         return strength
 
-    def get_strongest_path(self, start: str, end: str) -> tuple[list[str], float]:
-        """
-        Find the strongest causal path between two concepts.
-
-        Args:
-            start: Starting concept label.
-            end: Ending concept label.
-
-        Returns:
-            Tuple of (path, strength). Empty path if no path exists.
-        """
+    def get_strongest_path(self, start: str, end: str):
+        """Find strongest causal path between two concepts."""
         paths = self.find_paths(start, end)
 
         if not paths:
@@ -301,13 +225,7 @@ class CausalGraph:
             for node_id in self._nodes
         )
 
-    def _has_cycle_dfs(
-        self,
-        node: str,
-        visited: set[str],
-        rec_stack: set[str],
-    ) -> bool:
-        """DFS helper for cycle detection."""
+    def _has_cycle_dfs(self, node, visited, rec_stack):
         visited.add(node)
         rec_stack.add(node)
 
@@ -321,16 +239,8 @@ class CausalGraph:
         rec_stack.remove(node)
         return False
 
-    def merge_nodes(self, labels: list[str], merged_label: str) -> None:
-        """
-        Merge multiple nodes into a single node.
-
-        Useful for combining synonymous concepts.
-
-        Args:
-            labels: Labels of nodes to merge.
-            merged_label: Label for the merged node.
-        """
+    def merge_nodes(self, labels: list[str], merged_label: str):
+        """Merge multiple nodes into one (for synonymous concepts)."""
         node_ids = [self._normalize_label(label) for label in labels]
         existing_ids = [nid for nid in node_ids if nid in self._nodes]
 
@@ -412,18 +322,7 @@ class CausalGraph:
 
 
 class CausalExtractor:
-    """
-    Extract causal relationships from text.
-
-    Identifies cause-effect relationships using linguistic patterns
-    and returns structured CausalLink objects.
-
-    Example:
-        >>> extractor = CausalExtractor()
-        >>> links = extractor.extract("AI leads to job displacement because...")
-        >>> for link in links:
-        ...     print(f"{link.cause} -> {link.effect}")
-    """
+    """Extract causal relationships from text using linguistic patterns."""
 
     # Causal indicators with their link types
     CAUSAL_PATTERNS = [
@@ -449,30 +348,16 @@ class CausalExtractor:
         (r"(.+?)\s+implies\s+(?:that\s+)?(.+?)(?:\.|$)", LinkType.IMPLIES),
     ]
 
-    def __init__(self, min_length: int = 3) -> None:
-        """
-        Initialize the causal extractor.
-
-        Args:
-            min_length: Minimum word length for cause/effect phrases.
-        """
+    def __init__(self, min_length: int = 3):
         self.min_length = min_length
         self._compiled_patterns = [
             (re.compile(pattern, re.IGNORECASE), link_type)
             for pattern, link_type in self.CAUSAL_PATTERNS
         ]
 
-    def extract(self, text: str) -> list[tuple[CausalLink, LinkType]]:
-        """
-        Extract causal links from text.
-
-        Args:
-            text: The text to analyze.
-
-        Returns:
-            List of (CausalLink, LinkType) tuples.
-        """
-        results: list[tuple[CausalLink, LinkType]] = []
+    def extract(self, text: str):
+        """Extract causal links from text."""
+        results = []
 
         for pattern, link_type in self._compiled_patterns:
             for match in pattern.finditer(text):
@@ -496,8 +381,7 @@ class CausalExtractor:
 
         return results
 
-    def _clean_phrase(self, phrase: str) -> str:
-        """Clean and normalize a cause/effect phrase."""
+    def _clean_phrase(self, phrase):
         # Remove leading/trailing whitespace and punctuation
         phrase = phrase.strip().strip(".,;:")
 
@@ -513,23 +397,12 @@ class CausalExtractor:
 
         return phrase.strip()
 
-    def _is_valid_phrase(self, phrase: str) -> bool:
-        """Check if a phrase is valid for use as cause/effect."""
+    def _is_valid_phrase(self, phrase):
         words = phrase.split()
         return len(words) >= self.min_length // 2 and len(phrase) >= self.min_length
 
-    def _estimate_strength(self, text: str, start: int, end: int) -> float:
-        """
-        Estimate causal strength based on linguistic markers.
-
-        Args:
-            text: The full text.
-            start: Start position of the match.
-            end: End position of the match.
-
-        Returns:
-            Strength value between 0.0 and 1.0.
-        """
+    def _estimate_strength(self, text, start, end):
+        # HACK: just looking for certainty markers in surrounding context
         context = text[max(0, start - 30) : min(len(text), end + 30)].lower()
 
         # Strong certainty markers
@@ -553,16 +426,8 @@ class CausalExtractor:
         # Default moderate strength
         return 0.6
 
-    def build_graph(self, text: str) -> CausalGraph:
-        """
-        Build a causal graph from text.
-
-        Args:
-            text: The text to analyze.
-
-        Returns:
-            CausalGraph containing all extracted relationships.
-        """
+    def build_graph(self, text: str):
+        """Build a causal graph from text."""
         graph = CausalGraph()
 
         for link, link_type in self.extract(text):

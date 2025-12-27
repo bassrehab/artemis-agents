@@ -1,9 +1,4 @@
-"""
-ARTEMIS Evidence Extraction
-
-Utilities for extracting, classifying, and verifying evidence from arguments.
-Supports citation parsing, source credibility assessment, and evidence linking.
-"""
+"""Evidence extraction from arguments."""
 
 import re
 from dataclasses import dataclass, field
@@ -48,18 +43,7 @@ class ExtractedEvidence:
 
 @dataclass
 class EvidenceExtractor:
-    """
-    Extract and classify evidence from argument text.
-
-    Provides sophisticated evidence extraction with type classification,
-    credibility assessment, and source analysis.
-
-    Example:
-        >>> extractor = EvidenceExtractor()
-        >>> results = extractor.extract("According to Smith (2024), 75% of...")
-        >>> for ev in results:
-        ...     print(f"{ev.evidence_type}: {ev.evidence.content}")
-    """
+    """Extract and classify evidence from argument text."""
 
     # Configuration for extraction behavior
     min_confidence: float = 0.5
@@ -70,8 +54,8 @@ class EvidenceExtractor:
     # Pattern definitions
     _patterns: dict[str, re.Pattern[str]] = field(default_factory=dict, init=False)
 
-    def __post_init__(self) -> None:
-        """Initialize regex patterns for evidence extraction."""
+    def __post_init__(self):
+        # XXX: these regexes are pretty fragile
         self._patterns = {
             # Academic citations: (Author, Year) or (Author et al., Year)
             "apa_citation": re.compile(
@@ -111,17 +95,9 @@ class EvidenceExtractor:
             ),
         }
 
-    def extract(self, text: str) -> list[ExtractedEvidence]:
-        """
-        Extract all evidence from the given text.
-
-        Args:
-            text: The argument text to analyze.
-
-        Returns:
-            List of extracted evidence with metadata.
-        """
-        results: list[ExtractedEvidence] = []
+    def extract(self, text: str):
+        """Extract all evidence from the given text."""
+        results = []
 
         if self.extract_citations:
             results.extend(self._extract_citations(text))
@@ -143,9 +119,8 @@ class EvidenceExtractor:
 
         return results
 
-    def _extract_citations(self, text: str) -> list[ExtractedEvidence]:
-        """Extract academic and numbered citations."""
-        results: list[ExtractedEvidence] = []
+    def _extract_citations(self, text):
+        results = []
 
         # APA-style citations
         for match in self._patterns["apa_citation"].finditer(text):
@@ -191,9 +166,8 @@ class EvidenceExtractor:
 
         return results
 
-    def _extract_statistics(self, text: str) -> list[ExtractedEvidence]:
-        """Extract statistical data and numbers."""
-        results: list[ExtractedEvidence] = []
+    def _extract_statistics(self, text):
+        results = []
 
         # Percentages
         for match in self._patterns["percentage"].finditer(text):
@@ -235,9 +209,8 @@ class EvidenceExtractor:
 
         return results
 
-    def _extract_quotes(self, text: str) -> list[ExtractedEvidence]:
-        """Extract direct quotations."""
-        results: list[ExtractedEvidence] = []
+    def _extract_quotes(self, text):
+        results = []
 
         for pattern_name in ["double_quotes", "single_quotes"]:
             for match in self._patterns[pattern_name].finditer(text):
@@ -261,9 +234,8 @@ class EvidenceExtractor:
 
         return results
 
-    def _extract_expert_references(self, text: str) -> list[ExtractedEvidence]:
-        """Extract references to experts and authorities."""
-        results: list[ExtractedEvidence] = []
+    def _extract_expert_references(self, text):
+        results = []
 
         for match in self._patterns["expert_reference"].finditer(text):
             expert_name = match.group(1) if match.group(1) else match.group(0)
@@ -287,9 +259,8 @@ class EvidenceExtractor:
 
         return results
 
-    def _extract_study_references(self, text: str) -> list[ExtractedEvidence]:
-        """Extract references to studies and research."""
-        results: list[ExtractedEvidence] = []
+    def _extract_study_references(self, text):
+        results = []
 
         for match in self._patterns["study_reference"].finditer(text):
             source = match.group(1).strip() if match.group(1) else None
@@ -313,27 +284,13 @@ class EvidenceExtractor:
 
         return results
 
-    def _get_context(self, text: str, start: int, end: int, window: int = 50) -> str:
-        """Get surrounding context for an evidence match."""
+    def _get_context(self, text, start, end, window=50):
         context_start = max(0, start - window)
         context_end = min(len(text), end + window)
         return text[context_start:context_end]
 
-    def assess_credibility(
-        self,
-        evidence: Evidence,
-        known_sources: list[str] | None = None,
-    ) -> CredibilityLevel:
-        """
-        Assess the credibility of a piece of evidence.
-
-        Args:
-            evidence: The evidence to assess.
-            known_sources: Optional list of known credible sources.
-
-        Returns:
-            Credibility level assessment.
-        """
+    def assess_credibility(self, evidence, known_sources=None):
+        """Assess credibility of evidence."""
         if not evidence.source:
             return CredibilityLevel.UNKNOWN
 
@@ -378,31 +335,18 @@ class EvidenceExtractor:
 
 
 class EvidenceLinker:
-    """
-    Link evidence between arguments to track support relationships.
+    """Link evidence between arguments to track support/contradiction."""
 
-    Identifies when evidence in one argument supports or contradicts
-    evidence in another argument.
-    """
-
-    def __init__(self) -> None:
-        self._evidence_index: dict[str, list[Evidence]] = {}
+    def __init__(self):
+        self._evidence_index = {}
 
     def index_evidence(self, argument_id: str, evidence_list: list[Evidence]) -> None:
         """Index evidence from an argument for later linking."""
         self._evidence_index[argument_id] = evidence_list
 
-    def find_supporting(self, evidence: Evidence) -> list[tuple[str, Evidence]]:
-        """
-        Find evidence from other arguments that supports this evidence.
-
-        Args:
-            evidence: The evidence to find support for.
-
-        Returns:
-            List of (argument_id, supporting_evidence) tuples.
-        """
-        supporting: list[tuple[str, Evidence]] = []
+    def find_supporting(self, evidence):
+        """Find evidence that supports this evidence."""
+        supporting = []
 
         for arg_id, evidence_list in self._evidence_index.items():
             for other in evidence_list:
@@ -411,17 +355,9 @@ class EvidenceLinker:
 
         return supporting
 
-    def find_contradicting(self, evidence: Evidence) -> list[tuple[str, Evidence]]:
-        """
-        Find evidence from other arguments that contradicts this evidence.
-
-        Args:
-            evidence: The evidence to find contradictions for.
-
-        Returns:
-            List of (argument_id, contradicting_evidence) tuples.
-        """
-        contradicting: list[tuple[str, Evidence]] = []
+    def find_contradicting(self, evidence):
+        """Find evidence that contradicts this evidence."""
+        contradicting = []
 
         for arg_id, evidence_list in self._evidence_index.items():
             for other in evidence_list:
@@ -430,8 +366,7 @@ class EvidenceLinker:
 
         return contradicting
 
-    def _is_supporting(self, ev1: Evidence, ev2: Evidence) -> bool:
-        """Check if ev2 supports ev1."""
+    def _is_supporting(self, ev1, ev2):
         # Same source typically supports
         if ev1.source and ev2.source and ev1.source.lower() == ev2.source.lower():
             return True
@@ -449,9 +384,8 @@ class EvidenceLinker:
 
         return False
 
-    def _is_contradicting(self, ev1: Evidence, ev2: Evidence) -> bool:
-        """Check if ev2 contradicts ev1."""
-        # This is a simplified check - real implementation would use NLP
+    def _is_contradicting(self, ev1, ev2):
+        # TODO: this is a simplified check - real impl would use NLP
         # Look for negation patterns
         content1 = ev1.content.lower()
         content2 = ev2.content.lower()

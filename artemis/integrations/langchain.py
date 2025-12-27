@@ -1,9 +1,4 @@
-"""
-ARTEMIS LangChain Integration
-
-Provides LangChain Tool wrapper for ARTEMIS debates.
-Enables using structured multi-agent debates within LangChain chains and agents.
-"""
+"""LangChain tool wrapper for ARTEMIS debates."""
 
 import asyncio
 from typing import Any
@@ -74,41 +69,7 @@ class DebateOutput(BaseModel):
 
 
 class ArtemisDebateTool:
-    """
-    LangChain-compatible tool for running ARTEMIS debates.
-
-    Can be used as a standalone tool or integrated into LangChain agents
-    and chains for structured multi-agent debate analysis.
-
-    Supports both simple pro/con debates and complex multi-agent scenarios.
-
-    Example (simple):
-        >>> from artemis.integrations.langchain import ArtemisDebateTool
-        >>> tool = ArtemisDebateTool(model="gpt-4o")
-        >>> result = tool.invoke({
-        ...     "topic": "Should AI be regulated?",
-        ...     "pro_position": "supports regulation",
-        ...     "con_position": "opposes regulation",
-        ... })
-
-    Example (multi-agent):
-        >>> result = tool.invoke({
-        ...     "topic": "How should we approach climate change?",
-        ...     "agents": [
-        ...         {"name": "economist", "role": "Economic analyst", "position": "focus on market solutions"},
-        ...         {"name": "scientist", "role": "Climate scientist", "position": "focus on scientific solutions"},
-        ...         {"name": "activist", "role": "Environmental activist", "position": "focus on policy changes"},
-        ...     ],
-        ... })
-
-    With pre-configured agents:
-        >>> tool = ArtemisDebateTool(
-        ...     agents=[
-        ...         Agent(name="pro", role="Advocate", model="gpt-4o"),
-        ...         Agent(name="con", role="Critic", model="gpt-4o"),
-        ...     ]
-        ... )
-    """
+    """LangChain-compatible tool for running ARTEMIS debates."""
 
     name: str = "artemis_debate"
     description: str = (
@@ -126,18 +87,7 @@ class ArtemisDebateTool:
         config: DebateConfig | None = None,
         safety_monitors: list | None = None,
         **kwargs: Any,
-    ) -> None:
-        """
-        Initialize the ARTEMIS debate tool.
-
-        Args:
-            model: Default LLM model to use for agents.
-            default_rounds: Default number of debate rounds.
-            agents: Pre-configured agents to use (optional).
-            config: Optional debate configuration.
-            safety_monitors: Optional safety monitor instances.
-            **kwargs: Additional configuration.
-        """
+    ):
         self.model = model
         self.default_rounds = default_rounds
         self.default_agents = agents
@@ -152,31 +102,15 @@ class ArtemisDebateTool:
             pre_configured_agents=len(agents) if agents else 0,
         )
 
-    def invoke(self, input_data: dict | DebateInput) -> DebateOutput:
-        """
-        Run a debate synchronously.
-
-        Args:
-            input_data: Debate parameters.
-
-        Returns:
-            DebateOutput with verdict and analysis.
-        """
+    def invoke(self, input_data):
+        """Run a debate synchronously."""
         if isinstance(input_data, dict):
             input_data = DebateInput(**input_data)
 
         return asyncio.run(self.ainvoke(input_data))
 
-    async def ainvoke(self, input_data: dict | DebateInput) -> DebateOutput:
-        """
-        Run a debate asynchronously.
-
-        Args:
-            input_data: Debate parameters.
-
-        Returns:
-            DebateOutput with verdict and analysis.
-        """
+    async def ainvoke(self, input_data):
+        """Run a debate asynchronously."""
         if isinstance(input_data, dict):
             input_data = DebateInput(**input_data)
 
@@ -318,16 +252,8 @@ class ArtemisDebateTool:
 
         return " ".join(parts)
 
-    def as_langchain_tool(self) -> Any:
-        """
-        Convert to a LangChain Tool.
-
-        Returns:
-            LangChain Tool instance.
-
-        Raises:
-            ImportError: If langchain is not installed.
-        """
+    def as_langchain_tool(self):
+        """Convert to a LangChain Tool."""
         try:
             from langchain_core.tools import StructuredTool
         except ImportError as e:
@@ -344,13 +270,8 @@ class ArtemisDebateTool:
             args_schema=DebateInput,
         )
 
-    def as_openai_function(self) -> dict:
-        """
-        Convert to OpenAI function calling format.
-
-        Returns:
-            OpenAI function definition dict.
-        """
+    def as_openai_function(self):
+        """Convert to OpenAI function calling format."""
         return {
             "name": self.name,
             "description": self.description,
@@ -393,54 +314,16 @@ class ArtemisDebateTool:
 
 
 class QuickDebate:
-    """
-    Simplified interface for quick debates.
-
-    Example:
-        >>> result = QuickDebate.run("Should we use AI in healthcare?")
-        >>> print(f"Verdict: {result.verdict}")
-    """
+    """Simplified interface for quick debates."""
 
     @staticmethod
-    def run(
-        topic: str,
-        rounds: int = 3,
-        model: str = "gpt-4o",
-        agents: list[AgentConfig] | None = None,
-    ) -> DebateOutput:
-        """
-        Run a quick debate on a topic.
-
-        Args:
-            topic: The debate topic.
-            rounds: Number of rounds.
-            model: LLM model to use.
-            agents: Optional agent configurations.
-
-        Returns:
-            DebateOutput with verdict.
-        """
+    def run(topic, rounds=3, model="gpt-4o", agents=None):
+        """Run a quick debate on a topic."""
         tool = ArtemisDebateTool(model=model, default_rounds=rounds)
         return tool.invoke({"topic": topic, "rounds": rounds, "agents": agents})
 
     @staticmethod
-    async def arun(
-        topic: str,
-        rounds: int = 3,
-        model: str = "gpt-4o",
-        agents: list[AgentConfig] | None = None,
-    ) -> DebateOutput:
-        """
-        Run a quick debate asynchronously.
-
-        Args:
-            topic: The debate topic.
-            rounds: Number of rounds.
-            model: LLM model to use.
-            agents: Optional agent configurations.
-
-        Returns:
-            DebateOutput with verdict.
-        """
+    async def arun(topic, rounds=3, model="gpt-4o", agents=None):
+        """Run a quick debate asynchronously."""
         tool = ArtemisDebateTool(model=model, default_rounds=rounds)
         return await tool.ainvoke({"topic": topic, "rounds": rounds, "agents": agents})

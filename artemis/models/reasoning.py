@@ -1,9 +1,4 @@
-"""
-ARTEMIS Reasoning Model Configuration
-
-Configuration and utilities for reasoning models (o1, R1, Gemini 2.5 Pro)
-that support extended thinking and chain-of-thought generation.
-"""
+"""Config for reasoning models (o1, R1, Gemini 2.5 Pro)."""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -37,34 +32,17 @@ class ReasoningModel(str, Enum):
 
 
 class ReasoningStrategy(str, Enum):
-    """Strategies for using reasoning capabilities."""
-
     ALWAYS = "always"
-    """Always use extended thinking."""
-
-    ADAPTIVE = "adaptive"
-    """Use reasoning only for complex problems."""
-
+    ADAPTIVE = "adaptive"  # use only for complex problems
     NEVER = "never"
-    """Never use extended thinking, even if available."""
 
 
 @dataclass
 class ThinkingBudget:
-    """Configuration for thinking token budgets."""
-
     min_tokens: int = 1000
-    """Minimum thinking tokens."""
-
     max_tokens: int = 32000
-    """Maximum thinking tokens."""
-
     default_tokens: int = 8000
-    """Default thinking tokens when not specified."""
-
     scale_with_complexity: bool = True
-    """Whether to scale budget based on problem complexity."""
-
     complexity_multipliers: dict[str, float] = field(
         default_factory=lambda: {
             "simple": 0.5,
@@ -116,28 +94,15 @@ class ReasoningConfig(BaseModel):
 
 @dataclass
 class ReasoningCapabilities:
-    """Describes the reasoning capabilities of a model."""
+    """Reasoning capabilities for a model."""
 
     supports_extended_thinking: bool = False
-    """Whether the model supports extended thinking."""
-
     supports_thinking_budget: bool = False
-    """Whether thinking budget can be configured."""
-
     supports_thinking_visibility: bool = False
-    """Whether thinking trace can be shown."""
-
     supports_system_prompts: bool = True
-    """Whether system prompts are supported."""
-
     requires_temperature_1: bool = False
-    """Whether temperature must be 1.0."""
-
     max_thinking_tokens: int = 128000
-    """Maximum supported thinking tokens."""
-
     default_thinking_tokens: int = 8000
-    """Default thinking tokens."""
 
 
 # Capability definitions for known reasoning models
@@ -212,16 +177,8 @@ MODEL_CAPABILITIES: dict[str, ReasoningCapabilities] = {
 }
 
 
-def get_model_capabilities(model: str) -> ReasoningCapabilities:
-    """
-    Get reasoning capabilities for a model.
-
-    Args:
-        model: Model identifier.
-
-    Returns:
-        ReasoningCapabilities for the model.
-    """
+def get_model_capabilities(model: str):
+    """Get reasoning capabilities for a model."""
     # Check exact match first
     if model in MODEL_CAPABILITIES:
         return MODEL_CAPABILITIES[model]
@@ -235,48 +192,16 @@ def get_model_capabilities(model: str) -> ReasoningCapabilities:
     return ReasoningCapabilities()
 
 
-def is_reasoning_model(model: str) -> bool:
-    """
-    Check if a model supports extended reasoning.
-
-    Args:
-        model: Model identifier.
-
-    Returns:
-        True if model supports reasoning.
-    """
+def is_reasoning_model(model: str):
     return get_model_capabilities(model).supports_extended_thinking
 
 
-def get_default_thinking_budget(model: str) -> int:
-    """
-    Get the default thinking budget for a model.
-
-    Args:
-        model: Model identifier.
-
-    Returns:
-        Default thinking token budget.
-    """
+def get_default_thinking_budget(model: str):
     return get_model_capabilities(model).default_thinking_tokens
 
 
-def calculate_thinking_budget(
-    model: str,
-    complexity: str = "moderate",
-    base_budget: int | None = None,
-) -> int:
-    """
-    Calculate thinking budget based on complexity.
-
-    Args:
-        model: Model identifier.
-        complexity: Problem complexity level.
-        base_budget: Optional base budget override.
-
-    Returns:
-        Calculated thinking budget.
-    """
+def calculate_thinking_budget(model: str, complexity: str = "moderate", base_budget=None):
+    """Calculate thinking budget based on complexity."""
     caps = get_model_capabilities(model)
     base = base_budget or caps.default_thinking_tokens
 
@@ -288,32 +213,11 @@ def calculate_thinking_budget(
 
 
 class ReasoningPromptBuilder:
-    """
-    Builds prompts optimized for reasoning models.
-
-    Different reasoning models have different requirements for prompts.
-    This class handles the variations.
-    """
+    """Builds prompts optimized for reasoning models."""
 
     @staticmethod
-    def build_prompt(
-        task: str,
-        context: str | None = None,
-        model: str = "o1",
-        style: str = "thorough",
-    ) -> str:
-        """
-        Build a prompt optimized for reasoning.
-
-        Args:
-            task: The main task or question.
-            context: Optional context or background.
-            model: Target reasoning model.
-            style: Thinking style.
-
-        Returns:
-            Optimized prompt string.
-        """
+    def build_prompt(task, context=None, model="o1", style="thorough"):
+        """Build a prompt optimized for reasoning."""
         caps = get_model_capabilities(model)
 
         parts = []
@@ -351,24 +255,8 @@ class ReasoningPromptBuilder:
         return "\n\n".join(parts)
 
     @staticmethod
-    def build_debate_prompt(
-        topic: str,
-        position: str,
-        opponent_arguments: list[str] | None = None,
-        _model: str = "o1",
-    ) -> str:
-        """
-        Build a prompt for debate reasoning.
-
-        Args:
-            topic: Debate topic.
-            position: Position to argue.
-            opponent_arguments: Previous opponent arguments to address.
-            _model: Target reasoning model (reserved for future use).
-
-        Returns:
-            Debate-optimized prompt.
-        """
+    def build_debate_prompt(topic, position, opponent_arguments=None, _model="o1"):
+        """Build a prompt for debate reasoning."""
         parts = [
             "You are participating in a structured debate.",
             f"\nTopic: {topic}",
@@ -388,20 +276,8 @@ class ReasoningPromptBuilder:
         return "\n".join(parts)
 
 
-def create_reasoning_config(
-    model: str,
-    **overrides: Any,
-) -> ReasoningConfig:
-    """
-    Create a ReasoningConfig with model-appropriate defaults.
-
-    Args:
-        model: Model identifier.
-        **overrides: Configuration overrides.
-
-    Returns:
-        ReasoningConfig with appropriate settings.
-    """
+def create_reasoning_config(model: str, **overrides):
+    """Create ReasoningConfig with model-appropriate defaults."""
     caps = get_model_capabilities(model)
 
     # Start with model-specific defaults

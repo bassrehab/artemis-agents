@@ -1,9 +1,4 @@
-"""
-ARTEMIS L-AE-CR Adaptive Evaluation
-
-Implements the Adaptive Evaluation with Causal Reasoning (L-AE-CR) framework.
-Provides dynamic criteria weighting, argument scoring, and causal graph integration.
-"""
+"""L-AE-CR Adaptive Evaluation with Causal Reasoning."""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -37,32 +32,21 @@ class EvaluationDimension(str, Enum):
 
 @dataclass
 class AdaptationConfig:
-    """Configuration for criteria adaptation."""
-
     adaptation_rate: float = 0.1
-    """How quickly criteria weights adapt to context."""
     sensitivity_threshold: float = 0.7
-    """Topic sensitivity threshold for ethical weight boost."""
     complexity_threshold: float = 0.7
-    """Topic complexity threshold for causal reasoning boost."""
     late_round_factor: float = 0.3
-    """How much to increase evidence weight in later rounds."""
     ethical_boost: float = 1.5
-    """Multiplier for ethical weight on sensitive topics."""
     causal_boost: float = 1.3
-    """Multiplier for causal reasoning on complex topics."""
 
 
 @dataclass
 class TopicAnalysis:
     """Analysis of debate topic characteristics."""
 
-    sensitivity: float = 0.5
-    """How ethically sensitive the topic is (0-1)."""
+    sensitivity: float = 0.5  # 0-1
     complexity: float = 0.5
-    """How complex/technical the topic is (0-1)."""
     controversy: float = 0.5
-    """How controversial the topic is (0-1)."""
 
     # Class-level constants for keyword analysis
     _SENSITIVITY_KEYWORDS: list[str] = field(
@@ -76,8 +60,7 @@ class TopicAnalysis:
     )
 
     @staticmethod
-    def _get_sensitivity_keywords() -> list[str]:
-        """Get keywords indicating ethical sensitivity."""
+    def _get_sensitivity_keywords():
         return [
             "ethics",
             "moral",
@@ -97,8 +80,7 @@ class TopicAnalysis:
         ]
 
     @staticmethod
-    def _get_complexity_keywords() -> list[str]:
-        """Get keywords indicating topic complexity."""
+    def _get_complexity_keywords():
         return [
             "technical",
             "scientific",
@@ -115,8 +97,7 @@ class TopicAnalysis:
         ]
 
     @staticmethod
-    def _get_controversy_keywords() -> list[str]:
-        """Get keywords indicating controversy."""
+    def _get_controversy_keywords():
         return [
             "controversial",
             "debate",
@@ -166,20 +147,12 @@ class TopicAnalysis:
 class CriterionEvaluator:
     """Evaluates individual criteria for an argument."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self._evidence_extractor = EvidenceExtractor()
         self._causal_extractor = CausalExtractor()
 
-    def evaluate_logical_coherence(self, argument: Argument) -> float:
-        """
-        Evaluate the logical coherence of an argument.
-
-        Checks for:
-        - Clear thesis statement
-        - Logical flow between points
-        - Absence of contradictions
-        - Proper conclusion
-        """
+    def evaluate_logical_coherence(self, argument):
+        """Check thesis, logical flow, contradictions, conclusion."""
         content = argument.content.lower()
         score = 0.5  # Base score
 
@@ -226,16 +199,8 @@ class CriterionEvaluator:
 
         return max(0.0, min(1.0, score))
 
-    def evaluate_evidence_quality(self, argument: Argument) -> float:
-        """
-        Evaluate the quality of evidence in an argument.
-
-        Checks for:
-        - Presence of citations
-        - Statistical data
-        - Expert references
-        - Source credibility
-        """
+    def evaluate_evidence_quality(self, argument):
+        """Check citations, stats, expert refs, credibility."""
         score = 0.3  # Base score
 
         # Check existing evidence in argument
@@ -258,17 +223,8 @@ class CriterionEvaluator:
 
         return max(0.0, min(1.0, score))
 
-    def evaluate_causal_reasoning(
-        self, argument: Argument, causal_graph: CausalGraph | None = None
-    ) -> float:
-        """
-        Evaluate the quality of causal reasoning in an argument.
-
-        Checks for:
-        - Clear cause-effect relationships
-        - Causal chain validity
-        - Strength of causal claims
-        """
+    def evaluate_causal_reasoning(self, argument, causal_graph=None):
+        """Check cause-effect relationships, chain validity, claim strength."""
         score = 0.3  # Base score
 
         # Check existing causal links
@@ -296,16 +252,7 @@ class CriterionEvaluator:
 
         return max(0.0, min(1.0, score))
 
-    def evaluate_ethical_alignment(self, argument: Argument) -> float:
-        """
-        Evaluate the ethical alignment of an argument.
-
-        Checks for:
-        - Consideration of stakeholders
-        - Ethical principles mentioned
-        - Harm/benefit analysis
-        - Fairness considerations
-        """
+    def evaluate_ethical_alignment(self, argument):
         content = argument.content.lower()
         score = 0.5  # Base neutral score
 
@@ -348,16 +295,8 @@ class CriterionEvaluator:
 
         return max(0.0, min(1.0, score))
 
-    def evaluate_persuasiveness(self, argument: Argument) -> float:
-        """
-        Evaluate the persuasiveness of an argument.
-
-        Checks for:
-        - Rhetorical techniques
-        - Emotional appeal (appropriate)
-        - Clarity of expression
-        - Engagement with audience
-        """
+    def evaluate_persuasiveness(self, argument):
+        # rhetoric, emotional appeal, clarity, engagement
         content = argument.content.lower()
         score = 0.4  # Base score
 
@@ -401,18 +340,7 @@ class CriterionEvaluator:
 
 
 class AdaptiveEvaluator:
-    """
-    L-AE-CR: Adaptive Evaluation with Causal Reasoning.
-
-    Dynamically adjusts evaluation criteria based on debate context,
-    builds causal graphs from argument relationships, and provides
-    comprehensive argument scoring.
-
-    Example:
-        >>> evaluator = AdaptiveEvaluator()
-        >>> evaluation = await evaluator.evaluate_argument(argument, context)
-        >>> print(f"Total score: {evaluation.total_score}")
-    """
+    """L-AE-CR: Adaptive Evaluation with Causal Reasoning."""
 
     DEFAULT_CRITERIA = EvaluationCriteria()
 
@@ -420,14 +348,7 @@ class AdaptiveEvaluator:
         self,
         criteria: EvaluationCriteria | None = None,
         adaptation_config: AdaptationConfig | None = None,
-    ) -> None:
-        """
-        Initialize the adaptive evaluator.
-
-        Args:
-            criteria: Custom evaluation criteria weights.
-            adaptation_config: Configuration for criteria adaptation.
-        """
+    ):
         self.criteria = criteria or self.DEFAULT_CRITERIA
         self.config = adaptation_config or AdaptationConfig()
         self.causal_graph = CausalGraph()
@@ -440,16 +361,8 @@ class AdaptiveEvaluator:
             adaptation_rate=self.config.adaptation_rate,
         )
 
-    def analyze_topic(self, topic: str) -> TopicAnalysis:
-        """
-        Analyze the debate topic for context-aware evaluation.
-
-        Args:
-            topic: The debate topic string.
-
-        Returns:
-            TopicAnalysis with sensitivity, complexity, and controversy scores.
-        """
+    def analyze_topic(self, topic: str):
+        """Analyze topic for context-aware evaluation."""
         self._topic_analysis = TopicAnalysis.analyze(topic)
         logger.debug(
             "Topic analyzed",
@@ -459,16 +372,8 @@ class AdaptiveEvaluator:
         )
         return self._topic_analysis
 
-    def adapt_criteria(self, context: DebateContext) -> dict[str, float]:
-        """
-        Dynamically adjust criteria weights based on debate context.
-
-        Args:
-            context: Current debate context.
-
-        Returns:
-            Dictionary of adapted criteria weights.
-        """
+    def adapt_criteria(self, context: DebateContext):
+        """Dynamically adjust criteria weights based on context."""
         # Get base weights
         adapted = self.criteria.to_dict()
 
@@ -512,16 +417,7 @@ class AdaptiveEvaluator:
         argument: Argument,
         context: DebateContext,
     ) -> ArgumentEvaluation:
-        """
-        Evaluate an argument using adaptive criteria.
-
-        Args:
-            argument: The argument to evaluate.
-            context: Current debate context.
-
-        Returns:
-            Comprehensive ArgumentEvaluation.
-        """
+        """Evaluate an argument using adaptive criteria."""
         logger.info(
             "Evaluating argument",
             argument_id=argument.id,
@@ -623,17 +519,8 @@ class AdaptiveEvaluator:
 
         return evaluation
 
-    def _update_causal_graph(self, argument: Argument) -> CausalGraphUpdate:
-        """
-        Update the causal graph with links from the argument.
-
-        Args:
-            argument: The argument containing causal links.
-
-        Returns:
-            CausalGraphUpdate describing the changes.
-        """
-        added_links: list[CausalLink] = []
+    def _update_causal_graph(self, argument):
+        added_links = []
         strengthened_links: list[str] = []
 
         for link in argument.causal_links:
@@ -660,13 +547,7 @@ class AdaptiveEvaluator:
         """Get current criteria weights."""
         return self.criteria.to_dict()
 
-    def set_criteria_weights(self, weights: dict[str, float]) -> None:
-        """
-        Set custom criteria weights.
-
-        Args:
-            weights: Dictionary of criterion name to weight.
-        """
+    def set_criteria_weights(self, weights):
         self.criteria = EvaluationCriteria(**weights)
 
     def reset_causal_graph(self) -> None:
@@ -678,25 +559,12 @@ class AdaptiveEvaluator:
 class RoundEvaluator:
     """Evaluates all arguments in a debate round."""
 
-    def __init__(self, evaluator: AdaptiveEvaluator | None = None) -> None:
+    def __init__(self, evaluator=None):
         self.evaluator = evaluator or AdaptiveEvaluator()
 
-    async def evaluate_round(
-        self,
-        arguments: list[Argument],
-        context: DebateContext,
-    ) -> list[ArgumentEvaluation]:
-        """
-        Evaluate all arguments in a round.
-
-        Args:
-            arguments: List of arguments from the round.
-            context: Debate context.
-
-        Returns:
-            List of evaluations for each argument.
-        """
-        evaluations: list[ArgumentEvaluation] = []
+    async def evaluate_round(self, arguments, context):
+        """Evaluate all arguments in a round."""
+        evaluations = []
 
         for argument in arguments:
             evaluation = await self.evaluator.evaluate_argument(argument, context)
@@ -704,18 +572,7 @@ class RoundEvaluator:
 
         return evaluations
 
-    def get_round_summary(
-        self, evaluations: list[ArgumentEvaluation]
-    ) -> dict[str, float]:
-        """
-        Get summary statistics for a round's evaluations.
-
-        Args:
-            evaluations: List of argument evaluations.
-
-        Returns:
-            Dictionary with summary statistics.
-        """
+    def get_round_summary(self, evaluations):
         if not evaluations:
             return {"average_score": 0.0, "max_score": 0.0, "min_score": 0.0}
 
@@ -727,20 +584,9 @@ class RoundEvaluator:
             "score_spread": max(scores) - min(scores),
         }
 
-    def compare_agents(
-        self, evaluations: list[ArgumentEvaluation], arguments: list[Argument]
-    ) -> dict[str, dict[str, float]]:
-        """
-        Compare evaluation scores by agent.
-
-        Args:
-            evaluations: List of evaluations.
-            arguments: Corresponding arguments.
-
-        Returns:
-            Dictionary mapping agent names to their score summaries.
-        """
-        agent_scores: dict[str, list[float]] = {}
+    def compare_agents(self, evaluations, arguments):
+        """Compare evaluation scores by agent."""
+        agent_scores = {}
 
         for eval_result, argument in zip(evaluations, arguments, strict=True):
             agent = argument.agent
