@@ -74,13 +74,13 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/bassrehab/artemis-agents"
-Documentation = "https://github.com/bassrehab/artemis-agents#readme"
+Documentation = "https://artemis.subhadipmitra.com"
 Repository = "https://github.com/bassrehab/artemis-agents.git"
 Issues = "https://github.com/bassrehab/artemis-agents/issues"
 Changelog = "https://github.com/bassrehab/artemis-agents/blob/main/CHANGELOG.md"
 
 [project.scripts]
-artemis = "artemis.cli:main"
+artemis = "artemis.mcp.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["artemis"]

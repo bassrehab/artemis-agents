@@ -229,6 +229,7 @@ Any MCP-compatible client can now invoke structured debates:
 
 ##  Documentation
 
+- [**Full Documentation**](https://artemis.subhadipmitra.com) - Guides, API reference, examples
 - [Examples](examples/) - Real-world usage examples
 - [Contributing](CONTRIBUTING.md) - How to contribute
 
