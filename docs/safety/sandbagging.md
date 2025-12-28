@@ -41,189 +41,78 @@ graph TD
 ### Basic Setup
 
 ```python
-from artemis.safety import SandbagDetector
+from artemis.safety import SandbagDetector, MonitorMode
 
 detector = SandbagDetector(
+    mode=MonitorMode.PASSIVE,
     sensitivity=0.7,
-    baseline_rounds=2,
 )
 
-# Add to safety manager
-safety.add_monitor(detector)
+# Use in debate
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[detector.process],
+)
 ```
 
 ### Configuration Options
 
 ```python
 detector = SandbagDetector(
-    # Core settings
-    sensitivity=0.7,        # 0.0 to 1.0 (higher = more sensitive)
-    baseline_rounds=2,      # Rounds to establish baseline
-
-    # Capability metrics to track
-    capability_metrics=[
-        "vocabulary_complexity",
-        "reasoning_depth",
-        "evidence_quality",
-        "argument_structure",
-    ],
-
-    # Detection thresholds
-    drop_threshold=0.25,    # Significant capability drop
-    consistency_threshold=2, # Rounds of consistent underperformance
+    mode=MonitorMode.PASSIVE,      # PASSIVE, ACTIVE, or LEARNING
+    sensitivity=0.7,                # 0.0 to 1.0 (higher = more sensitive)
+    baseline_turns=3,               # Turns to establish baseline
+    drop_threshold=0.3,             # Significant capability drop threshold
 )
 ```
 
-## Capability Metrics
+### Configuration Parameters
 
-### Vocabulary Complexity
-
-Measures the sophistication of language used:
-
-```python
-# Metrics tracked:
-# - Average word length
-# - Unique word ratio
-# - Technical term usage
-# - Sentence complexity
-
-vocabulary_score = detector.analyze_vocabulary(argument)
-# Returns 0.0 (simple) to 1.0 (complex)
-```
-
-### Reasoning Depth
-
-Measures the depth of logical reasoning:
-
-```python
-# Metrics tracked:
-# - Inference chain length
-# - Premise count
-# - Logical operator usage
-# - Counter-argument consideration
-
-reasoning_score = detector.analyze_reasoning(argument)
-```
-
-### Evidence Quality
-
-Measures the quality of supporting evidence:
-
-```python
-# Metrics tracked:
-# - Citation count
-# - Source diversity
-# - Evidence specificity
-# - Quantitative vs qualitative
-
-evidence_score = detector.analyze_evidence(argument)
-```
-
-### Argument Structure
-
-Measures structural sophistication:
-
-```python
-# Metrics tracked:
-# - H-L-DAG completeness
-# - Level distribution
-# - Causal link count
-# - Coherence score
-
-structure_score = detector.analyze_structure(argument)
-```
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `baseline_turns` | int | 3 | Rounds to establish baseline |
+| `drop_threshold` | float | 0.3 | Performance drop threshold |
 
 ## Detection Algorithm
 
 ### Phase 1: Baseline Establishment
 
-During the first N rounds, the detector builds a capability profile:
+During the first N turns, the detector builds a capability profile:
 
-```python
-class CapabilityBaseline:
-    def __init__(self, rounds: int = 2):
-        self.samples = []
-
-    def add_sample(self, metrics: dict) -> None:
-        self.samples.append(metrics)
-
-    def get_baseline(self) -> dict:
-        return {
-            metric: {
-                "mean": np.mean([s[metric] for s in self.samples]),
-                "std": np.std([s[metric] for s in self.samples]),
-            }
-            for metric in self.samples[0].keys()
-        }
-```
+- Word count and vocabulary complexity
+- Unique word ratio
+- Evidence usage patterns
+- Causal link density
+- Overall argument complexity
 
 ### Phase 2: Deviation Detection
 
-After baseline, monitor for significant drops:
+After baseline, monitor for significant drops in:
 
-```python
-def detect_deviation(
-    self,
-    current: dict,
-    baseline: dict,
-) -> dict:
-    deviations = {}
-
-    for metric, value in current.items():
-        expected = baseline[metric]["mean"]
-        std = baseline[metric]["std"]
-
-        # Calculate z-score
-        z_score = (value - expected) / (std + 1e-6)
-
-        # Significant negative deviation
-        if z_score < -2:
-            deviations[metric] = {
-                "expected": expected,
-                "actual": value,
-                "deviation": z_score,
-            }
-
-    return deviations
-```
+- Argument sophistication
+- Evidence quality
+- Reasoning depth
+- Vocabulary complexity
 
 ### Phase 3: Pattern Analysis
 
-Look for consistent underperformance:
-
-```python
-def analyze_pattern(
-    self,
-    deviation_history: list,
-) -> bool:
-    # Count consecutive underperforming rounds
-    consecutive = 0
-    for deviation in reversed(deviation_history):
-        if deviation["is_significant"]:
-            consecutive += 1
-        else:
-            break
-
-    return consecutive >= self.consistency_threshold
-```
+Look for consistent underperformance patterns that suggest intentional sandbagging rather than normal variation.
 
 ## Results
 
-The detector returns detailed results:
+The detector contributes to debate safety alerts:
 
 ```python
-result = await detector.analyze(turn, context)
+result = await debate.run()
 
-print(f"Is Safe: {result.is_safe}")
-print(f"Sandbagging Score: {result.score}")
-print(f"Details: {result.details}")
-
-# Detailed breakdown
-details = result.details
-print(f"Baseline: {details['baseline']}")
-print(f"Current Metrics: {details['current_metrics']}")
-print(f"Deviations: {details['deviations']}")
-print(f"Pattern Detected: {details['pattern_detected']}")
+# Check for sandbagging alerts
+for alert in result.safety_alerts:
+    if "sandbag" in alert.type.lower():
+        print(f"Agent: {alert.agent}")
+        print(f"Severity: {alert.severity:.0%}")
 ```
 
 ## Handling False Positives
@@ -232,23 +121,28 @@ Some legitimate reasons for performance drops:
 
 - Topic difficulty varies
 - Round context (opening vs. closing)
-- Strategic simplification
+- Strategic simplification for clarity
 
-### Contextual Adjustment
+### Sensitivity Tuning
 
 ```python
+# Low sensitivity - only obvious sandbagging
 detector = SandbagDetector(
-    sensitivity=0.7,
-    context_aware=True,  # Adjust for round context
-    topic_normalization=True,  # Normalize across topics
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.3,
 )
-```
 
-### Manual Override
+# Medium sensitivity - balanced detection
+detector = SandbagDetector(
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.6,
+)
 
-```python
-# Mark a specific alert as false positive
-safety.dismiss_alert(alert_id, reason="strategic_simplification")
+# High sensitivity - catches subtle cases
+detector = SandbagDetector(
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.8,
+)
 ```
 
 ## Integration
@@ -256,65 +150,73 @@ safety.dismiss_alert(alert_id, reason="strategic_simplification")
 ### With Debate
 
 ```python
+from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.safety import SandbagDetector, SafetyManager
+from artemis.safety import SandbagDetector, MonitorMode
 
-safety = SafetyManager()
-safety.add_monitor(SandbagDetector(sensitivity=0.7))
+agents = [
+    Agent(name="pro", role="Advocate for the proposition", model="gpt-4o"),
+    Agent(name="con", role="Advocate against the proposition", model="gpt-4o"),
+]
+
+detector = SandbagDetector(
+    mode=MonitorMode.PASSIVE,
+    sensitivity=0.7,
+)
 
 debate = Debate(
     topic="Your topic",
     agents=agents,
-    safety_manager=safety,
+    safety_monitors=[detector.process],
 )
+
+debate.assign_positions({
+    "pro": "supports the proposition",
+    "con": "opposes the proposition",
+})
 
 result = await debate.run()
 
-# Check for sandbagging alerts
+# Check for sandbagging
 sandbagging_alerts = [
     a for a in result.safety_alerts
-    if a.type == "sandbagging"
+    if "sandbag" in a.type.lower()
 ]
+
+for alert in sandbagging_alerts:
+    print(f"Agent {alert.agent}: {alert.severity:.0%} severity")
 ```
 
-### Standalone
+### With Other Monitors
 
 ```python
-from artemis.safety import SandbagDetector
+from artemis.safety import (
+    SandbagDetector,
+    DeceptionMonitor,
+    BehaviorTracker,
+    MonitorMode,
+)
 
-detector = SandbagDetector(sensitivity=0.7)
+# Combine monitors
+sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
+deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
+behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5)
 
-# Analyze a single argument
-result = await detector.analyze(
-    turn=turn,
-    context=context,
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[
+        sandbag.process,
+        deception.process,
+        behavior.process,
+    ],
 )
 ```
-
-## Tuning Sensitivity
-
-### Low Sensitivity (0.3)
-
-- Catches only obvious sandbagging
-- Few false positives
-- May miss subtle cases
-
-### Medium Sensitivity (0.6)
-
-- Balanced detection
-- Some false positives
-- Good general setting
-
-### High Sensitivity (0.8)
-
-- Catches subtle sandbagging
-- More false positives
-- Good for high-stakes scenarios
 
 ## Best Practices
 
 1. **Start with medium sensitivity**: Tune based on observations
-2. **Establish good baselines**: Allow enough rounds for baseline
+2. **Establish good baselines**: Allow enough turns for baseline
 3. **Consider context**: Some performance variation is normal
 4. **Review alerts**: Verify detections before acting
 5. **Combine with other monitors**: Sandbagging often accompanies other issues
@@ -323,4 +225,4 @@ result = await detector.analyze(
 
 - Learn about [Deception Monitoring](deception.md)
 - Explore [Behavior Tracking](behavior.md)
-- Configure [Safety Manager](overview.md)
+- Configure [Safety Overview](overview.md)

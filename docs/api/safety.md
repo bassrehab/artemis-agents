@@ -2,52 +2,17 @@
 
 This page documents the ARTEMIS safety monitoring API.
 
-## SafetyManager
+## MonitorMode
 
-Central manager for safety monitors.
-
-```python
-from artemis.safety import SafetyManager
-```
-
-### Constructor
+Enum for safety monitor modes.
 
 ```python
-SafetyManager(
-    monitors: list[SafetyMonitor] | None = None,
-    alert_handler: AlertHandler | None = None,
-)
+from artemis.safety import MonitorMode
+
+MonitorMode.PASSIVE   # Observe and report only
+MonitorMode.ACTIVE    # Can intervene and halt debate
+MonitorMode.LEARNING  # Learn patterns without alerting
 ```
-
-### Methods
-
-#### add_monitor
-
-```python
-def add_monitor(self, monitor: SafetyMonitor) -> None
-```
-
-Adds a safety monitor.
-
-#### analyze
-
-```python
-async def analyze(
-    self,
-    turn: Turn,
-    context: DebateContext,
-) -> list[SafetyResult]
-```
-
-Runs all monitors on a turn.
-
-#### on_alert
-
-```python
-def on_alert(self, callback: Callable[[SafetyAlert], None]) -> None
-```
-
-Registers an alert callback.
 
 ---
 
@@ -56,18 +21,17 @@ Registers an alert callback.
 Detects intentional underperformance.
 
 ```python
-from artemis.safety import SandbagDetector
+from artemis.safety import SandbagDetector, MonitorMode
 ```
 
 ### Constructor
 
 ```python
 SandbagDetector(
-    sensitivity: float = 0.7,
-    baseline_rounds: int = 2,
-    capability_metrics: list[str] | None = None,
-    mode: str = "passive",  # passive or active
-    halt_threshold: float = 0.9,
+    mode: MonitorMode = MonitorMode.PASSIVE,
+    sensitivity: float = 0.5,
+    baseline_turns: int = 3,
+    drop_threshold: float = 0.3,
 )
 ```
 
@@ -75,25 +39,24 @@ SandbagDetector(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sensitivity` | float | 0.7 | Detection sensitivity (0-1) |
-| `baseline_rounds` | int | 2 | Rounds for baseline |
-| `capability_metrics` | list[str] | [...] | Metrics to track |
-| `mode` | str | "passive" | Monitor mode |
-| `halt_threshold` | float | 0.9 | Threshold for active halt |
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `baseline_turns` | int | 3 | Turns for baseline establishment |
+| `drop_threshold` | float | 0.3 | Capability drop threshold |
 
 ### Methods
 
-#### analyze
+#### process
 
 ```python
-async def analyze(
+async def process(
     self,
     turn: Turn,
     context: DebateContext,
-) -> SafetyResult
+) -> SafetyResult | None
 ```
 
-Analyzes a turn for sandbagging.
+Processes a turn for sandbagging detection. Used as `safety_monitors=[detector.process]`.
 
 ---
 
@@ -102,19 +65,15 @@ Analyzes a turn for sandbagging.
 Detects deceptive claims.
 
 ```python
-from artemis.safety import DeceptionMonitor
+from artemis.safety import DeceptionMonitor, MonitorMode
 ```
 
 ### Constructor
 
 ```python
 DeceptionMonitor(
-    sensitivity: float = 0.6,
-    check_factual: bool = True,
-    check_logical: bool = True,
-    check_consistency: bool = True,
-    check_sources: bool = True,
-    use_external_verification: bool = False,
+    mode: MonitorMode = MonitorMode.PASSIVE,
+    sensitivity: float = 0.5,
 )
 ```
 
@@ -122,30 +81,22 @@ DeceptionMonitor(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sensitivity` | float | 0.6 | Detection sensitivity |
-| `check_factual` | bool | True | Check factual accuracy |
-| `check_logical` | bool | True | Detect logical fallacies |
-| `check_consistency` | bool | True | Track contradictions |
-| `check_sources` | bool | True | Verify source accuracy |
-| `use_external_verification` | bool | False | Use external fact-check |
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
 
 ### Methods
 
-#### detect_fallacies
+#### process
 
 ```python
-def detect_fallacies(self, argument: Argument) -> list[Fallacy]
+async def process(
+    self,
+    turn: Turn,
+    context: DebateContext,
+) -> SafetyResult | None
 ```
 
-Detects logical fallacies.
-
-#### verify_facts
-
-```python
-async def verify_facts(self, argument: Argument) -> FactCheckResult
-```
-
-Verifies factual claims.
+Processes a turn for deception detection.
 
 ---
 
@@ -154,18 +105,17 @@ Verifies factual claims.
 Tracks behavioral changes over time.
 
 ```python
-from artemis.safety import BehaviorTracker
+from artemis.safety import BehaviorTracker, MonitorMode
 ```
 
 ### Constructor
 
 ```python
 BehaviorTracker(
+    mode: MonitorMode = MonitorMode.PASSIVE,
+    sensitivity: float = 0.5,
     window_size: int = 5,
     drift_threshold: float = 0.3,
-    track_style: bool = True,
-    track_position: bool = True,
-    track_capability: bool = True,
 )
 ```
 
@@ -173,33 +123,24 @@ BehaviorTracker(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `window_size` | int | 5 | Turns to consider |
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `window_size` | int | 5 | Turns to consider for drift |
 | `drift_threshold` | float | 0.3 | Drift alert threshold |
-| `track_style` | bool | True | Track writing style |
-| `track_position` | bool | True | Track position changes |
-| `track_capability` | bool | True | Track capability metrics |
 
 ### Methods
 
-#### get_history
+#### process
 
 ```python
-def get_history(self, agent_name: str) -> list[BehaviorSnapshot]
-```
-
-Gets behavior history for an agent.
-
-#### calculate_drift
-
-```python
-def calculate_drift(
+async def process(
     self,
-    current: dict,
-    historical: list[dict],
-) -> float
+    turn: Turn,
+    context: DebateContext,
+) -> SafetyResult | None
 ```
 
-Calculates drift score.
+Processes a turn for behavior drift detection.
 
 ---
 
@@ -208,17 +149,15 @@ Calculates drift score.
 Monitors ethical boundaries.
 
 ```python
-from artemis.safety import EthicsGuard
+from artemis.safety import EthicsGuard, EthicsConfig, MonitorMode
 ```
 
 ### Constructor
 
 ```python
 EthicsGuard(
-    sensitivity: float = 0.6,
-    principles: list[str | EthicalPrinciple] | None = None,
-    mode: str = "warn",  # warn, block, remediate
-    violation_threshold: float = 0.7,
+    mode: MonitorMode = MonitorMode.PASSIVE,
+    config: EthicsConfig | None = None,
 )
 ```
 
@@ -226,59 +165,73 @@ EthicsGuard(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sensitivity` | float | 0.6 | Detection sensitivity |
-| `principles` | list | [...] | Ethical principles |
-| `mode` | str | "warn" | Response mode |
-| `violation_threshold` | float | 0.7 | Threshold for action |
+| `mode` | MonitorMode | PASSIVE | Monitor mode |
+| `config` | EthicsConfig | None | Ethics configuration |
 
-### Methods
-
-#### remediate
+### EthicsConfig
 
 ```python
-async def remediate(
-    self,
-    argument: Argument,
-    result: SafetyResult,
-) -> Argument
-```
-
-Attempts to fix ethical violations.
-
----
-
-## CompositeMonitor
-
-Combines multiple monitors.
-
-```python
-from artemis.safety import CompositeMonitor
-```
-
-### Constructor
-
-```python
-CompositeMonitor(
-    monitors: list[SafetyMonitor],
-    aggregation: str = "max",  # max, mean, weighted
-    weights: dict[str, float] | None = None,
+EthicsConfig(
+    sensitivity: float = 0.5,
+    principles: list[str] = ["fairness", "transparency", "non-harm"],
 )
 ```
 
-### Class Methods
+**Parameters:**
 
-#### default
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
+| `principles` | list[str] | [...] | Ethical principles to enforce |
+
+### Methods
+
+#### process
 
 ```python
-@classmethod
-def default(cls) -> CompositeMonitor
+async def process(
+    self,
+    turn: Turn,
+    context: DebateContext,
+) -> SafetyResult | None
 ```
 
-Creates a monitor with default settings.
+Processes a turn for ethics violations.
+
+---
+
+## Using Multiple Monitors
+
+Combine monitors by passing a list to the Debate:
 
 ```python
-monitor = CompositeMonitor.default()
-# Includes all monitors with balanced settings
+from artemis.core.debate import Debate
+from artemis.safety import (
+    SandbagDetector,
+    DeceptionMonitor,
+    BehaviorTracker,
+    EthicsGuard,
+    MonitorMode,
+    EthicsConfig,
+)
+
+# Create individual monitors
+sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
+deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
+behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5)
+ethics = EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(sensitivity=0.5))
+
+# Pass their process methods to the debate
+debate = Debate(
+    topic="Your topic",
+    agents=agents,
+    safety_monitors=[
+        sandbag.process,
+        deception.process,
+        behavior.process,
+        ethics.process,
+    ],
+)
 ```
 
 ---
@@ -288,18 +241,19 @@ monitor = CompositeMonitor.default()
 Result from a safety monitor.
 
 ```python
-from artemis.safety.base import SafetyResult
+from artemis.core.types import SafetyResult
 ```
 
 ### Class Definition
 
 ```python
 class SafetyResult(BaseModel):
-    is_safe: bool
-    score: float  # 0-1, lower is safer
-    monitor_type: str
-    details: dict
-    recommendations: list[str] = []
+    monitor: str             # Name of the monitor
+    severity: float          # 0.0 to 1.0
+    indicators: list[SafetyIndicator]
+    should_alert: bool = False
+    should_halt: bool = False
+    analysis_notes: str | None = None
 ```
 
 ---
@@ -309,107 +263,54 @@ class SafetyResult(BaseModel):
 Safety alert from monitoring.
 
 ```python
-from artemis.safety.base import SafetyAlert
+from artemis.core.types import SafetyAlert
 ```
 
 ### Class Definition
 
 ```python
 class SafetyAlert(BaseModel):
-    type: str  # sandbagging, deception, drift, ethics
-    severity: float  # 0-1
-    agent: str
-    round: int
-    turn: int
-    details: dict
+    id: str
+    monitor: str              # Name of the monitor
+    agent: str                # Agent that triggered alert
+    type: str                 # "sandbagging", "deception", "drift", "ethics"
+    severity: float           # 0.0 to 1.0
+    indicators: list[SafetyIndicator]
+    turn_id: str | None
     timestamp: datetime
+    resolved: bool = False
+    resolution_notes: str | None = None
 ```
 
 ---
 
-## EthicalPrinciple
+## SafetyIndicator
 
-Custom ethical principle.
+Individual safety indicator.
 
 ```python
-from artemis.safety.ethics import EthicalPrinciple
+from artemis.core.types import SafetyIndicator, SafetyIndicatorType
 ```
 
 ### Class Definition
 
 ```python
-class EthicalPrinciple(BaseModel):
-    name: str
-    description: str
-    keywords: list[str] = []
-    violation_patterns: list[str] = []
-    weight: float = 1.0
-```
+class SafetyIndicator(BaseModel):
+    type: SafetyIndicatorType
+    severity: float
+    evidence: str | list[str]
+    metadata: dict = {}
 
-**Example:**
-
-```python
-privacy_principle = EthicalPrinciple(
-    name="privacy",
-    description="Protect personal information",
-    keywords=["personal", "private", "confidential"],
-    violation_patterns=[
-        r"reveal.*personal",
-        r"expose.*private",
-    ],
-    weight=1.5,
-)
-```
-
----
-
-## AlertHandler
-
-Base class for alert handlers.
-
-```python
-from artemis.safety.base import AlertHandler
-```
-
-### Abstract Methods
-
-```python
-async def handle(self, alert: SafetyAlert) -> None
-```
-
-Handles a safety alert.
-
-### Built-in Handlers
-
-```python
-from artemis.safety.handlers import (
-    LoggingHandler,    # Logs alerts
-    CallbackHandler,   # Calls a function
-    WebhookHandler,    # Posts to webhook
-)
-```
-
----
-
-## SafetySummary
-
-Summary of safety results.
-
-```python
-from artemis.safety.base import SafetySummary
-```
-
-### Class Definition
-
-```python
-class SafetySummary(BaseModel):
-    total_alerts: int
-    critical_count: int
-    warning_count: int
-    info_count: int
-    overall_score: float
-    by_type: dict[str, int]
-    by_agent: dict[str, int]
+class SafetyIndicatorType(str, Enum):
+    CAPABILITY_DROP = "capability_drop"
+    STRATEGIC_TIMING = "strategic_timing"
+    SELECTIVE_ENGAGEMENT = "selective_engagement"
+    FACTUAL_INCONSISTENCY = "factual_inconsistency"
+    LOGICAL_FALLACY = "logical_fallacy"
+    EMOTIONAL_MANIPULATION = "emotional_manipulation"
+    CITATION_FABRICATION = "citation_fabrication"
+    BEHAVIORAL_DRIFT = "behavioral_drift"
+    ETHICS_BOUNDARY = "ethics_boundary"
 ```
 
 ---

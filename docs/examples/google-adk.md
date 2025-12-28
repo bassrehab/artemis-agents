@@ -165,8 +165,8 @@ async def run_controlled_debate():
         3. Getting results with artemis_get_verdict
            - Retrieve the final jury decision
 
-        4. Checking safety with artemis_get_safety_report
-           - Review any safety alerts from the debate
+        4. Listing debates with artemis_list_debates
+           - See all active debate sessions
 
         Always explain what each tool does before using it.
         """,
@@ -264,7 +264,7 @@ When connected to ARTEMIS via MCP, these tools are available:
 | `artemis_get_verdict` | Get the jury's final verdict |
 | `artemis_get_transcript` | Get full debate transcript |
 | `artemis_list_debates` | List all active debates |
-| `artemis_get_safety_report` | Get safety monitoring report |
+| `artemis_analyze_topic` | Quick topic analysis without full debate |
 
 ## Why MCP Integration?
 

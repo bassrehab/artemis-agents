@@ -331,7 +331,7 @@ def mock_model():
     return model
 
 async def test_agent_generates_argument(mock_model):
-    agent = Agent(name="test", model=mock_model)
+    agent = Agent(name="test", role="Test agent", model=mock_model)
     argument = await agent.generate_argument(context)
     assert argument.content == "Test argument"
 ```
@@ -357,16 +357,24 @@ async def test_debate_runs_complete():
 Verify monitor detection:
 
 ```python
+from artemis.safety import SandbagDetector, MonitorMode
+
 async def test_detects_sandbagging():
-    detector = SandbagDetector(sensitivity=0.8)
+    detector = SandbagDetector(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.8,
+    )
 
     # Create turns with declining capability
     turns = create_declining_capability_turns()
 
+    results = []
     for turn in turns:
-        result = await detector.analyze(turn, context)
+        result = await detector.process(turn, context)
+        if result:
+            results.append(result)
 
-    assert any(r.score > 0.7 for r in results)
+    assert any(r.severity > 0.7 for r in results)
 ```
 
 ## Getting Help
