@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="ARTEMIS Logo" width="80" height="80">
+  <img src="https://raw.githubusercontent.com/bassrehab/artemis-agents/main/assets/logo.svg" alt="ARTEMIS Logo" width="80" height="80">
 </p>
 
 <h1 align="center">ARTEMIS Agents</h1>
