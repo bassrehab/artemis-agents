@@ -396,7 +396,7 @@ Returns:
     "uptime_seconds": 3600,
     "model_usage": {
         "gpt-4o": 95,
-        "claude-3-opus": 32
+        "deepseek-reasoner": 32
     }
 }
 ```

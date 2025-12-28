@@ -22,8 +22,10 @@ from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 guard = EthicsGuard(
     mode=MonitorMode.PASSIVE,
     config=EthicsConfig(
-        sensitivity=0.6,
-        principles=["fairness", "transparency", "non-harm"],
+        harmful_content_threshold=0.4,
+        bias_threshold=0.4,
+        fairness_threshold=0.3,
+        enabled_checks=["harmful_content", "bias", "fairness"],
     ),
 )
 
@@ -40,13 +42,15 @@ debate = Debate(
 from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
 config = EthicsConfig(
-    sensitivity=0.6,
-    principles=[
+    harmful_content_threshold=0.4,
+    bias_threshold=0.4,
+    fairness_threshold=0.3,
+    enabled_checks=[
+        "harmful_content",
+        "bias",
         "fairness",
-        "transparency",
-        "non-harm",
-        "respect",
-        "accuracy",
+        "privacy",
+        "manipulation",
     ],
 )
 
@@ -60,8 +64,10 @@ guard = EthicsGuard(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
-| `principles` | list[str] | default set | Ethical principles to enforce |
+| `harmful_content_threshold` | float | 0.5 | Threshold for harmful content |
+| `bias_threshold` | float | 0.4 | Threshold for bias detection |
+| `fairness_threshold` | float | 0.3 | Threshold for fairness violations |
+| `enabled_checks` | list[str] | default set | Ethics checks to enable |
 
 ## Ethical Principles
 
@@ -75,14 +81,14 @@ guard = EthicsGuard(
 | Respect | Dignified treatment | Insults, dehumanization |
 | Accuracy | Truthful claims | Misinformation, false claims |
 
-### Custom Principles
+### Custom Checks
 
-You can specify which principles to enforce:
+You can specify which checks to enable:
 
 ```python
 config = EthicsConfig(
-    sensitivity=0.7,
-    principles=["fairness", "non-harm"],  # Only these two
+    harmful_content_threshold=0.3,
+    enabled_checks=["harmful_content", "bias"],  # Only these two
 )
 ```
 
@@ -156,7 +162,7 @@ agents = [
 
 guard = EthicsGuard(
     mode=MonitorMode.PASSIVE,
-    config=EthicsConfig(sensitivity=0.6),
+    config=EthicsConfig(harmful_content_threshold=0.4),
 )
 
 debate = Debate(
@@ -196,7 +202,7 @@ from artemis.safety import (
 
 ethics = EthicsGuard(
     mode=MonitorMode.PASSIVE,
-    config=EthicsConfig(sensitivity=0.6),
+    config=EthicsConfig(harmful_content_threshold=0.4),
 )
 deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
 behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5)
@@ -240,8 +246,9 @@ debate = Debate(
 guard = EthicsGuard(
     mode=MonitorMode.PASSIVE,
     config=EthicsConfig(
-        sensitivity=0.5,
-        principles=["accuracy", "fairness", "transparency"],
+        harmful_content_threshold=0.5,
+        bias_threshold=0.5,
+        enabled_checks=["harmful_content", "bias", "fairness"],
     ),
 )
 ```
@@ -252,8 +259,9 @@ guard = EthicsGuard(
 guard = EthicsGuard(
     mode=MonitorMode.ACTIVE,  # Can halt debate
     config=EthicsConfig(
-        sensitivity=0.8,
-        principles=["non-harm", "respect", "fairness"],
+        harmful_content_threshold=0.2,  # Very strict
+        bias_threshold=0.3,
+        enabled_checks=["harmful_content", "bias", "fairness", "privacy"],
     ),
 )
 ```
@@ -264,8 +272,9 @@ guard = EthicsGuard(
 guard = EthicsGuard(
     mode=MonitorMode.PASSIVE,
     config=EthicsConfig(
-        sensitivity=0.6,
-        principles=["accuracy", "transparency", "fairness"],
+        harmful_content_threshold=0.4,
+        bias_threshold=0.4,
+        enabled_checks=["harmful_content", "bias", "fairness"],
     ),
 )
 ```

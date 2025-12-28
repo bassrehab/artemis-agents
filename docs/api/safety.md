@@ -172,8 +172,11 @@ EthicsGuard(
 
 ```python
 EthicsConfig(
-    sensitivity: float = 0.5,
-    principles: list[str] = ["fairness", "transparency", "non-harm"],
+    harmful_content_threshold: float = 0.5,
+    bias_threshold: float = 0.4,
+    fairness_threshold: float = 0.3,
+    enabled_checks: list[str] = ["harmful_content", "bias", "fairness", "privacy", "manipulation"],
+    custom_boundaries: dict[str, str] = {},
 )
 ```
 
@@ -181,8 +184,11 @@ EthicsConfig(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
-| `principles` | list[str] | [...] | Ethical principles to enforce |
+| `harmful_content_threshold` | float | 0.5 | Threshold for harmful content |
+| `bias_threshold` | float | 0.4 | Threshold for bias detection |
+| `fairness_threshold` | float | 0.3 | Threshold for fairness violations |
+| `enabled_checks` | list[str] | [...] | List of enabled ethics checks |
+| `custom_boundaries` | dict | {} | Custom ethical boundaries |
 
 ### Methods
 
@@ -219,7 +225,7 @@ from artemis.safety import (
 sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
 deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
 behavior = BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5)
-ethics = EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(sensitivity=0.5))
+ethics = EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(harmful_content_threshold=0.5))
 
 # Pass their process methods to the debate
 debate = Debate(

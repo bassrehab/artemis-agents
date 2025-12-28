@@ -31,8 +31,10 @@ from artemis.safety import EthicsGuard, MonitorMode, EthicsConfig
 
 # Configure ethics guard
 ethics_config = EthicsConfig(
-    sensitivity=0.7,
-    principles=["fairness", "transparency", "non-harm"],
+    harmful_content_threshold=0.3,
+    bias_threshold=0.4,
+    fairness_threshold=0.3,
+    enabled_checks=["harmful_content", "bias", "fairness"],
 )
 
 guard = EthicsGuard(
@@ -52,22 +54,24 @@ debate = Debate(
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `sensitivity` | float | 0.5 | Detection sensitivity (0-1) |
-| `principles` | list | default | Ethical principles to enforce |
+| `harmful_content_threshold` | float | 0.5 | Threshold for harmful content detection |
+| `bias_threshold` | float | 0.4 | Threshold for bias detection |
+| `fairness_threshold` | float | 0.3 | Threshold for fairness violations |
+| `enabled_checks` | list[str] | default | Checks to enable |
 
-### Sensitivity Levels
+### Threshold Levels
 
 ```python
 from artemis.safety import EthicsConfig
 
 # Low sensitivity - only severe violations
-low_config = EthicsConfig(sensitivity=0.3)
+low_config = EthicsConfig(harmful_content_threshold=0.7)
 
 # Medium sensitivity - most violations
-medium_config = EthicsConfig(sensitivity=0.6)
+medium_config = EthicsConfig(harmful_content_threshold=0.5)
 
 # High sensitivity - strict enforcement
-high_config = EthicsConfig(sensitivity=0.9)
+high_config = EthicsConfig(harmful_content_threshold=0.3)
 ```
 
 ## Ethical Evaluation in L-AE-CR
@@ -184,7 +188,7 @@ sandbag = SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7)
 deception = DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6)
 ethics = EthicsGuard(
     mode=MonitorMode.PASSIVE,
-    config=EthicsConfig(sensitivity=0.7),
+    config=EthicsConfig(harmful_content_threshold=0.3),
 )
 
 # Use all monitors together

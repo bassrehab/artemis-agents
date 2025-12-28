@@ -140,14 +140,14 @@ async def run_reasoning_debate():
         name="deep_thinker_pro",
         role="Philosopher arguing consciousness is computable",
         model="deepseek-reasoner",  # DeepSeek R1
-        reasoning=reasoning_config,
+        reasoning_config=reasoning_config,
     )
 
     con_agent = Agent(
         name="deep_thinker_con",
         role="Philosopher arguing consciousness is not computable",
         model="deepseek-reasoner",
-        reasoning=reasoning_config,
+        reasoning_config=reasoning_config,
     )
 
     debate = Debate(

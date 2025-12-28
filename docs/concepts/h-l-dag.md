@@ -15,6 +15,7 @@ The highest level of abstraction, focusing on:
 ```python
 # Example strategic-level argument
 Argument(
+    agent="Proponent",
     level=ArgumentLevel.STRATEGIC,
     content="""
     AI regulation is essential for societal protection. The core thesis
@@ -37,6 +38,7 @@ The middle level, providing:
 ```python
 # Example tactical-level argument
 Argument(
+    agent="Proponent",
     level=ArgumentLevel.TACTICAL,
     content="""
     Three key factors support AI regulation:
@@ -45,8 +47,16 @@ Argument(
     3. Industry self-regulation has proven insufficient
     """,
     evidence=[
-        Evidence(type="historical", source="FDA drug approval process"),
-        Evidence(type="empirical", source="AI incident database"),
+        Evidence(
+            type="example",
+            content="FDA drug approval process demonstrates successful tech regulation",
+            source="FDA History",
+        ),
+        Evidence(
+            type="study",
+            content="Analysis of 200+ AI incidents from 2020-2024",
+            source="AI Incident Database",
+        ),
     ],
 )
 ```
@@ -62,6 +72,7 @@ The ground level with:
 ```python
 # Example operational-level argument
 Argument(
+    agent="Proponent",
     level=ArgumentLevel.OPERATIONAL,
     content="""
     The EU AI Act, implemented in 2024, demonstrates successful regulation.
@@ -72,9 +83,9 @@ Argument(
     """,
     evidence=[
         Evidence(
-            type="citation",
+            type="quote",
+            content="compliance costs averaged 2.3% of development budgets",
             source="European Commission AI Act Report 2024",
-            quote="compliance costs averaged 2.3% of development budgets",
         ),
     ],
 )
@@ -111,6 +122,19 @@ Strategic Thesis
 └── Tactical Point 3
     └── Operational Fact 3.1
 ```
+
+## Evidence Types
+
+The `Evidence` class supports these types:
+
+| Type | Description |
+|------|-------------|
+| `fact` | Verifiable factual statement |
+| `statistic` | Numerical data or statistics |
+| `quote` | Direct quotation from a source |
+| `example` | Real-world case or example |
+| `study` | Research study or analysis |
+| `expert_opinion` | Opinion from domain expert |
 
 ## Causal Links
 
@@ -168,7 +192,7 @@ for turn in result.transcript:
         print(f"  Evidence: {evidence.source}")
 
     for link in arg.causal_links:
-        print(f"  Causal: {link.source} -> {link.target}")
+        print(f"  Causal: {link.cause} -> {link.effect}")
 ```
 
 ## Benefits of H-L-DAG

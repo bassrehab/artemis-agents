@@ -307,7 +307,7 @@ async def examine_argument_structure():
         if arg.causal_links:
             print("\nCausal Links:")
             for link in arg.causal_links:
-                print(f"  {link.source} --[{link.relation}]--> {link.target}")
+                print(f"  {link.cause} --> {link.effect}")
                 print(f"  Strength: {link.strength:.2f}")
 
 asyncio.run(examine_argument_structure())

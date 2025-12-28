@@ -84,7 +84,7 @@ behavior = BehaviorTracker(
 )
 ethics = EthicsGuard(
     mode=MonitorMode.PASSIVE,
-    config=EthicsConfig(sensitivity=0.5),
+    config=EthicsConfig(harmful_content_threshold=0.5),
 )
 
 # Create debate with safety monitors
@@ -132,7 +132,7 @@ monitors = [
     SandbagDetector(mode=MonitorMode.PASSIVE, sensitivity=0.7),
     DeceptionMonitor(mode=MonitorMode.PASSIVE, sensitivity=0.6),
     BehaviorTracker(mode=MonitorMode.PASSIVE, sensitivity=0.5),
-    EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(sensitivity=0.5)),
+    EthicsGuard(mode=MonitorMode.PASSIVE, config=EthicsConfig(harmful_content_threshold=0.5)),
 ]
 
 # Pass their process methods to the debate
@@ -248,8 +248,10 @@ behavior = BehaviorTracker(
 ethics = EthicsGuard(
     mode=MonitorMode.PASSIVE,
     config=EthicsConfig(
-        sensitivity=0.5,
-        principles=["fairness", "transparency", "non-harm"],
+        harmful_content_threshold=0.5,
+        bias_threshold=0.4,
+        fairness_threshold=0.3,
+        enabled_checks=["harmful_content", "bias", "fairness"],
     ),
 )
 ```

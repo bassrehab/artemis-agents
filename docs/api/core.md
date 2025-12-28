@@ -16,8 +16,10 @@ from artemis.core.debate import Debate
 Debate(
     topic: str,
     agents: list[Agent],
-    rounds: int = 3,
+    rounds: int = 5,
     config: DebateConfig | None = None,
+    jury: JuryPanel | None = None,
+    evaluator: AdaptiveEvaluator | None = None,
     safety_monitors: list[Callable] | None = None,
 )
 ```
@@ -28,8 +30,10 @@ Debate(
 |-----------|------|----------|-------------|
 | `topic` | str | Yes | The debate topic |
 | `agents` | list[Agent] | Yes | List of participating agents (2+) |
-| `rounds` | int | No | Number of debate rounds (default: 3) |
+| `rounds` | int | No | Number of debate rounds (default: 5) |
 | `config` | DebateConfig | No | Debate configuration |
+| `jury` | JuryPanel | No | Custom jury panel |
+| `evaluator` | AdaptiveEvaluator | No | Custom argument evaluator |
 | `safety_monitors` | list | No | List of safety monitor process methods |
 
 ### Methods
@@ -165,11 +169,17 @@ from artemis.core.types import Argument, ArgumentLevel
 
 ```python
 class Argument(BaseModel):
-    content: str
+    id: str  # Auto-generated UUID
+    agent: str  # Required: agent name
     level: ArgumentLevel
+    content: str
     evidence: list[Evidence] = []
     causal_links: list[CausalLink] = []
-    metadata: dict = {}
+    rebuts: str | None = None  # ID of argument this rebuts
+    supports: str | None = None  # ID of argument this supports
+    ethical_score: float | None = None
+    thinking_trace: str | None = None  # For reasoning models
+    timestamp: datetime
 ```
 
 ### ArgumentLevel
@@ -185,10 +195,13 @@ class ArgumentLevel(str, Enum):
 
 ```python
 class Evidence(BaseModel):
-    type: str  # "empirical", "citation", "historical", etc.
-    source: str
-    quote: str | None = None
-    credibility: float = 1.0
+    id: str  # Auto-generated UUID
+    type: Literal["fact", "statistic", "quote", "example", "study", "expert_opinion"]
+    content: str  # The evidence content
+    source: str | None = None
+    url: str | None = None
+    confidence: float  # 0.0 to 1.0
+    verified: bool = False
 ```
 
 ### CausalLink
@@ -219,9 +232,11 @@ from artemis.core.types import JuryPerspective
 ```python
 JuryPanel(
     evaluators: int = 3,
+    criteria: list[str] | None = None,
     model: str = "gpt-4o",
-    perspectives: list[JuryPerspective] | None = None,
     consensus_threshold: float = 0.7,
+    api_key: str | None = None,
+    **model_kwargs,
 )
 ```
 
@@ -230,9 +245,10 @@ JuryPanel(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `evaluators` | int | 3 | Number of jury evaluators |
+| `criteria` | list[str] | None | Custom evaluation criteria |
 | `model` | str | "gpt-4o" | LLM model for evaluators |
-| `perspectives` | list | None | Evaluation perspectives |
 | `consensus_threshold` | float | 0.7 | Threshold for consensus |
+| `api_key` | str | None | API key (uses env var if not provided) |
 
 ### JuryPerspective
 

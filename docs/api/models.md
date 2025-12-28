@@ -14,8 +14,8 @@ from artemis.models import create_model
 
 ```python
 def create_model(
-    model_name: str,
-    api_key: str | None = None,
+    model: str,
+    provider: str | None = None,
     **kwargs,
 ) -> BaseModel
 ```
@@ -24,21 +24,21 @@ def create_model(
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `model_name` | str | Yes | Model identifier |
-| `api_key` | str | No | API key (uses env var if not provided) |
-| `**kwargs` | - | No | Additional model-specific options |
+| `model` | str | Yes | Model identifier (e.g., "gpt-4o", "deepseek-reasoner") |
+| `provider` | str | No | Provider name. If not specified, inferred from model name |
+| `**kwargs` | - | No | Additional arguments passed to the model constructor |
 
 **Example:**
 
 ```python
-# OpenAI
-model = create_model("gpt-4o", temperature=0.7)
+# OpenAI (provider inferred from model name)
+model = create_model("gpt-4o")
 
-# Anthropic
-model = create_model("claude-3-opus", max_tokens=4000)
+# DeepSeek with explicit provider
+model = create_model("deepseek-reasoner", provider="deepseek")
 
-# DeepSeek
-model = create_model("deepseek-reasoner", timeout=120.0)
+# With additional options
+model = create_model("gpt-4o", timeout=120.0, max_retries=5)
 ```
 
 ---
@@ -105,12 +105,24 @@ from artemis.models.openai import OpenAIModel
 OpenAIModel(
     model: str = "gpt-4o",
     api_key: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int = 4000,
+    base_url: str | None = None,
+    organization: str | None = None,
     timeout: float = 60.0,
     max_retries: int = 3,
+    **kwargs,
 )
 ```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | str | "gpt-4o" | Model identifier |
+| `api_key` | str \| None | None | API key (reads from OPENAI_API_KEY env var if not provided) |
+| `base_url` | str \| None | None | Custom API base URL (for Azure or proxies) |
+| `organization` | str \| None | None | OpenAI organization ID |
+| `timeout` | float | 60.0 | Request timeout in seconds |
+| `max_retries` | int | 3 | Maximum retry attempts |
 
 ### Supported Models
 
@@ -124,67 +136,9 @@ OpenAIModel(
 
 ---
 
-## AnthropicModel
-
-Anthropic model provider.
-
-```python
-from artemis.models.anthropic import AnthropicModel
-```
-
-### Constructor
-
-```python
-AnthropicModel(
-    model: str = "claude-3-opus",
-    api_key: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int = 4000,
-    timeout: float = 60.0,
-)
-```
-
-### Supported Models
-
-| Model | Description |
-|-------|-------------|
-| `claude-3-opus` | Most capable |
-| `claude-3-sonnet` | Balanced |
-| `claude-3-haiku` | Fast |
-
----
-
-## GoogleModel
-
-Google AI model provider.
-
-```python
-from artemis.models.google import GoogleModel
-```
-
-### Constructor
-
-```python
-GoogleModel(
-    model: str = "gemini-2.0-flash",
-    api_key: str | None = None,
-    temperature: float = 0.7,
-    max_tokens: int = 4000,
-)
-```
-
-### Supported Models
-
-| Model | Reasoning | Description |
-|-------|-----------|-------------|
-| `gemini-2.0-flash` | No | Fast Gemini |
-| `gemini-2.5-pro` | Yes | Pro with thinking |
-
----
-
 ## DeepSeekModel
 
-DeepSeek model provider.
+DeepSeek model provider with R1 reasoning support.
 
 ```python
 from artemis.models.deepseek import DeepSeekModel
@@ -196,18 +150,31 @@ from artemis.models.deepseek import DeepSeekModel
 DeepSeekModel(
     model: str = "deepseek-reasoner",
     api_key: str | None = None,
-    temperature: float = 1.0,
-    max_tokens: int = 8000,
+    base_url: str | None = None,
     timeout: float = 120.0,
+    max_retries: int = 3,
+    **kwargs,
 )
 ```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | str | "deepseek-reasoner" | Model identifier |
+| `api_key` | str \| None | None | API key (reads from DEEPSEEK_API_KEY env var if not provided) |
+| `base_url` | str \| None | "https://api.deepseek.com/v1" | Custom API base URL |
+| `timeout` | float | 120.0 | Request timeout in seconds |
+| `max_retries` | int | 3 | Maximum retry attempts |
 
 ### Supported Models
 
 | Model | Reasoning | Description |
 |-------|-----------|-------------|
-| `deepseek-chat` | No | Standard chat |
-| `deepseek-reasoner` | Yes | R1 reasoning model |
+| `deepseek-chat` | No | Standard chat model |
+| `deepseek-coder` | No | Code-specialized model |
+| `deepseek-reasoner` | Yes | Full R1 with extended thinking |
+| `deepseek-r1-distill-llama-70b` | Yes | Distilled R1 variant |
 
 ---
 
@@ -216,18 +183,29 @@ DeepSeekModel(
 Configuration for reasoning models.
 
 ```python
-from artemis.models.reasoning import ReasoningConfig, create_reasoning_config
+from artemis.models import ReasoningConfig, ReasoningStrategy, create_reasoning_config
 ```
 
 ### Class Definition
 
 ```python
 class ReasoningConfig(BaseModel):
-    model: str
-    strategy: str = "adaptive"  # always, adaptive, never
+    model: str = "o1"
+    strategy: ReasoningStrategy = ReasoningStrategy.ADAPTIVE
     thinking_budget: int = 8000
-    show_thinking: bool = True
+    show_thinking: bool = False
+    thinking_style: str = "thorough"  # "thorough", "concise", "analytical"
     temperature: float = 1.0
+    use_system_prompt: bool = True
+```
+
+### ReasoningStrategy
+
+```python
+class ReasoningStrategy(str, Enum):
+    ALWAYS = "always"     # Always use extended thinking
+    ADAPTIVE = "adaptive" # Use reasoning only for complex problems
+    NEVER = "never"       # Never use extended thinking
 ```
 
 ### create_reasoning_config
@@ -235,12 +213,11 @@ class ReasoningConfig(BaseModel):
 ```python
 def create_reasoning_config(
     model: str,
-    thinking_budget: int = 8000,
-    show_thinking: bool = True,
+    **overrides,
 ) -> ReasoningConfig
 ```
 
-Creates appropriate config based on model capabilities.
+Creates appropriate config with model-specific defaults.
 
 **Example:**
 
@@ -259,35 +236,36 @@ config = create_reasoning_config("deepseek-reasoner", show_thinking=True)
 Message structure for model calls.
 
 ```python
-from artemis.models.types import Message
+from artemis.core.types import Message
 ```
 
 ### Class Definition
 
 ```python
 class Message(BaseModel):
-    role: str  # "system", "user", "assistant"
+    role: Literal["system", "user", "assistant"]
     content: str
+    name: str | None = None  # Optional name for multi-agent scenarios
 ```
 
 ---
 
-## Response
+## ModelResponse
 
 Model response structure.
 
 ```python
-from artemis.models.types import Response
+from artemis.core.types import ModelResponse
 ```
 
 ### Class Definition
 
 ```python
-class Response(BaseModel):
+class ModelResponse(BaseModel):
     content: str
     usage: Usage
-    model: str
-    finish_reason: str
+    model: str | None = None
+    finish_reason: str | None = None
 ```
 
 ---
@@ -297,17 +275,15 @@ class Response(BaseModel):
 Response from reasoning models.
 
 ```python
-from artemis.models.types import ReasoningResponse
+from artemis.core.types import ReasoningResponse
 ```
 
 ### Class Definition
 
 ```python
-class ReasoningResponse(BaseModel):
-    thinking: str  # The reasoning trace
-    output: str    # The final output
-    usage: Usage
-    model: str
+class ReasoningResponse(ModelResponse):
+    thinking: str | None = None  # The extended thinking/reasoning trace
+    thinking_tokens: int = 0
 ```
 
 ---
@@ -317,17 +293,17 @@ class ReasoningResponse(BaseModel):
 Token usage information.
 
 ```python
-from artemis.models.types import Usage
+from artemis.core.types import Usage
 ```
 
 ### Class Definition
 
 ```python
 class Usage(BaseModel):
-    prompt_tokens: int
-    completion_tokens: int
-    total_tokens: int
-    thinking_tokens: int = 0  # For reasoning models
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    reasoning_tokens: int | None = None  # For reasoning models
 ```
 
 ---
@@ -340,20 +316,20 @@ List available model providers.
 from artemis.models import list_providers
 
 providers = list_providers()
-# ['openai', 'anthropic', 'google', 'deepseek']
+# ['openai', 'deepseek']
 ```
 
 ---
 
-## list_models
+## is_reasoning_model
 
-List available models for a provider.
+Check if a model supports extended reasoning.
 
 ```python
-from artemis.models import list_models
+from artemis.models import is_reasoning_model
 
-models = list_models("openai")
-# ['gpt-4o', 'gpt-4-turbo', 'o1', 'o1-preview', 'o1-mini']
+is_reasoning_model("o1")  # True
+is_reasoning_model("gpt-4o")  # False
 ```
 
 ---

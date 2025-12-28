@@ -176,17 +176,14 @@ from artemis.safety import MonitorMode, EthicsGuard, EthicsConfig
 
 async def run_triage_debate():
     # Ethics guard for sensitive medical content
-    ethics_config = EthicsConfig(
-        harmful_content_threshold=0.6,  # Higher threshold for medical context
-        bias_threshold=0.4,
-        fairness_threshold=0.4,
-        enabled_checks=["harmful_content", "bias", "fairness"],
-    )
-
     ethics_guard = EthicsGuard(
         mode=MonitorMode.PASSIVE,  # Monitor but don't halt
-        sensitivity=0.7,
-        ethics_config=ethics_config,
+        config=EthicsConfig(
+            harmful_content_threshold=0.3,  # Lower threshold for sensitive topics
+            bias_threshold=0.4,
+            fairness_threshold=0.3,
+            enabled_checks=["harmful_content", "bias", "fairness"],
+        ),
     )
 
     # Medical ethics jury
@@ -426,37 +423,23 @@ from artemis.safety import (
     EthicsGuard,
     EthicsConfig,
     DeceptionMonitor,
-    CompositeMonitor,
 )
 
 async def run_comprehensive_ethics_debate():
     # Ethics configuration for sensitive topic
-    ethics_config = EthicsConfig(
-        harmful_content_threshold=0.5,
-        bias_threshold=0.4,
-        fairness_threshold=0.3,
-        enabled_checks=[
-            "harmful_content",
-            "bias",
-            "fairness",
-            "manipulation",
-        ],
+    ethics_guard = EthicsGuard(
+        mode=MonitorMode.PASSIVE,
+        config=EthicsConfig(
+            harmful_content_threshold=0.3,
+            bias_threshold=0.4,
+            fairness_threshold=0.3,
+            enabled_checks=["harmful_content", "bias", "fairness", "privacy"],
+        ),
     )
 
-    # Combine ethics guard with deception monitor
-    composite = CompositeMonitor(
-        monitors=[
-            EthicsGuard(
-                mode=MonitorMode.PASSIVE,
-                sensitivity=0.7,
-                ethics_config=ethics_config,
-            ),
-            DeceptionMonitor(
-                mode=MonitorMode.PASSIVE,
-                sensitivity=0.6,
-            ),
-        ],
-        aggregation="max",
+    deception_monitor = DeceptionMonitor(
+        mode=MonitorMode.PASSIVE,
+        sensitivity=0.6,
     )
 
     # High-stakes jury configuration
@@ -484,7 +467,7 @@ async def run_comprehensive_ethics_debate():
         agents=agents,
         rounds=3,
         jury=jury,
-        safety_monitors=[composite.process],
+        safety_monitors=[ethics_guard.process, deception_monitor.process],
     )
 
     debate.assign_positions({
