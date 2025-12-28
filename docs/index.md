@@ -96,6 +96,10 @@ ARTEMIS is based on peer-reviewed research:
 > Mitra, S. (2025). Technical Disclosure Commons.
 > [Read the paper](https://www.tdcommons.org/dpubs_series/7729/)
 
+## Benchmarks
+
+We've run ARTEMIS against AutoGen, CrewAI, and CAMEL across 60 structured debates. See the [benchmark results and analysis](https://github.com/bassrehab/artemis-agents#benchmarks) in the README.
+
 ## Get Started
 
 Ready to dive in? Check out the [Installation Guide](getting-started/installation.md) or jump straight to the [Quick Start](getting-started/quickstart.md).
