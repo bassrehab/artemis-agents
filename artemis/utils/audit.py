@@ -277,17 +277,17 @@ class AuditLog:
         lines = []
 
         # Header
-        lines.append(f"# Debate Audit Log")
-        lines.append(f"")
+        lines.append("# Debate Audit Log")
+        lines.append("")
         lines.append(f"**Topic:** {self.topic}")
         lines.append(f"**Debate ID:** `{self.debate_id}`")
-        lines.append(f"")
+        lines.append("")
 
         # Metadata
-        lines.append(f"## Metadata")
-        lines.append(f"")
-        lines.append(f"| Field | Value |")
-        lines.append(f"|-------|-------|")
+        lines.append("## Metadata")
+        lines.append("")
+        lines.append("| Field | Value |")
+        lines.append("|-------|-------|")
         lines.append(f"| Started | {self.metadata.get('started_at', 'N/A')} |")
         lines.append(f"| Ended | {self.metadata.get('ended_at', 'N/A')} |")
         lines.append(f"| Rounds | {self.metadata.get('total_rounds', 'N/A')} |")
@@ -295,21 +295,21 @@ class AuditLog:
         lines.append(f"| Agents | {', '.join(self.metadata.get('agents', []))} |")
         lines.append(f"| Jury Size | {self.metadata.get('jury_size', 'N/A')} |")
         lines.append(f"| Safety Monitors | {', '.join(self.metadata.get('safety_monitors', [])) or 'None'} |")
-        lines.append(f"")
+        lines.append("")
 
         # Model usage if available
         model_usage = self.metadata.get('model_usage', {})
         if model_usage:
-            lines.append(f"### Model Usage")
-            lines.append(f"")
+            lines.append("### Model Usage")
+            lines.append("")
             for agent, usage in model_usage.items():
                 if isinstance(usage, dict):
                     lines.append(f"- **{agent}**: {usage.get('total_tokens', 0):,} tokens")
-            lines.append(f"")
+            lines.append("")
 
         # Full Transcript
-        lines.append(f"## Full Transcript")
-        lines.append(f"")
+        lines.append("## Full Transcript")
+        lines.append("")
 
         current_round = None
         for entry in self.entries:
@@ -318,9 +318,9 @@ class AuditLog:
                     current_round = entry.round
                     round_label = "Opening Statements" if current_round == 0 else f"Round {current_round}"
                     lines.append(f"### {round_label}")
-                    lines.append(f"")
-                    lines.append(f"---")
-                    lines.append(f"")
+                    lines.append("")
+                    lines.append("---")
+                    lines.append("")
 
                 # Agent header with full details
                 turn_id = entry.details.get('turn_id', 'N/A')
@@ -329,88 +329,88 @@ class AuditLog:
                 ethical_str = f" | Ethical Score: {ethical_score:.2f}" if ethical_score else ""
 
                 lines.append(f"#### {entry.agent}")
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"*Level: {level}{ethical_str} | Turn ID: `{turn_id}`*")
-                lines.append(f"")
+                lines.append("")
 
                 # FULL argument content
                 content = entry.details.get('content', '')
                 lines.append(content)
-                lines.append(f"")
+                lines.append("")
 
                 # Rebuts/Supports
                 rebuts = entry.details.get('rebuts', [])
                 supports = entry.details.get('supports', [])
                 if rebuts:
                     lines.append(f"**Rebuts:** {', '.join(f'`{r}`' for r in rebuts)}")
-                    lines.append(f"")
+                    lines.append("")
                 if supports:
                     lines.append(f"**Supports:** {', '.join(f'`{s}`' for s in supports)}")
-                    lines.append(f"")
+                    lines.append("")
 
                 # Full Evidence
                 evidence = entry.details.get('evidence', [])
                 if evidence:
                     lines.append(f"**Evidence ({len(evidence)}):**")
-                    lines.append(f"")
+                    lines.append("")
                     for i, e in enumerate(evidence, 1):
                         verified = " (verified)" if e.get('verified') else ""
                         lines.append(f"{i}. **[{e.get('type')}]** {e.get('content')}")
                         lines.append(f"   - Source: {e.get('source', 'N/A')}")
                         lines.append(f"   - Confidence: {e.get('confidence', 0):.2f}{verified}")
-                    lines.append(f"")
+                    lines.append("")
 
                 # Causal Links
                 causal_links = entry.details.get('causal_links', [])
                 if causal_links:
                     lines.append(f"**Causal Links ({len(causal_links)}):**")
-                    lines.append(f"")
+                    lines.append("")
                     for link in causal_links:
                         strength = f" (strength: {link.get('strength', 'N/A')})" if link.get('strength') else ""
                         lines.append(f"- {link.get('cause')} → {link.get('effect')}{strength}")
                         if link.get('mechanism'):
                             lines.append(f"  - Mechanism: {link.get('mechanism')}")
-                    lines.append(f"")
+                    lines.append("")
 
             # Evaluation details
             elif entry.event_type == "argument_evaluated":
-                lines.append(f"<details>")
+                lines.append("<details>")
                 lines.append(f"<summary><strong>Evaluation</strong> (Score: {entry.details.get('total_score', 0):.2f})</summary>")
-                lines.append(f"")
+                lines.append("")
 
                 # Score breakdown
                 scores = entry.details.get('scores', {})
                 weights = entry.details.get('weights', {})
                 if scores:
-                    lines.append(f"| Criterion | Score | Weight |")
-                    lines.append(f"|-----------|-------|--------|")
+                    lines.append("| Criterion | Score | Weight |")
+                    lines.append("|-----------|-------|--------|")
                     for criterion, score in scores.items():
                         weight = weights.get(criterion, 0)
                         lines.append(f"| {criterion} | {score:.2f} | {weight:.2f} |")
-                    lines.append(f"")
+                    lines.append("")
 
                 # Feedback
                 feedback = entry.details.get('feedback')
                 if feedback:
                     lines.append(f"**Feedback:** {feedback}")
-                    lines.append(f"")
+                    lines.append("")
 
                 # Strengths and Weaknesses
                 strengths = entry.details.get('strengths', [])
                 weaknesses = entry.details.get('weaknesses', [])
                 if strengths:
-                    lines.append(f"**Strengths:**")
+                    lines.append("**Strengths:**")
                     for s in strengths:
                         lines.append(f"- {s}")
-                    lines.append(f"")
+                    lines.append("")
                 if weaknesses:
-                    lines.append(f"**Weaknesses:**")
+                    lines.append("**Weaknesses:**")
                     for w in weaknesses:
                         lines.append(f"- {w}")
-                    lines.append(f"")
+                    lines.append("")
 
-                lines.append(f"</details>")
-                lines.append(f"")
+                lines.append("</details>")
+                lines.append("")
 
             # Safety check details
             elif entry.event_type == "safety_check":
@@ -426,49 +426,49 @@ class AuditLog:
                     recommendation = entry.details.get('recommendation')
                     if recommendation:
                         lines.append(f"- Recommendation: {recommendation}")
-                    lines.append(f"")
+                    lines.append("")
 
         # Verdict
         verdict_entries = [e for e in self.entries if e.event_type == "verdict_issued"]
         if verdict_entries:
             verdict = verdict_entries[0]
-            lines.append(f"## Verdict")
-            lines.append(f"")
+            lines.append("## Verdict")
+            lines.append("")
             lines.append(f"**Decision:** {verdict.details.get('decision', 'N/A')}")
             lines.append(f"**Confidence:** {verdict.details.get('confidence', 0):.0%}")
             lines.append(f"**Unanimous:** {'Yes' if verdict.details.get('unanimous') else 'No'}")
-            lines.append(f"")
-            lines.append(f"### Reasoning")
-            lines.append(f"")
+            lines.append("")
+            lines.append("### Reasoning")
+            lines.append("")
             lines.append(f"{verdict.details.get('reasoning', '')}")
-            lines.append(f"")
+            lines.append("")
 
             # Score breakdown
             scores = verdict.details.get('score_breakdown', {})
             if scores:
-                lines.append(f"### Score Breakdown")
-                lines.append(f"")
-                lines.append(f"| Agent | Score |")
-                lines.append(f"|-------|-------|")
+                lines.append("### Score Breakdown")
+                lines.append("")
+                lines.append("| Agent | Score |")
+                lines.append("|-------|-------|")
                 for agent, score in scores.items():
                     lines.append(f"| {agent} | {score:.2f} |")
-                lines.append(f"")
+                lines.append("")
 
         # Safety Alerts
         alert_entries = [e for e in self.entries if e.event_type == "safety_alert"]
         if alert_entries:
-            lines.append(f"## Safety Alerts")
-            lines.append(f"")
+            lines.append("## Safety Alerts")
+            lines.append("")
             for alert in alert_entries:
                 severity = alert.details.get('severity', 0)
                 severity_label = "HIGH" if severity > 0.7 else "MEDIUM" if severity > 0.4 else "LOW"
                 lines.append(f"### [{severity_label}] {alert.details.get('type', 'Unknown')}")
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"- **Agent:** {alert.agent}")
                 lines.append(f"- **Monitor:** {alert.details.get('monitor', 'N/A')}")
                 lines.append(f"- **Severity:** {severity:.2f}")
                 lines.append(f"- **Resolved:** {'Yes' if alert.details.get('resolved') else 'No'}")
-                lines.append(f"")
+                lines.append("")
 
         md_str = "\n".join(lines)
 
@@ -570,7 +570,7 @@ class AuditLog:
             "</head>",
             "<body>",
             "<div class='container'>",
-            f"<h1>Debate Audit Report</h1>",
+            "<h1>Debate Audit Report</h1>",
             f"<p><strong>Topic:</strong> {html.escape(self.topic)}</p>",
             f"<p><strong>Debate ID:</strong> <code>{self.debate_id}</code></p>",
         ]
@@ -632,12 +632,12 @@ class AuditLog:
                 if rebuts or supports:
                     html_parts.append("<div class='rebuts-supports'>")
                     if rebuts:
-                        html_parts.append(f"<div class='rebuts'><strong>Rebuts:</strong> ")
+                        html_parts.append("<div class='rebuts'><strong>Rebuts:</strong> ")
                         for r in rebuts:
                             html_parts.append(f"<span>{html.escape(str(r))}</span>")
                         html_parts.append("</div>")
                     if supports:
-                        html_parts.append(f"<div class='supports'><strong>Supports:</strong> ")
+                        html_parts.append("<div class='supports'><strong>Supports:</strong> ")
                         for s in supports:
                             html_parts.append(f"<span>{html.escape(str(s))}</span>")
                         html_parts.append("</div>")
@@ -715,7 +715,7 @@ class AuditLog:
 
             # Safety check inline
             elif entry.event_type == "safety_check":
-                passed = entry.details.get('passed', True)
+                entry.details.get('passed', True)
                 severity = entry.details.get('severity', 0)
                 monitor = entry.details.get('monitor', 'Unknown')
                 notes = entry.details.get('analysis_notes', '')
@@ -783,7 +783,7 @@ class AuditLog:
                     resolved = alert.details.get('resolved', False)
 
                     html_parts.append(f"<div class='alert {severity_class}'>")
-                    html_parts.append(f"<div class='alert-header'>")
+                    html_parts.append("<div class='alert-header'>")
                     html_parts.append(f"<span>{'🔴' if severity > 0.7 else '🟡' if severity > 0.4 else '🔵'}</span>")
                     html_parts.append(f"<strong>{html.escape(str(alert.details.get('type', 'Unknown')))}</strong>")
                     html_parts.append(f"<span> - {html.escape(str(alert.agent))}</span>")

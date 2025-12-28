@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 
 from artemis.core.evaluation import AdaptiveEvaluator
 from artemis.core.prompts.jury import (
-    PERSPECTIVE_PROMPTS,
     build_reasoning_system_prompt,
     build_reasoning_user_prompt,
 )

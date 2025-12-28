@@ -107,10 +107,7 @@ class DebateAnalyzer:
         round_metrics = metrics_calc.get_all_round_metrics()
 
         # Determine number of rounds
-        if self._transcript:
-            max_round = max(t.round for t in self._transcript)
-        else:
-            max_round = 0
+        max_round = max(t.round for t in self._transcript) if self._transcript else 0
 
         # Build final momentum from last round's data
         final_momentum = {}
@@ -139,7 +136,7 @@ class DebateAnalyzer:
     def generate_comprehensive_report(
         self,
         analytics: DebateAnalytics | None = None,
-        result: "DebateResult | None" = None,
+        result: DebateResult | None = None,
     ) -> str:
         """Generate comprehensive HTML report with analytics AND full transcript.
 
@@ -198,7 +195,7 @@ class DebateAnalyzer:
             current_round = None
             agent_colors = ["#2196F3", "#FF9800", "#9C27B0", "#4CAF50", "#E91E63"]
 
-            for i, turn in enumerate(self._transcript):
+            for _i, turn in enumerate(self._transcript):
                 if turn.round != current_round:
                     current_round = turn.round
                     round_label = "Opening Statements" if current_round == 0 else f"Round {current_round}"
@@ -208,7 +205,7 @@ class DebateAnalyzer:
                 color = agent_colors[agent_idx % len(agent_colors)]
 
                 transcript_html.append(f"<div class='turn' style='border-left-color: {color}'>")
-                transcript_html.append(f"<div class='turn-header'>")
+                transcript_html.append("<div class='turn-header'>")
                 transcript_html.append(f"<h4>{html_escape.escape(turn.agent)}</h4>")
                 transcript_html.append(f"<span class='turn-meta'>Level: {turn.argument.level.value} | ID: <code>{turn.id}</code></span>")
                 transcript_html.append("</div>")
@@ -222,7 +219,7 @@ class DebateAnalyzer:
                     transcript_html.append(f"<div class='evidence'><h5>Evidence ({len(turn.argument.evidence)})</h5>")
                     for ev in turn.argument.evidence:
                         verified = " (Verified)" if getattr(ev, 'verified', False) else ""
-                        transcript_html.append(f"<div class='evidence-item'>")
+                        transcript_html.append("<div class='evidence-item'>")
                         transcript_html.append(f"<div class='type'>{html_escape.escape(ev.type)}</div>")
                         transcript_html.append(f"<div class='content'>{html_escape.escape(ev.content)}</div>")
                         transcript_html.append(f"<div class='meta'>Source: {html_escape.escape(ev.source or 'N/A')} | Confidence: {ev.confidence:.2f}{verified}</div>")
@@ -233,7 +230,7 @@ class DebateAnalyzer:
                 if turn.argument.causal_links:
                     transcript_html.append(f"<div class='causal-links'><h5>Causal Links ({len(turn.argument.causal_links)})</h5>")
                     for link in turn.argument.causal_links:
-                        transcript_html.append(f"<div class='causal-link'>")
+                        transcript_html.append("<div class='causal-link'>")
                         transcript_html.append(f"<span class='cause'>{html_escape.escape(link.cause)}</span>")
                         transcript_html.append("<span class='arrow'>→</span>")
                         transcript_html.append(f"<span class='effect'>{html_escape.escape(link.effect)}</span>")

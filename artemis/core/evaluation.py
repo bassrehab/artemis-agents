@@ -10,7 +10,6 @@ from artemis.core.types import (
     ArgumentEvaluation,
     ArgumentLevel,
     CausalGraphUpdate,
-    CausalLink,
     CriterionScore,
     DebateContext,
     EvaluationCriteria,

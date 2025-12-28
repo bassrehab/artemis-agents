@@ -309,7 +309,7 @@ class MomentumChart(SVGChart):
         parts.append(self._draw_grid())
 
         # Get rounds
-        rounds = sorted(set(mp.round for mp in momentum_history))
+        rounds = sorted({mp.round for mp in momentum_history})
         if not rounds:
             return self._render_empty("No rounds found")
 
@@ -696,7 +696,7 @@ class TopicCoverageHeatmap(SVGChart):
         for agent_topics in coverage.values():
             all_topics.update(agent_topics.keys())
 
-        topics = sorted(list(all_topics))[:15]  # Limit to 15 topics
+        topics = sorted(all_topics)[:15]  # Limit to 15 topics
 
         if not topics:
             return self._render_empty("No topics found")

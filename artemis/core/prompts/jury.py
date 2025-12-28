@@ -6,7 +6,6 @@ Prompts for jury evaluation from different perspectives.
 
 from artemis.core.types import JuryPerspective
 
-
 # =============================================================================
 # Perspective-Specific Prompts
 # =============================================================================

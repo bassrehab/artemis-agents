@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from artemis.core.argument import ArgumentParser
 from artemis.core.causal import CausalExtractor, CausalGraph
-from artemis.core.evidence import EvidenceExtractor, ExtractedEvidence
+from artemis.core.evidence import EvidenceExtractor
 from artemis.core.prompts.hdag import (
     build_closing_prompt,
     build_generation_prompt,

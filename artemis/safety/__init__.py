@@ -18,18 +18,6 @@ from artemis.safety.base import (
     SafetyManager,
     SafetyMonitor,
 )
-from artemis.safety.deception import (
-    AgentClaimHistory,
-    ClaimRecord,
-    DeceptionMonitor,
-    DeceptionSignal,
-)
-from artemis.safety.sandbagging import (
-    AgentBaseline,
-    ArgumentMetrics,
-    SandbagDetector,
-    SandbagSignal,
-)
 from artemis.safety.behavior import (
     AgentBehaviorProfile,
     BehaviorSnapshot,
@@ -37,11 +25,23 @@ from artemis.safety.behavior import (
     DriftSignal,
     StyleMetrics,
 )
+from artemis.safety.deception import (
+    AgentClaimHistory,
+    ClaimRecord,
+    DeceptionMonitor,
+    DeceptionSignal,
+)
 from artemis.safety.ethics_guard import (
     EthicsConfig,
     EthicsGuard,
     EthicsScore,
     EthicsViolation,
+)
+from artemis.safety.sandbagging import (
+    AgentBaseline,
+    ArgumentMetrics,
+    SandbagDetector,
+    SandbagSignal,
 )
 
 __all__ = [

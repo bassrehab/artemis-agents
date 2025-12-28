@@ -71,8 +71,8 @@ class MomentumTracker:
         # Track scores and momentum per agent
         agent_scores: dict[str, list[float]] = {agent: [] for agent in agents}
         momentum_history: list[MomentumPoint] = []
-        previous_momentum: dict[str, float] = {agent: 0.0 for agent in agents}
-        cumulative_advantage: dict[str, float] = {agent: 0.0 for agent in agents}
+        previous_momentum: dict[str, float] = dict.fromkeys(agents, 0.0)
+        cumulative_advantage: dict[str, float] = dict.fromkeys(agents, 0.0)
 
         for round_num in sorted_rounds:
             round_turns = rounds_data[round_num]
@@ -215,7 +215,7 @@ class MomentumTracker:
 
                 if sign_flip or large_shift:
                     # Find the turn that caused this
-                    curr_data = rounds_data[curr_round].get(agent)
+                    rounds_data[curr_round].get(agent)
                     turn_id = f"round_{curr_round}_{agent}"
 
                     analysis = self._generate_turning_point_analysis(

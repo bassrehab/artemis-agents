@@ -10,7 +10,6 @@ from uuid import uuid4
 from artemis.core.types import (
     DebateContext,
     SafetyIndicator,
-    SafetyIndicatorType,
     SafetyResult,
     Turn,
 )

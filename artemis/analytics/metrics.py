@@ -106,8 +106,8 @@ class DebateMetricsCalculator:
 
         Formula: weighted_evidence_count / total_arguments
         """
-        agent_evidence: dict[str, float] = {a: 0.0 for a in self._agents}
-        agent_turns: dict[str, int] = {a: 0 for a in self._agents}
+        agent_evidence: dict[str, float] = dict.fromkeys(self._agents, 0.0)
+        agent_turns: dict[str, int] = dict.fromkeys(self._agents, 0)
 
         for turn in self._transcript:
             if not turn.argument:
@@ -295,7 +295,7 @@ class DebateMetricsCalculator:
         if not self._transcript:
             return []
 
-        rounds = sorted(set(t.round for t in self._transcript))
+        rounds = sorted({t.round for t in self._transcript})
         return [self.get_round_metrics(r) for r in rounds]
 
     def _get_previous_round_metrics(self, round_num: int) -> RoundMetrics | None:
