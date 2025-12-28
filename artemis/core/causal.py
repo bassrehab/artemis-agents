@@ -239,6 +239,176 @@ class CausalGraph:
         rec_stack.remove(node)
         return False
 
+    def get_all_cycles(self) -> list[list[str]]:
+        """Get all cycles in the graph.
+
+        Returns:
+            List of cycles, each as a list of node IDs.
+        """
+        cycles: list[list[str]] = []
+        visited: set[str] = set()
+        rec_stack: set[str] = set()
+        path: list[str] = []
+
+        def dfs(node: str) -> None:
+            visited.add(node)
+            rec_stack.add(node)
+            path.append(node)
+
+            for neighbor in self._outgoing.get(node, set()):
+                if neighbor not in visited:
+                    dfs(neighbor)
+                elif neighbor in rec_stack:
+                    cycle_start = path.index(neighbor)
+                    cycle = path[cycle_start:].copy()
+                    if len(cycle) > 1:
+                        cycles.append(cycle)
+
+            path.pop()
+            rec_stack.remove(node)
+
+        for node_id in self._nodes:
+            if node_id not in visited:
+                dfs(node_id)
+
+        return cycles
+
+    def get_contradicting_edges(self) -> list[tuple[CausalEdge, CausalEdge]]:
+        """Find pairs of edges that contradict each other.
+
+        Contradictions include:
+        - Same source and target but opposite link types (CAUSES vs PREVENTS)
+        - Bidirectional strong causal claims
+
+        Returns:
+            List of (edge1, edge2) tuples representing contradictions.
+        """
+        contradictions: list[tuple[CausalEdge, CausalEdge]] = []
+        edges = list(self._edges.values())
+
+        for i, e1 in enumerate(edges):
+            for e2 in edges[i + 1:]:
+                # Same cause-effect pair with opposite types
+                if e1.source_id == e2.source_id and e1.target_id == e2.target_id:
+                    if self._are_contradictory_types(e1.link_type, e2.link_type):
+                        contradictions.append((e1, e2))
+
+                # Bidirectional strong causation
+                if (
+                    e1.source_id == e2.target_id
+                    and e1.target_id == e2.source_id
+                    and e1.link_type == LinkType.CAUSES
+                    and e2.link_type == LinkType.CAUSES
+                    and e1.strength > 0.6
+                    and e2.strength > 0.6
+                ):
+                    contradictions.append((e1, e2))
+
+        return contradictions
+
+    def _are_contradictory_types(self, t1: LinkType, t2: LinkType) -> bool:
+        """Check if two link types are contradictory."""
+        contradictions = {
+            (LinkType.CAUSES, LinkType.PREVENTS),
+            (LinkType.ENABLES, LinkType.PREVENTS),
+        }
+        return (t1, t2) in contradictions or (t2, t1) in contradictions
+
+    def compute_betweenness_centrality(self) -> dict[str, float]:
+        """Compute betweenness centrality for all nodes.
+
+        Betweenness centrality measures how often a node lies on
+        shortest paths between other nodes.
+
+        Returns:
+            Dictionary mapping node_id to centrality score (0-1).
+        """
+        centrality: dict[str, int] = {node_id: 0 for node_id in self._nodes}
+        nodes = list(self._nodes.keys())
+
+        for source in nodes:
+            for target in nodes:
+                if source != target:
+                    paths = self.find_paths(source, target, max_length=5)
+                    for path in paths:
+                        # Exclude endpoints
+                        for node in path[1:-1]:
+                            centrality[node] += 1
+
+        max_val = max(centrality.values()) if centrality.values() else 1
+        if max_val == 0:
+            max_val = 1
+
+        return {k: v / max_val for k, v in centrality.items()}
+
+    def get_subgraph(self, node_ids: list[str]) -> "CausalGraph":
+        """Extract a subgraph containing only specified nodes.
+
+        Args:
+            node_ids: List of node IDs to include.
+
+        Returns:
+            New CausalGraph containing only the specified nodes and edges between them.
+        """
+        subgraph = CausalGraph()
+        node_set = set(node_ids)
+
+        # Add nodes
+        for node_id in node_ids:
+            if node_id in self._nodes:
+                node = self._nodes[node_id]
+                subgraph._nodes[node_id] = CausalNode(
+                    id=node.id,
+                    label=node.label,
+                    argument_ids=node.argument_ids.copy(),
+                    metadata=node.metadata.copy(),
+                )
+
+        # Add edges between included nodes
+        for (source, target), edge in self._edges.items():
+            if source in node_set and target in node_set:
+                subgraph._edges[(source, target)] = CausalEdge(
+                    source_id=edge.source_id,
+                    target_id=edge.target_id,
+                    link_type=edge.link_type,
+                    strength=edge.strength,
+                    evidence_count=edge.evidence_count,
+                    argument_ids=edge.argument_ids.copy(),
+                )
+                subgraph._outgoing[source].add(target)
+                subgraph._incoming[target].add(source)
+
+        return subgraph
+
+    def get_neighborhood(self, node_label: str, depth: int = 1) -> "CausalGraph":
+        """Get subgraph of nodes within a certain depth from a node.
+
+        Args:
+            node_label: Label of the center node.
+            depth: Maximum distance from center node.
+
+        Returns:
+            CausalGraph containing the neighborhood.
+        """
+        node_id = self._normalize_label(node_label)
+        if node_id not in self._nodes:
+            return CausalGraph()
+
+        to_include = {node_id}
+        frontier = {node_id}
+
+        for _ in range(depth):
+            new_frontier: set[str] = set()
+            for current in frontier:
+                # Add outgoing neighbors
+                new_frontier.update(self._outgoing.get(current, set()))
+                # Add incoming neighbors
+                new_frontier.update(self._incoming.get(current, set()))
+            frontier = new_frontier - to_include
+            to_include.update(frontier)
+
+        return self.get_subgraph(list(to_include))
+
     def merge_nodes(self, labels: list[str], merged_label: str):
         """Merge multiple nodes into one (for synonymous concepts)."""
         node_ids = [self._normalize_label(label) for label in labels]

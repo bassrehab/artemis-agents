@@ -18,6 +18,22 @@ from artemis.core.causal import (
     CausalNode,
     LinkType,
 )
+from artemis.core.causal_analysis import (
+    CausalAnalyzer,
+    CausalFallacyDetector,
+)
+from artemis.core.causal_strategy import (
+    CausalStrategy,
+    DefensePriority,
+    OpponentStrategyProfile,
+    PredictedTarget,
+    RebuttalSuggestion,
+    VulnerableClaim,
+)
+from artemis.core.causal_visualization import (
+    CausalVisualizer,
+    create_snapshot,
+)
 from artemis.core.debate import Debate, DebateError, DebateHaltedError
 from artemis.core.disagreement import DisagreementAnalyzer, DisagreementType
 from artemis.core.ethics import (
@@ -95,6 +111,19 @@ from artemis.core.types import (
     Turn,
     Usage,
     Verdict,
+    # Causal Analysis Types (v2)
+    ArgumentStrengthScore,
+    AttackTarget,
+    CausalAnalysisResult,
+    CircularReasoningResult,
+    ContradictionResult,
+    CriticalNodeResult,
+    FallacyResult,
+    FallacyType,
+    GraphSnapshot,
+    ReasoningGap,
+    ReinforcementSuggestion,
+    WeakLinkResult,
 )
 
 __all__ = [
@@ -190,4 +219,28 @@ __all__ = [
     # Disagreement Analysis
     "DisagreementAnalyzer",
     "DisagreementType",
+    # Causal Analysis (v2)
+    "CausalAnalyzer",
+    "CausalFallacyDetector",
+    "CausalStrategy",
+    "CausalVisualizer",
+    "DefensePriority",
+    "OpponentStrategyProfile",
+    "PredictedTarget",
+    "RebuttalSuggestion",
+    "VulnerableClaim",
+    "create_snapshot",
+    # Causal Analysis Types (v2)
+    "ArgumentStrengthScore",
+    "AttackTarget",
+    "CausalAnalysisResult",
+    "CircularReasoningResult",
+    "ContradictionResult",
+    "CriticalNodeResult",
+    "FallacyResult",
+    "FallacyType",
+    "GraphSnapshot",
+    "ReasoningGap",
+    "ReinforcementSuggestion",
+    "WeakLinkResult",
 ]

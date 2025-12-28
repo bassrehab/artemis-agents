@@ -84,6 +84,7 @@ nav:
     - L-AE-CR Evaluation: concepts/l-ae-cr.md
     - Jury Mechanism: concepts/jury.md
     - Ethics Module: concepts/ethics.md
+    - Causal Analysis: concepts/causal-analysis.md
     - Prompts System: concepts/prompts.md
     - LLM Extraction: concepts/llm-extraction.md
   - Safety Monitoring:

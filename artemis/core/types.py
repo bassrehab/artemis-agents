@@ -517,3 +517,212 @@ class DebateContext(BaseModel):
     """Accumulated causal links by agent."""
     agent_feedback: dict[str, str] = Field(default_factory=dict)
     """Performance feedback per agent (from FeedbackSynthesizer)."""
+
+
+# =============================================================================
+# Causal Analysis Types (CausalGraph v2)
+# =============================================================================
+
+
+class FallacyType(str, Enum):
+    """Types of causal reasoning fallacies."""
+
+    POST_HOC = "post_hoc"
+    """A occurred before B, therefore A caused B."""
+
+    FALSE_CAUSE = "false_cause"
+    """Treating correlation as causation."""
+
+    SLIPPERY_SLOPE = "slippery_slope"
+    """Unwarranted chain of consequences."""
+
+    CIRCULAR_REASONING = "circular_reasoning"
+    """A because B because A."""
+
+    APPEAL_TO_CONSEQUENCE = "appeal_to_consequence"
+    """Something is true because of its consequences."""
+
+    HASTY_GENERALIZATION = "hasty_generalization"
+    """Conclusion from insufficient evidence."""
+
+    SINGLE_CAUSE = "single_cause"
+    """Ignoring multiple contributing factors."""
+
+
+class CircularReasoningResult(BaseModel):
+    """Result of circular reasoning detection."""
+
+    cycle: list[str]
+    """Node IDs forming the cycle."""
+    argument_ids: list[str] = Field(default_factory=list)
+    """Arguments involved in the cycle."""
+    severity: float = Field(default=0.5, ge=0.0, le=1.0)
+    """Severity of the circular reasoning (0-1)."""
+
+
+class WeakLinkResult(BaseModel):
+    """Result of weak link analysis."""
+
+    source: str
+    """Source node of the weak link."""
+    target: str
+    """Target node of the weak link."""
+    strength: float
+    """Current strength of the link."""
+    weakness_score: float
+    """Weakness score (1 - strength)."""
+    attack_suggestions: list[str] = Field(default_factory=list)
+    """Suggested attack strategies."""
+    argument_ids: list[str] = Field(default_factory=list)
+    """Arguments that established this link."""
+
+
+class ContradictionResult(BaseModel):
+    """Result of contradiction detection."""
+
+    claim_a_source: str
+    """Source of first claim."""
+    claim_a_target: str
+    """Target of first claim."""
+    claim_a_type: str
+    """Type of first claim (causes, prevents, etc.)."""
+    claim_b_source: str
+    """Source of second claim."""
+    claim_b_target: str
+    """Target of second claim."""
+    claim_b_type: str
+    """Type of second claim."""
+    agents: list[str] = Field(default_factory=list)
+    """Agents who made these claims."""
+    severity: float = Field(default=0.5, ge=0.0, le=1.0)
+    """Severity of the contradiction."""
+    explanation: str | None = None
+    """Explanation of why these are contradictory."""
+
+
+class ArgumentStrengthScore(BaseModel):
+    """Strength score for an argument based on causal support."""
+
+    argument_id: str
+    overall_score: float = Field(ge=0.0, le=1.0)
+    """Overall strength score."""
+    causal_support: float = Field(ge=0.0, le=1.0)
+    """How well-supported by causal graph."""
+    evidence_backing: float = Field(ge=0.0, le=1.0)
+    """Evidence supporting causal claims."""
+    vulnerability: float = Field(ge=0.0, le=1.0)
+    """Exposure to attack (weak links)."""
+    critical_dependencies: list[str] = Field(default_factory=list)
+    """Node IDs this argument critically depends on."""
+
+
+class CriticalNodeResult(BaseModel):
+    """Result of critical node analysis."""
+
+    node_id: str
+    label: str
+    centrality_score: float = Field(ge=0.0, le=1.0)
+    """Betweenness centrality score."""
+    dependent_arguments: list[str] = Field(default_factory=list)
+    """Arguments that depend on this node."""
+    impact_if_challenged: float = Field(ge=0.0, le=1.0)
+    """Expected impact if this node is successfully challenged."""
+    in_degree: int = 0
+    """Number of incoming edges."""
+    out_degree: int = 0
+    """Number of outgoing edges."""
+
+
+class ReasoningGap(BaseModel):
+    """A gap in the causal reasoning chain."""
+
+    start_node: str
+    """Starting node of the gap."""
+    end_node: str
+    """Ending node (expected target)."""
+    gap_type: str
+    """Type of gap: 'missing_link', 'weak_chain', 'unsupported_conclusion'."""
+    severity: float = Field(ge=0.0, le=1.0)
+    """Severity of the gap."""
+    suggested_bridges: list[str] = Field(default_factory=list)
+    """Suggested intermediate nodes to bridge the gap."""
+
+
+class FallacyResult(BaseModel):
+    """Result of fallacy detection."""
+
+    fallacy_type: FallacyType
+    description: str
+    """Human-readable description of the fallacy."""
+    evidence: list[str] = Field(default_factory=list)
+    """Evidence supporting the detection."""
+    severity: float = Field(default=0.5, ge=0.0, le=1.0)
+    """Severity of the fallacy."""
+    affected_links: list[str] = Field(default_factory=list)
+    """IDs of affected causal links."""
+    affected_arguments: list[str] = Field(default_factory=list)
+    """IDs of affected arguments."""
+
+
+class AttackTarget(BaseModel):
+    """A potential target for attacking opponent's argument."""
+
+    source: str
+    """Source node of vulnerable link."""
+    target: str
+    """Target node of vulnerable link."""
+    vulnerability_score: float = Field(ge=0.0, le=1.0)
+    """How vulnerable this link is to attack."""
+    attack_strategies: list[str] = Field(default_factory=list)
+    """Suggested attack strategies."""
+    expected_impact: float = Field(ge=0.0, le=1.0)
+    """Expected impact if attack succeeds."""
+    priority: int = Field(default=0, ge=0)
+    """Priority rank (0 = highest priority)."""
+
+
+class ReinforcementSuggestion(BaseModel):
+    """Suggestion for reinforcing a weak link in own argument."""
+
+    source: str
+    """Source node of link to reinforce."""
+    target: str
+    """Target node of link to reinforce."""
+    current_strength: float = Field(ge=0.0, le=1.0)
+    """Current strength of the link."""
+    suggested_evidence: list[str] = Field(default_factory=list)
+    """Types of evidence that would strengthen this link."""
+    suggested_mechanisms: list[str] = Field(default_factory=list)
+    """Mechanisms to explain the causal relationship."""
+    priority: float = Field(ge=0.0, le=1.0)
+    """Priority for reinforcement (higher = more urgent)."""
+
+
+class CausalAnalysisResult(BaseModel):
+    """Complete result of causal graph analysis."""
+
+    has_circular_reasoning: bool = False
+    circular_chains: list[CircularReasoningResult] = Field(default_factory=list)
+    weak_links: list[WeakLinkResult] = Field(default_factory=list)
+    contradictions: list[ContradictionResult] = Field(default_factory=list)
+    critical_nodes: list[CriticalNodeResult] = Field(default_factory=list)
+    reasoning_gaps: list[ReasoningGap] = Field(default_factory=list)
+    fallacies: list[FallacyResult] = Field(default_factory=list)
+    overall_coherence: float = Field(default=1.0, ge=0.0, le=1.0)
+    """Overall coherence score of the causal graph."""
+    argument_strengths: dict[str, ArgumentStrengthScore] = Field(default_factory=dict)
+    """Strength scores by argument ID."""
+
+
+class GraphSnapshot(BaseModel):
+    """Snapshot of graph state at a point in time."""
+
+    round: int
+    turn: int
+    node_count: int
+    edge_count: int
+    nodes: list[str] = Field(default_factory=list)
+    """Node IDs at this point."""
+    edges: list[tuple[str, str]] = Field(default_factory=list)
+    """Edge pairs (source, target) at this point."""
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
