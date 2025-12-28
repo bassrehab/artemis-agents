@@ -7,7 +7,7 @@ Implements data structures for H-L-DAG arguments, turns, evaluations, and verdic
 
 from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
@@ -456,13 +456,166 @@ class DebateConfig(BaseModel):
 # =============================================================================
 
 
+class ContentType(str, Enum):
+    """Type of content in a multimodal message."""
+
+    TEXT = "text"
+    IMAGE = "image"
+    DOCUMENT = "document"
+
+
+class ContentPart(BaseModel):
+    """A part of multimodal message content.
+
+    Supports text, images, and documents for multimodal debates.
+
+    Example:
+        ```python
+        # Text content
+        text_part = ContentPart(type=ContentType.TEXT, text="This is text")
+
+        # Image from URL
+        image_part = ContentPart(
+            type=ContentType.IMAGE,
+            url="https://example.com/chart.png",
+            media_type="image/png",
+        )
+
+        # Image from base64 data
+        image_data = ContentPart(
+            type=ContentType.IMAGE,
+            data=b"...",  # base64 encoded
+            media_type="image/jpeg",
+        )
+
+        # PDF document
+        doc_part = ContentPart(
+            type=ContentType.DOCUMENT,
+            data=b"...",
+            media_type="application/pdf",
+            filename="evidence.pdf",
+        )
+        ```
+    """
+
+    type: ContentType
+    text: str | None = None
+    """Text content (for TEXT type)."""
+
+    data: bytes | None = None
+    """Binary content for IMAGE/DOCUMENT (base64 encoded)."""
+
+    url: str | None = None
+    """URL reference for remote content."""
+
+    media_type: str | None = None
+    """MIME type (e.g., 'image/png', 'application/pdf')."""
+
+    filename: str | None = None
+    """Original filename for documents."""
+
+    alt_text: str | None = None
+    """Alternative text description for images."""
+
+    @property
+    def is_text(self) -> bool:
+        """Check if this is text content."""
+        return self.type == ContentType.TEXT
+
+    @property
+    def is_image(self) -> bool:
+        """Check if this is image content."""
+        return self.type == ContentType.IMAGE
+
+    @property
+    def is_document(self) -> bool:
+        """Check if this is document content."""
+        return self.type == ContentType.DOCUMENT
+
+    def get_text(self) -> str:
+        """Get text representation of content.
+
+        Returns:
+            Text content or description.
+        """
+        if self.text:
+            return self.text
+        if self.alt_text:
+            return f"[Image: {self.alt_text}]"
+        if self.filename:
+            return f"[Document: {self.filename}]"
+        return f"[{self.type.value}]"
+
+
 class Message(BaseModel):
-    """A message in an LLM conversation."""
+    """A message in an LLM conversation.
+
+    Supports both simple text and multimodal content.
+
+    Example:
+        ```python
+        # Simple text message
+        msg = Message(role="user", content="What is AI?")
+
+        # Multimodal message with image
+        msg = Message(
+            role="user",
+            content="Analyze this chart",
+            parts=[
+                ContentPart(type=ContentType.TEXT, text="Analyze this chart"),
+                ContentPart(
+                    type=ContentType.IMAGE,
+                    url="https://example.com/chart.png",
+                    media_type="image/png",
+                ),
+            ],
+        )
+        ```
+    """
 
     role: Literal["system", "user", "assistant"]
     content: str
+    """Primary text content of the message."""
+
     name: str | None = None
     """Optional name for multi-agent scenarios."""
+
+    parts: list[ContentPart] | None = None
+    """Multimodal content parts (if any)."""
+
+    @property
+    def is_multimodal(self) -> bool:
+        """Check if message contains multimodal content."""
+        return bool(self.parts and any(p.type != ContentType.TEXT for p in self.parts))
+
+    @property
+    def text_content(self) -> str:
+        """Get all text content from message.
+
+        Combines primary content and text parts.
+        """
+        if not self.parts:
+            return self.content
+
+        texts = [self.content] if self.content else []
+        for part in self.parts:
+            if part.text:
+                texts.append(part.text)
+        return " ".join(texts)
+
+    @property
+    def images(self) -> list[ContentPart]:
+        """Get all image parts."""
+        if not self.parts:
+            return []
+        return [p for p in self.parts if p.type == ContentType.IMAGE]
+
+    @property
+    def documents(self) -> list[ContentPart]:
+        """Get all document parts."""
+        if not self.parts:
+            return []
+        return [p for p in self.parts if p.type == ContentType.DOCUMENT]
 
     model_config = {"frozen": True}
 
@@ -726,3 +879,355 @@ class GraphSnapshot(BaseModel):
     edges: list[tuple[str, str]] = Field(default_factory=list)
     """Edge pairs (source, target) at this point."""
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+# =============================================================================
+# Streaming Types
+# =============================================================================
+
+
+class StreamEventType(str, Enum):
+    """Types of streaming events during debate execution."""
+
+    DEBATE_START = "debate_start"
+    """Debate is starting."""
+
+    ROUND_START = "round_start"
+    """A new round is starting."""
+
+    TURN_START = "turn_start"
+    """An agent's turn is starting."""
+
+    CHUNK = "chunk"
+    """A chunk of argument content."""
+
+    ARGUMENT_COMPLETE = "argument_complete"
+    """An argument has been fully generated."""
+
+    EVALUATION_START = "evaluation_start"
+    """Evaluation of an argument is starting."""
+
+    EVALUATION_COMPLETE = "evaluation_complete"
+    """Evaluation of an argument is complete."""
+
+    TURN_COMPLETE = "turn_complete"
+    """An agent's turn is complete."""
+
+    ROUND_COMPLETE = "round_complete"
+    """A round is complete."""
+
+    SAFETY_CHECK = "safety_check"
+    """Safety monitor is checking."""
+
+    SAFETY_ALERT = "safety_alert"
+    """Safety monitor raised an alert."""
+
+    VERDICT = "verdict"
+    """Jury verdict is being delivered."""
+
+    DEBATE_END = "debate_end"
+    """Debate has ended."""
+
+    ERROR = "error"
+    """An error occurred."""
+
+
+class StreamEvent(BaseModel):
+    """An event emitted during streaming debate execution."""
+
+    event_type: StreamEventType
+    """Type of the event."""
+
+    agent: str | None = None
+    """Agent associated with this event (if applicable)."""
+
+    content: str | None = None
+    """Content chunk for CHUNK events."""
+
+    argument: "Argument | None" = None
+    """Complete argument for ARGUMENT_COMPLETE events."""
+
+    turn: "Turn | None" = None
+    """Complete turn for TURN_COMPLETE events."""
+
+    evaluation: "ArgumentEvaluation | None" = None
+    """Evaluation for EVALUATION_COMPLETE events."""
+
+    safety_result: "SafetyResult | None" = None
+    """Safety result for SAFETY_CHECK/SAFETY_ALERT events."""
+
+    verdict: "Verdict | None" = None
+    """Verdict for VERDICT events."""
+
+    round_num: int | None = None
+    """Round number for round-related events."""
+
+    turn_num: int | None = None
+    """Turn number within the round."""
+
+    error: str | None = None
+    """Error message for ERROR events."""
+
+    metadata: dict[str, str | int | float | bool] = Field(default_factory=dict)
+    """Additional metadata."""
+
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    """When the event occurred."""
+
+    class Config:
+        """Pydantic config."""
+
+        arbitrary_types_allowed = True
+
+
+# =============================================================================
+# Hierarchical Debate Types
+# =============================================================================
+
+
+class HierarchyLevel(str, Enum):
+    """Level in a hierarchical debate structure."""
+
+    ROOT = "root"
+    """Top-level parent debate."""
+
+    BRANCH = "branch"
+    """Intermediate sub-debate."""
+
+    LEAF = "leaf"
+    """Terminal sub-debate with no further decomposition."""
+
+
+class SubDebateSpec(BaseModel):
+    """Specification for a sub-debate within a hierarchical debate."""
+
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    """Unique identifier for the sub-debate."""
+
+    aspect: str
+    """The specific aspect or sub-topic to debate."""
+
+    weight: float = Field(default=1.0, ge=0.0, le=1.0)
+    """Weight of this sub-debate in final aggregation."""
+
+    description: str | None = None
+    """Optional description of what this sub-debate should address."""
+
+    rounds_override: int | None = None
+    """Override number of rounds for this sub-debate."""
+
+    agent_config_overrides: dict[str, dict] = Field(default_factory=dict)
+    """Per-agent configuration overrides: {agent_name: {config_key: value}}."""
+
+
+class HierarchicalContext(BaseModel):
+    """Context passed to sub-debates in a hierarchical structure."""
+
+    parent_topic: str
+    """The parent debate's topic."""
+
+    parent_verdict: "Verdict | None" = None
+    """Parent's verdict if this is a refinement round."""
+
+    sibling_verdicts: list["Verdict"] = Field(default_factory=list)
+    """Verdicts from sibling sub-debates."""
+
+    sibling_topics: list[str] = Field(default_factory=list)
+    """Topics of sibling sub-debates."""
+
+    depth: int = Field(default=0, ge=0)
+    """Current depth in the hierarchy (0 = root)."""
+
+    max_depth: int = Field(default=2, ge=1)
+    """Maximum allowed depth."""
+
+    path: list[str] = Field(default_factory=list)
+    """Path from root to current node (topic names)."""
+
+
+class CompoundVerdict(BaseModel):
+    """Verdict from a hierarchical debate with sub-verdicts."""
+
+    final_decision: str
+    """The aggregated final decision."""
+
+    confidence: float = Field(ge=0.0, le=1.0)
+    """Confidence in the aggregated verdict."""
+
+    reasoning: str
+    """Explanation of how the verdict was reached."""
+
+    sub_verdicts: list["Verdict"] = Field(default_factory=list)
+    """Verdicts from each sub-debate."""
+
+    sub_topics: list[str] = Field(default_factory=list)
+    """Topics of each sub-debate."""
+
+    aggregation_method: str = "weighted_average"
+    """Method used to aggregate sub-verdicts."""
+
+    aggregation_weights: dict[str, float] = Field(default_factory=dict)
+    """Weights used for each sub-debate."""
+
+    depth: int = 0
+    """Depth at which this verdict was produced."""
+
+
+class DecompositionStrategy(str, Enum):
+    """Strategy for decomposing topics."""
+
+    LLM = "llm"
+    """Use LLM to decompose topics."""
+
+    RULE_BASED = "rule_based"
+    """Use rule-based decomposition."""
+
+    HYBRID = "hybrid"
+    """Combine LLM and rules."""
+
+    MANUAL = "manual"
+    """Manually specified decomposition."""
+
+
+class AggregationMethod(str, Enum):
+    """Method for aggregating sub-verdicts."""
+
+    WEIGHTED_AVERAGE = "weighted_average"
+    """Weight verdicts by sub-debate importance."""
+
+    MAJORITY_VOTE = "majority_vote"
+    """Simple majority vote."""
+
+    CONFIDENCE_WEIGHTED = "confidence_weighted"
+    """Weight by verdict confidence."""
+
+    UNANIMOUS = "unanimous"
+    """Require unanimous agreement."""
+
+    WEIGHTED_MAJORITY = "weighted_majority"
+    """Majority vote with weights."""
+
+
+# =============================================================================
+# Formal Verification Types
+# =============================================================================
+
+
+class VerificationRuleType(str, Enum):
+    """Type of verification rule."""
+
+    CAUSAL_CHAIN = "causal_chain"
+    """Verify causal reasoning chains are valid."""
+
+    CITATION = "citation"
+    """Verify citations and references."""
+
+    LOGICAL_CONSISTENCY = "logical_consistency"
+    """Check for logical contradictions."""
+
+    EVIDENCE_SUPPORT = "evidence_support"
+    """Verify claims are supported by evidence."""
+
+    FALLACY_FREE = "fallacy_free"
+    """Check for logical fallacies."""
+
+
+class VerificationRule(BaseModel):
+    """A single verification rule.
+
+    Example:
+        ```python
+        rule = VerificationRule(
+            rule_type=VerificationRuleType.CAUSAL_CHAIN,
+            enabled=True,
+            severity=1.0,
+            config={"min_chain_length": 2},
+        )
+        ```
+    """
+
+    rule_type: VerificationRuleType
+    enabled: bool = True
+    severity: float = Field(default=1.0, ge=0.0, le=1.0)
+    """Weight of this rule in the overall score."""
+    config: dict[str, Any] = Field(default_factory=dict)
+    """Rule-specific configuration."""
+
+
+class VerificationSpec(BaseModel):
+    """Specification for argument verification.
+
+    Example:
+        ```python
+        spec = VerificationSpec(
+            rules=[
+                VerificationRule(rule_type=VerificationRuleType.CAUSAL_CHAIN),
+                VerificationRule(rule_type=VerificationRuleType.CITATION),
+            ],
+            strict_mode=False,
+            min_score=0.6,
+        )
+        ```
+    """
+
+    rules: list[VerificationRule] = Field(default_factory=list)
+    strict_mode: bool = False
+    """If True, fail on any violation."""
+    min_score: float = Field(default=0.6, ge=0.0, le=1.0)
+    """Minimum score to pass verification."""
+
+
+class VerificationViolation(BaseModel):
+    """A single verification violation."""
+
+    description: str
+    """Human-readable description."""
+    location: str | None = None
+    """Location in the argument (if applicable)."""
+    severity: float = Field(default=1.0, ge=0.0, le=1.0)
+    """Severity of the violation."""
+    suggestion: str | None = None
+    """Suggested fix."""
+
+
+class VerificationResult(BaseModel):
+    """Result of applying a single verification rule.
+
+    Example:
+        ```python
+        result = VerificationResult(
+            rule_type=VerificationRuleType.CAUSAL_CHAIN,
+            passed=True,
+            score=0.85,
+            violations=[],
+        )
+        ```
+    """
+
+    rule_type: VerificationRuleType
+    passed: bool
+    score: float = Field(ge=0.0, le=1.0)
+    violations: list[VerificationViolation] = Field(default_factory=list)
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class VerificationReport(BaseModel):
+    """Complete verification report for an argument.
+
+    Example:
+        ```python
+        report = VerificationReport(
+            overall_passed=True,
+            overall_score=0.85,
+            results=[...],
+            argument_id="arg-123",
+        )
+        ```
+    """
+
+    overall_passed: bool
+    overall_score: float = Field(ge=0.0, le=1.0)
+    results: list[VerificationResult] = Field(default_factory=list)
+    argument_id: str
+    summary: str = ""
+    """Human-readable summary of verification results."""

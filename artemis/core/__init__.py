@@ -72,6 +72,28 @@ from artemis.core.llm_evaluation import (
     EvaluatorFactory,
     LLMCriterionEvaluator,
 )
+from artemis.core.streaming import (
+    ConsoleStreamCallback,
+    StreamCallback,
+    StreamingDebate,
+)
+from artemis.core.aggregation import (
+    ConfidenceWeightedAggregator,
+    MajorityVoteAggregator,
+    UnanimousAggregator,
+    VerdictAggregator,
+    WeightedAverageAggregator,
+    WeightedMajorityAggregator,
+    create_aggregator,
+)
+from artemis.core.decomposition import (
+    HybridDecomposer,
+    LLMTopicDecomposer,
+    ManualDecomposer,
+    RuleBasedDecomposer,
+    TopicDecomposer,
+)
+from artemis.core.hierarchical import HierarchicalDebate
 from artemis.core.types import (
     # Argument
     Argument,
@@ -124,6 +146,45 @@ from artemis.core.types import (
     ReasoningGap,
     ReinforcementSuggestion,
     WeakLinkResult,
+    # Streaming Types
+    StreamEvent,
+    StreamEventType,
+    # Hierarchical Debate Types
+    AggregationMethod,
+    CompoundVerdict,
+    DecompositionStrategy,
+    HierarchicalContext,
+    HierarchyLevel,
+    SubDebateSpec,
+    # Multimodal Types
+    ContentPart,
+    ContentType,
+)
+from artemis.core.multimodal_evidence import (
+    DocumentProcessor,
+    ExtractedContent,
+    ExtractionType,
+    ImageAnalyzer,
+    MultimodalEvidenceExtractor,
+)
+from artemis.core.verification import (
+    ArgumentVerifier,
+    CausalChainRule,
+    CitationRule,
+    CitationValidator,
+    EvidenceSupportRule,
+    FallacyFreeRule,
+    LogicalConsistencyRule,
+    VerificationError,
+    VerificationRuleBase,
+)
+from artemis.core.types import (
+    VerificationReport,
+    VerificationResult,
+    VerificationRule,
+    VerificationRuleType,
+    VerificationSpec,
+    VerificationViolation,
 )
 
 __all__ = [
@@ -243,4 +304,56 @@ __all__ = [
     "ReasoningGap",
     "ReinforcementSuggestion",
     "WeakLinkResult",
+    # Streaming
+    "StreamingDebate",
+    "StreamCallback",
+    "ConsoleStreamCallback",
+    "StreamEvent",
+    "StreamEventType",
+    # Hierarchical Debates
+    "HierarchicalDebate",
+    "TopicDecomposer",
+    "ManualDecomposer",
+    "RuleBasedDecomposer",
+    "LLMTopicDecomposer",
+    "HybridDecomposer",
+    "VerdictAggregator",
+    "WeightedAverageAggregator",
+    "MajorityVoteAggregator",
+    "ConfidenceWeightedAggregator",
+    "UnanimousAggregator",
+    "WeightedMajorityAggregator",
+    "create_aggregator",
+    # Hierarchical Types
+    "HierarchyLevel",
+    "SubDebateSpec",
+    "HierarchicalContext",
+    "CompoundVerdict",
+    "DecompositionStrategy",
+    "AggregationMethod",
+    # Multimodal
+    "ContentType",
+    "ContentPart",
+    "MultimodalEvidenceExtractor",
+    "ExtractedContent",
+    "ExtractionType",
+    "DocumentProcessor",
+    "ImageAnalyzer",
+    # Verification
+    "ArgumentVerifier",
+    "VerificationError",
+    "VerificationRuleBase",
+    "CausalChainRule",
+    "CitationRule",
+    "LogicalConsistencyRule",
+    "EvidenceSupportRule",
+    "FallacyFreeRule",
+    "CitationValidator",
+    # Verification Types
+    "VerificationRuleType",
+    "VerificationRule",
+    "VerificationSpec",
+    "VerificationResult",
+    "VerificationReport",
+    "VerificationViolation",
 ]

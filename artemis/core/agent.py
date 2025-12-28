@@ -27,6 +27,7 @@ from artemis.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from artemis.models.base import BaseModel
+    from artemis.steering.controller import SteeringController
 
 logger = get_logger(__name__)
 
@@ -142,6 +143,9 @@ class Agent:
         # Current strategy
         self._current_strategy = DebateStrategy.ESTABLISH
 
+        # Steering controller for behavior modification
+        self._steering_controller: "SteeringController | None" = None
+
         logger.debug(
             "Agent initialized",
             name=name,
@@ -166,6 +170,29 @@ class Agent:
     @property
     def current_strategy(self):
         return self._current_strategy
+
+    @property
+    def steering_controller(self) -> "SteeringController | None":
+        """The steering controller for behavior modification."""
+        return self._steering_controller
+
+    def set_steering(self, controller: "SteeringController") -> None:
+        """Set the steering controller for this agent.
+
+        Args:
+            controller: The SteeringController to use.
+        """
+        self._steering_controller = controller
+        logger.debug(
+            "Steering controller set",
+            agent=self.name,
+            strength=controller.strength,
+        )
+
+    def clear_steering(self) -> None:
+        """Remove the steering controller."""
+        self._steering_controller = None
+        logger.debug("Steering controller cleared", agent=self.name)
 
     def set_position(self, position: str) -> None:
         self.position = position
@@ -331,6 +358,11 @@ class Agent:
                 additional_instructions=combined_instructions if combined_instructions else None,
             )
 
+            # Apply steering modifications to prompts
+            if self._steering_controller:
+                system_prompt = self._steering_controller.apply_to_system_prompt(system_prompt)
+                user_prompt = self._steering_controller.apply_to_prompt(user_prompt)
+
             # Generate response
             messages = [
                 Message(role="system", content=system_prompt),
@@ -350,6 +382,10 @@ class Agent:
             else:
                 response = await self._model.generate(messages=messages)
                 content = response.content
+
+            # Record output for steering effectiveness tracking
+            if self._steering_controller:
+                self._steering_controller.record_output(content)
 
             # Parse the response into structured argument
             argument = self._parser.parse(
