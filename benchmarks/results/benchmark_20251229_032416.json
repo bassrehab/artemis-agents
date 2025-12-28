@@ -1,0 +1,1223 @@
+{
+  "timestamp": "2025-12-29T03:24:16.973174",
+  "config": {
+    "model": "gpt-4o",
+    "rounds": 3,
+    "trials": 3
+  },
+  "raw_results": {
+    "artemis": [
+      {
+        "framework": "artemis",
+        "topic": "Should governments regulate AI development?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 80.89221906661987,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Should governments regulate AI development?",
+        "trial": 1,
+        "argument_quality": 81.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 85.68272304534912,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Should governments regulate AI development?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 83.68686008453369,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 0,
+        "argument_quality": 81.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 83.32683610916138,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 1,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 97.28570699691772,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 92.44007611274719,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 0,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 89.8500988483429,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 1,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 94.00595021247864,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 81.5651319026947,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 0,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 88.89965915679932,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 1,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 81.0,
+        "time_seconds": 85.09272289276123,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 81.0,
+        "time_seconds": 87.25265288352966,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 0,
+        "argument_quality": 81.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 83.90051198005676,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 1,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 82.20247793197632,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      },
+      {
+        "framework": "artemis",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 89.53638029098511,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "H-L-DAG",
+            "L-AE-CR",
+            "jury_verdict",
+            "evidence_tracking"
+          ]
+        }
+      }
+    ],
+    "autogen": [
+      {
+        "framework": "autogen",
+        "topic": "Should governments regulate AI development?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 26.845995903015137,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Should governments regulate AI development?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 29.968080043792725,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Should governments regulate AI development?",
+        "trial": 2,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 26.868422985076904,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 29.222999095916748,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 29.650721073150635,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 2,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 31.401097774505615,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 38.456655979156494,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 30.015609979629517,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 32.29095101356506,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 28.02341604232788,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 34.7581741809845,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 2,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 78.0,
+        "time_seconds": 30.046950817108154,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 31.53797698020935,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 31.172579288482666,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      },
+      {
+        "framework": "autogen",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 32.34205913543701,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "max_messages": 7,
+          "features": [
+            "assistant_agents",
+            "round_robin_chat",
+            "autogen_v0.7"
+          ]
+        }
+      }
+    ],
+    "crewai": [
+      {
+        "framework": "crewai",
+        "topic": "Should governments regulate AI development?",
+        "trial": 0,
+        "argument_quality": 95.0,
+        "decision_accuracy": 95.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 55.46203589439392,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Should governments regulate AI development?",
+        "trial": 1,
+        "argument_quality": 95.0,
+        "decision_accuracy": 85.0,
+        "reasoning_depth": 95.0,
+        "time_seconds": 74.39045190811157,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Should governments regulate AI development?",
+        "trial": 2,
+        "argument_quality": 91.0,
+        "decision_accuracy": 85.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 63.212578773498535,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 67.08418416976929,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 1,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 72.3608672618866,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 2,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 73.45077085494995,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 0,
+        "argument_quality": 95.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 63.531635999679565,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 1,
+        "argument_quality": 95.0,
+        "decision_accuracy": 95.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 65.76937985420227,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 2,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 74.28880620002747,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 78.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 65.8035180568695,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 1,
+        "argument_quality": 91.0,
+        "decision_accuracy": 85.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 84.87367796897888,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 2,
+        "argument_quality": 91.0,
+        "decision_accuracy": 85.0,
+        "reasoning_depth": 95.0,
+        "time_seconds": 67.6564826965332,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 76.83676385879517,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 1,
+        "argument_quality": 91.0,
+        "decision_accuracy": 81.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 94.07887506484985,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      },
+      {
+        "framework": "crewai",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 2,
+        "argument_quality": 85.0,
+        "decision_accuracy": 75.0,
+        "reasoning_depth": 85.0,
+        "time_seconds": 76.34701204299927,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "agent_roles",
+            "sequential_tasks",
+            "crew_orchestration"
+          ]
+        }
+      }
+    ],
+    "camel": [
+      {
+        "framework": "camel",
+        "topic": "Should governments regulate AI development?",
+        "trial": 0,
+        "argument_quality": 61.0,
+        "decision_accuracy": 61.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 16.89944100379944,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Should governments regulate AI development?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 22.777594089508057,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Should governments regulate AI development?",
+        "trial": 2,
+        "argument_quality": 61.0,
+        "decision_accuracy": 50.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 15.069103717803955,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 17.964037895202637,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 15.161228656768799,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is it ethical to use AI for criminal sentencing decisions?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 50.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 15.236533880233765,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 23.797991037368774,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 45.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 20.454163312911987,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Will AI create more jobs than it destroys in the next decade?",
+        "trial": 2,
+        "argument_quality": 71.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 22.303882122039795,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 16.615617990493774,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 1,
+        "argument_quality": 61.0,
+        "decision_accuracy": 30.0,
+        "reasoning_depth": 55.0,
+        "time_seconds": 14.366199970245361,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Should social media platforms be legally liable for user-generated content?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 45.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 17.36309504508972,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 0,
+        "argument_quality": 61.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 17.524229764938354,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 15.063208103179932,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      },
+      {
+        "framework": "camel",
+        "topic": "Is nuclear energy essential for addressing climate change?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 41.0,
+        "reasoning_depth": 75.0,
+        "time_seconds": 21.104718685150146,
+        "error": null,
+        "metadata": {
+          "model": "gpt-4o",
+          "rounds": 3,
+          "features": [
+            "role_playing",
+            "communicative_agents"
+          ]
+        }
+      }
+    ]
+  },
+  "aggregated": {
+    "artemis": {
+      "framework": "artemis",
+      "argument_quality_mean": 81.26666666666667,
+      "argument_quality_std": 1.0327955589886446,
+      "decision_accuracy_mean": 67.26666666666667,
+      "decision_accuracy_std": 11.972985465304005,
+      "reasoning_depth_mean": 84.0,
+      "reasoning_depth_std": 2.1712405933672376,
+      "total_runs": 15,
+      "successful_runs": 15,
+      "avg_time_seconds": 87.04133383433025
+    },
+    "autogen": {
+      "framework": "autogen",
+      "argument_quality_mean": 77.2,
+      "argument_quality_std": 1.3732131246511903,
+      "decision_accuracy_mean": 75.0,
+      "decision_accuracy_std": 0.0,
+      "reasoning_depth_mean": 76.4,
+      "reasoning_depth_std": 1.5491933384829668,
+      "total_runs": 15,
+      "successful_runs": 15,
+      "avg_time_seconds": 30.840112686157227
+    },
+    "crewai": {
+      "framework": "crewai",
+      "argument_quality_mean": 89.26666666666667,
+      "argument_quality_std": 4.399134113934349,
+      "decision_accuracy_mean": 81.33333333333333,
+      "decision_accuracy_std": 6.9659033530339425,
+      "reasoning_depth_mean": 86.33333333333333,
+      "reasoning_depth_std": 3.518657752744984,
+      "total_runs": 15,
+      "successful_runs": 15,
+      "avg_time_seconds": 71.676469373703
+    },
+    "camel": {
+      "framework": "camel",
+      "argument_quality_mean": 71.0,
+      "argument_quality_std": 6.324555320336759,
+      "decision_accuracy_mean": 45.2,
+      "decision_accuracy_std": 7.757024466342012,
+      "reasoning_depth_mean": 73.66666666666667,
+      "reasoning_depth_std": 5.163977794943222,
+      "total_runs": 15,
+      "successful_runs": 15,
+      "avg_time_seconds": 18.113403018315633
+    }
+  }
+}

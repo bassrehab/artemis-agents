@@ -278,16 +278,22 @@ graph.add_node("debate", ArtemisDebateNode())
 
 ##  Benchmarks
 
-Performance comparison on the DebateQA benchmark:
+We ran 60 debates across four frameworks. Here's what we found:
 
 | Framework | Argument Quality | Decision Accuracy | Reasoning Depth |
-|-----------|-----------------|-------------------|-----------------|
-| AutoGen | 72.3% | 68.1% | 65.4% |
-| CrewAI | 74.1% | 70.2% | 67.8% |
-| CAMEL | 69.8% | 64.5% | 62.1% |
-| **ARTEMIS** | **81.7%** | **78.4%** | **82.3%** |
+|-----------|------------------|-------------------|-----------------|
+| CrewAI | **89.3%** | **81.3%** | **86.3%** |
+| **ARTEMIS** | 81.3% | 67.3% | 84.0% |
+| AutoGen | 77.2% | 75.0% | 76.4% |
+| CAMEL | 71.0% | 45.2% | 73.7% |
 
-*Benchmarks run on GPT-4o with default configurations. See [benchmarks/](benchmarks/) for methodology.*
+**Honest take:** CrewAI scored higher on raw metrics. ARTEMIS came second.
+
+But the numbers don't tell the whole story. ARTEMIS had the lowest variance across runs (most consistent), and features like safety monitoring and jury deliberation aren't captured in these metrics. The decision accuracy gap is something we're actively investigating.
+
+This is v1. We're using these results to improve.
+
+*See [benchmarks/ANALYSIS.md](benchmarks/ANALYSIS.md) for the full breakdown of what worked, what didn't, and what we're doing about it.*
 
 ##  Roadmap
 
