@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="ARTEMIS Logo" width="120" height="120">
+</p>
+
 # ARTEMIS Agents
 
 **Adaptive Reasoning Through Evaluation of Multi-agent Intelligent Systems**

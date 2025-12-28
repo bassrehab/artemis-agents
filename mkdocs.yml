@@ -8,6 +8,8 @@ repo_url: https://github.com/bassrehab/artemis-agents
 
 theme:
   name: material
+  logo: assets/logo-white.svg
+  favicon: assets/logo.svg
   palette:
     - scheme: default
       primary: pink

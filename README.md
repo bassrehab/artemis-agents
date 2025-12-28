@@ -1,12 +1,22 @@
-#  ARTEMIS Agents
+<p align="center">
+  <img src="assets/logo.svg" alt="ARTEMIS Logo" width="80" height="80">
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<h1 align="center">ARTEMIS Agents</h1>
 
-**Adaptive Reasoning Through Evaluation of Multi-agent Intelligent Systems**
+<p align="center">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
+  <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg" alt="License: Apache 2.0"></a>
+  <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
+</p>
 
-A production-ready framework for structured multi-agent debates with adaptive evaluation, causal reasoning, and built-in safety monitoring.
+<p align="center">
+  <strong>Adaptive Reasoning Through Evaluation of Multi-agent Intelligent Systems</strong>
+</p>
+
+<p align="center">
+  <em>A production-ready framework for structured multi-agent debates with adaptive evaluation, causal reasoning, and built-in safety monitoring.</em>
+</p>
 
 ---
 
