@@ -117,39 +117,39 @@ Strategic Thesis
 H-L-DAG tracks causal relationships between arguments:
 
 ```python
-from artemis.core.types import CausalLink, CausalRelationType
+from artemis.core.types import CausalLink
 
 link = CausalLink(
-    source="unregulated_ai",
-    target="societal_harm",
-    relation=CausalRelationType.CAUSES,
-    strength=0.8,
-    evidence=["AI incident statistics", "Expert testimony"],
+    cause="unregulated_ai",
+    effect="societal_harm",
+    mechanism="Lack of oversight allows harmful deployments",
+    strength=0.8,  # 0.0 to 1.0
+    bidirectional=False,
 )
 ```
 
-### Relation Types
+### CausalLink Fields
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `CAUSES` | Direct causation | "X causes Y" |
-| `ENABLES` | Makes possible | "X enables Y" |
-| `PREVENTS` | Blocks outcome | "X prevents Y" |
-| `CORRELATES` | Associated with | "X correlates with Y" |
-| `IMPLIES` | Logical implication | "X implies Y" |
+| Field | Type | Description |
+|-------|------|-------------|
+| `cause` | str | The cause in the relationship |
+| `effect` | str | The effect in the relationship |
+| `mechanism` | str | How cause leads to effect |
+| `strength` | float | Relationship strength (0-1) |
+| `bidirectional` | bool | Whether relationship works both ways |
 
 ## Using H-L-DAG
 
-### Configuring Argument Depth
+### Configuring Arguments
 
 ```python
 from artemis.core.types import DebateConfig
 
 config = DebateConfig(
-    argument_depth="deep",  # shallow, medium, deep
     require_evidence=True,
-    min_tactical_points=2,
-    min_operational_facts=3,
+    require_causal_links=True,
+    min_evidence_per_argument=1,
+    max_argument_tokens=1000,
 )
 ```
 

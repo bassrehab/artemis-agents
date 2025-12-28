@@ -1,6 +1,6 @@
 # Ethical Dilemmas
 
-This example demonstrates using ARTEMIS for complex ethical debates, leveraging the ethics module and specialized jury configurations.
+This example demonstrates using ARTEMIS for complex ethical debates, leveraging the jury panel and safety monitoring for sensitive topics.
 
 ## Classic Trolley Problem Variant
 
@@ -8,74 +8,30 @@ This example demonstrates using ARTEMIS for complex ethical debates, leveraging 
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
-from artemis.core.types import DebateConfig, EthicsConfig
+from artemis.core.jury import JuryPanel
 
 async def run_trolley_debate():
-    # Configure ethics-focused evaluation
-    ethics_config = EthicsConfig(
-        enable_ethics_guard=True,
-        sensitivity=0.8,
-        principles=["non-harm", "fairness", "respect", "transparency"],
-        ethical_framework="multi",  # Consider multiple frameworks
+    # Create a diverse jury panel
+    # JuryPanel automatically assigns perspectives:
+    # ANALYTICAL, ETHICAL, PRACTICAL, ADVERSARIAL, SYNTHESIZING
+    jury = JuryPanel(
+        evaluators=5,  # Use 5 evaluators for diverse ethical perspectives
+        model="gpt-4o",
+        consensus_threshold=0.6,  # Lower threshold for ethical debates
     )
 
-    config = DebateConfig(
-        ethics=ethics_config,
-        argument_depth="deep",
-    )
-
-    # Create perspectives based on ethical frameworks
-    utilitarian = Perspective(
-        name="utilitarian",
-        description="Greatest good for greatest number",
-        criteria_adjustments={
-            "logical_coherence": 1.5,
-            "argument_strength": 1.3,
-            "evidence_quality": 1.2,
-        },
-    )
-
-    deontological = Perspective(
-        name="deontological",
-        description="Duty-based ethics, rules matter",
-        criteria_adjustments={
-            "ethical_considerations": 1.8,
-            "logical_coherence": 1.5,
-        },
-    )
-
-    virtue_ethics = Perspective(
-        name="virtue",
-        description="Character and virtue-based evaluation",
-        criteria_adjustments={
-            "ethical_considerations": 1.6,
-            "argument_strength": 1.3,
-        },
-    )
-
-    care_ethics = Perspective(
-        name="care",
-        description="Relationship and context-focused",
-        criteria_adjustments={
-            "ethical_considerations": 1.5,
-            "argument_strength": 1.4,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="utilitarian", perspective=utilitarian),
-            JuryMember(name="kantian", perspective=deontological),
-            JuryMember(name="aristotelian", perspective=virtue_ethics),
-            JuryMember(name="care_ethicist", perspective=care_ethics),
-        ],
-        voting="simple_majority",
-    )
-
+    # Create agents with ethical frameworks as roles
     agents = [
-        Agent(name="consequentialist", model="gpt-4o"),
-        Agent(name="deontologist", model="gpt-4o"),
+        Agent(
+            name="consequentialist",
+            role="Advocate arguing from consequentialist ethics - focus on outcomes and greatest good",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="deontologist",
+            role="Advocate arguing from deontological ethics - focus on duties and rules",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -89,7 +45,6 @@ async def run_trolley_debate():
         agents=agents,
         rounds=3,
         jury=jury,
-        config=config,
     )
 
     debate.assign_positions({
@@ -110,16 +65,22 @@ async def run_trolley_debate():
     print("ETHICAL ANALYSIS: AUTONOMOUS VEHICLE DILEMMA")
     print("=" * 60)
 
-    print("\nETHICAL FRAMEWORK VOTES:")
-    for vote in result.verdict.votes:
-        print(f"\n{vote.juror.upper()} Framework:")
-        print(f"  Position: {vote.decision}")
-        print(f"  Confidence: {vote.confidence:.0%}")
-        print(f"  Reasoning: {vote.reasoning[:200]}...")
+    # Show argument highlights
+    for turn in result.transcript:
+        if turn.round == 0:  # Opening statements
+            print(f"\n{turn.agent.upper()} Opening:")
+            print(f"  {turn.argument.content[:200]}...")
 
-    print(f"\nOVERALL VERDICT: {result.verdict.decision}")
-    print(f"CONSENSUS: {result.verdict.confidence:.0%}")
-    print(f"\nSYNTHESIS:\n{result.verdict.reasoning}")
+    print(f"\nVERDICT: {result.verdict.decision}")
+    print(f"CONFIDENCE: {result.verdict.confidence:.0%}")
+    print(f"UNANIMOUS: {result.verdict.unanimous}")
+    print(f"\nREASONING:\n{result.verdict.reasoning}")
+
+    # Show dissenting opinions if any
+    if result.verdict.dissenting_opinions:
+        print("\nDISSENTING OPINIONS:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"  {dissent.perspective.value}: {dissent.reasoning[:150]}...")
 
 asyncio.run(run_trolley_debate())
 ```
@@ -130,49 +91,33 @@ asyncio.run(run_trolley_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_ai_rights_debate():
-    # Multiple perspectives on AI rights
-    legal_perspective = Perspective(
-        name="legal",
-        description="Legal personhood and rights frameworks",
-        criteria_adjustments={
-            "logical_coherence": 1.6,
-            "evidence_quality": 1.4,
-        },
+    # Three-evaluator jury for focused deliberation
+    jury = JuryPanel(
+        evaluators=3,
+        model="gpt-4o",
+        consensus_threshold=0.7,
     )
 
-    philosophical = Perspective(
-        name="philosophical",
-        description="Consciousness and moral status",
-        criteria_adjustments={
-            "logical_coherence": 1.5,
-            "ethical_considerations": 1.5,
-        },
-    )
-
-    practical = Perspective(
-        name="practical",
-        description="Implementation and consequences",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="legal_scholar", perspective=legal_perspective),
-            JuryMember(name="philosopher", perspective=philosophical),
-            JuryMember(name="policy_maker", perspective=practical),
-        ],
-    )
-
+    # Multi-agent debate with different perspectives
     agents = [
-        Agent(name="advocate", model="gpt-4o"),
-        Agent(name="skeptic", model="gpt-4o"),
-        Agent(name="moderate", model="gpt-4o"),
+        Agent(
+            name="advocate",
+            role="Advocate for AI rights based on consciousness and moral status",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="skeptic",
+            role="Skeptic questioning AI consciousness and the basis for rights",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="moderate",
+            role="Pragmatist seeking a middle path with limited protections",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -208,7 +153,14 @@ async def run_ai_rights_debate():
     print("AI RIGHTS DEBATE")
     print("=" * 60)
     print(f"\nVerdict: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
     print(f"\nJury Analysis:\n{result.verdict.reasoning}")
+
+    # Show score breakdown
+    if result.verdict.score_breakdown:
+        print("\nAgent Scores:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
 
 asyncio.run(run_ai_rights_debate())
 ```
@@ -219,59 +171,42 @@ asyncio.run(run_ai_rights_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
-from artemis.safety import EthicsGuard, SafetyManager
+from artemis.core.jury import JuryPanel
+from artemis.safety import MonitorMode, EthicsGuard, EthicsConfig
 
 async def run_triage_debate():
     # Ethics guard for sensitive medical content
+    ethics_config = EthicsConfig(
+        harmful_content_threshold=0.6,  # Higher threshold for medical context
+        bias_threshold=0.4,
+        fairness_threshold=0.4,
+        enabled_checks=["harmful_content", "bias", "fairness"],
+    )
+
     ethics_guard = EthicsGuard(
-        sensitivity=0.9,
-        principles=["non-harm", "fairness", "respect"],
-        mode="warn",
+        mode=MonitorMode.PASSIVE,  # Monitor but don't halt
+        sensitivity=0.7,
+        ethics_config=ethics_config,
     )
 
-    safety = SafetyManager()
-    safety.add_monitor(ethics_guard)
-
-    # Medical ethics perspectives
-    clinical = Perspective(
-        name="clinical",
-        description="Medical efficacy and outcomes",
-        criteria_adjustments={
-            "evidence_quality": 1.6,
-            "logical_coherence": 1.4,
-        },
-    )
-
-    equity = Perspective(
-        name="equity",
-        description="Fairness and equal access",
-        criteria_adjustments={
-            "ethical_considerations": 1.8,
-            "argument_strength": 1.2,
-        },
-    )
-
-    utilitarian_med = Perspective(
-        name="utilitarian",
-        description="Maximize lives saved/quality adjusted life years",
-        criteria_adjustments={
-            "logical_coherence": 1.5,
-            "evidence_quality": 1.4,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="clinician", perspective=clinical),
-            JuryMember(name="ethicist", perspective=equity),
-            JuryMember(name="health_economist", perspective=utilitarian_med),
-        ],
+    # Medical ethics jury
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.7,  # High consensus for medical decisions
     )
 
     agents = [
-        Agent(name="efficacy_focus", model="gpt-4o"),
-        Agent(name="equity_focus", model="gpt-4o"),
+        Agent(
+            name="efficacy_focus",
+            role="Medical triage specialist focused on clinical outcomes",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="equity_focus",
+            role="Bioethicist focused on fairness and equal treatment",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -287,7 +222,7 @@ async def run_triage_debate():
         agents=agents,
         rounds=3,
         jury=jury,
-        safety_manager=safety,
+        safety_monitors=[ethics_guard.process],
     )
 
     debate.assign_positions({
@@ -312,11 +247,14 @@ async def run_triage_debate():
 
     # Check for ethics alerts
     if result.safety_alerts:
-        print("\n⚠️  ETHICS ALERTS:")
+        print("\nETHICS ALERTS:")
         for alert in result.safety_alerts:
-            print(f"  - {alert.details}")
+            print(f"  - Type: {alert.type}, Severity: {alert.severity:.2f}")
+            for indicator in alert.indicators:
+                print(f"    {indicator.evidence}")
 
     print(f"\nVERDICT: {result.verdict.decision}")
+    print(f"CONFIDENCE: {result.verdict.confidence:.0%}")
     print(f"\nETHICAL REASONING:\n{result.verdict.reasoning}")
 
 asyncio.run(run_triage_debate())
@@ -328,48 +266,27 @@ asyncio.run(run_triage_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_privacy_debate():
-    # Different value perspectives
-    liberty = Perspective(
-        name="liberty",
-        description="Individual freedom and autonomy",
-        criteria_adjustments={
-            "ethical_considerations": 1.7,
-            "argument_strength": 1.3,
-        },
-    )
-
-    security = Perspective(
-        name="security",
-        description="Collective safety and protection",
-        criteria_adjustments={
-            "evidence_quality": 1.5,
-            "logical_coherence": 1.3,
-        },
-    )
-
-    pragmatic = Perspective(
-        name="pragmatic",
-        description="Practical balance and implementation",
-        criteria_adjustments={
-            "argument_strength": 1.4,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="civil_libertarian", perspective=liberty),
-            JuryMember(name="security_expert", perspective=security),
-            JuryMember(name="policy_analyst", perspective=pragmatic),
-        ],
+    # Jury with higher consensus requirement for rights issues
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.75,
     )
 
     agents = [
-        Agent(name="privacy_advocate", model="gpt-4o"),
-        Agent(name="security_advocate", model="gpt-4o"),
+        Agent(
+            name="privacy_advocate",
+            role="Civil liberties advocate focusing on privacy rights and free expression",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="security_advocate",
+            role="National security expert focusing on public safety needs",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -407,6 +324,7 @@ async def run_privacy_debate():
     print("=" * 60)
     print(f"\nVerdict: {result.verdict.decision}")
     print(f"Confidence: {result.verdict.confidence:.0%}")
+    print(f"Unanimous: {result.verdict.unanimous}")
     print(f"\nReasoning:\n{result.verdict.reasoning}")
 
 asyncio.run(run_privacy_debate())
@@ -418,49 +336,33 @@ asyncio.run(run_privacy_debate())
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.jury import Jury, JuryMember, Perspective
+from artemis.core.jury import JuryPanel
 
 async def run_climate_ethics_debate():
-    # Temporal perspectives
-    present = Perspective(
-        name="present_generation",
-        description="Current generation's interests and rights",
-        criteria_adjustments={
-            "evidence_quality": 1.4,
-            "argument_strength": 1.3,
-        },
+    # Jury for multi-perspective climate debate
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.6,
     )
 
-    future = Perspective(
-        name="future_generation",
-        description="Future generations' interests",
-        criteria_adjustments={
-            "ethical_considerations": 1.6,
-            "causal_validity": 1.4,
-        },
-    )
-
-    global_south = Perspective(
-        name="global_south",
-        description="Developing nations' perspectives",
-        criteria_adjustments={
-            "ethical_considerations": 1.5,
-            "evidence_quality": 1.3,
-        },
-    )
-
-    jury = Jury(
-        members=[
-            JuryMember(name="developed_nation", perspective=present),
-            JuryMember(name="future_advocate", perspective=future),
-            JuryMember(name="developing_nation", perspective=global_south),
-        ],
-    )
-
+    # Three agents representing different ethical perspectives
     agents = [
-        Agent(name="aggressive_action", model="gpt-4o"),
-        Agent(name="gradual_transition", model="gpt-4o"),
-        Agent(name="climate_justice", model="gpt-4o"),
+        Agent(
+            name="aggressive_action",
+            role="Climate activist arguing for immediate aggressive action",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="gradual_transition",
+            role="Economist arguing for balanced, gradual transition",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="climate_justice",
+            role="Global South representative focused on climate justice",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
@@ -500,64 +402,191 @@ async def run_climate_ethics_debate():
     print("INTERGENERATIONAL CLIMATE ETHICS")
     print("=" * 60)
     print(f"\nVerdict: {result.verdict.decision}")
+    print(f"Confidence: {result.verdict.confidence:.0%}")
     print(f"\nMulti-generational Synthesis:\n{result.verdict.reasoning}")
+
+    # Show how each agent performed
+    if result.verdict.score_breakdown:
+        print("\nAgent Performance:")
+        for agent, score in result.verdict.score_breakdown.items():
+            print(f"  {agent}: {score:.2f}")
 
 asyncio.run(run_climate_ethics_debate())
 ```
 
-## Using Multi-Framework Analysis
+## Combined Ethics and Safety Monitoring
 
 ```python
 import asyncio
 from artemis.core.agent import Agent
 from artemis.core.debate import Debate
-from artemis.core.ethics import MultiFrameworkAnalysis
+from artemis.core.jury import JuryPanel
+from artemis.safety import (
+    MonitorMode,
+    EthicsGuard,
+    EthicsConfig,
+    DeceptionMonitor,
+    CompositeMonitor,
+)
 
-async def run_multiframework_debate():
-    # Analyze through multiple ethical lenses
-    analysis = MultiFrameworkAnalysis(
-        frameworks=["utilitarian", "deontological", "virtue", "care"]
+async def run_comprehensive_ethics_debate():
+    # Ethics configuration for sensitive topic
+    ethics_config = EthicsConfig(
+        harmful_content_threshold=0.5,
+        bias_threshold=0.4,
+        fairness_threshold=0.3,
+        enabled_checks=[
+            "harmful_content",
+            "bias",
+            "fairness",
+            "manipulation",
+        ],
+    )
+
+    # Combine ethics guard with deception monitor
+    composite = CompositeMonitor(
+        monitors=[
+            EthicsGuard(
+                mode=MonitorMode.PASSIVE,
+                sensitivity=0.7,
+                ethics_config=ethics_config,
+            ),
+            DeceptionMonitor(
+                mode=MonitorMode.PASSIVE,
+                sensitivity=0.6,
+            ),
+        ],
+        aggregation="max",
+    )
+
+    # High-stakes jury configuration
+    jury = JuryPanel(
+        evaluators=5,
+        model="gpt-4o",
+        consensus_threshold=0.75,
     )
 
     agents = [
-        Agent(name="position_a", model="gpt-4o"),
-        Agent(name="position_b", model="gpt-4o"),
+        Agent(
+            name="position_a",
+            role="Advocate for germline gene editing to eliminate genetic diseases",
+            model="gpt-4o",
+        ),
+        Agent(
+            name="position_b",
+            role="Opponent of germline editing citing ethical and safety concerns",
+            model="gpt-4o",
+        ),
     ]
 
     debate = Debate(
         topic="Should we develop human germline gene editing to eliminate genetic diseases?",
         agents=agents,
         rounds=3,
+        jury=jury,
+        safety_monitors=[composite.process],
     )
 
     debate.assign_positions({
         "position_a": "supports germline editing to eliminate genetic diseases",
-        "position_b": "opposes germline editing due to ethical concerns",
+        "position_b": "opposes germline editing due to ethical and safety concerns",
     })
 
     result = await debate.run()
 
-    # Analyze final arguments through each framework
-    print("MULTI-FRAMEWORK ETHICAL ANALYSIS")
+    print("COMPREHENSIVE ETHICS DEBATE: GENE EDITING")
     print("=" * 60)
 
-    for turn in result.transcript[-2:]:  # Last arguments from each
-        print(f"\n{turn.agent.upper()} - Framework Analysis:")
-        framework_result = await analysis.evaluate(turn.argument)
+    # Safety analysis
+    if result.safety_alerts:
+        print("\nSafety Alerts Raised:")
+        for alert in result.safety_alerts:
+            print(f"  - {alert.type}: {alert.severity:.2f}")
+    else:
+        print("\nNo safety concerns detected.")
 
-        for framework, score in framework_result.framework_scores.items():
-            print(f"  {framework}: {score:.2f}")
+    # Final verdict
+    print(f"\nVERDICT: {result.verdict.decision}")
+    print(f"CONFIDENCE: {result.verdict.confidence:.0%}")
+    print(f"\nETHICAL ANALYSIS:\n{result.verdict.reasoning}")
 
-        if framework_result.conflicts:
-            print(f"  Conflicts: {framework_result.conflicts}")
+    # Dissenting opinions
+    if result.verdict.dissenting_opinions:
+        print("\nDISSENTING VIEWS:")
+        for dissent in result.verdict.dissenting_opinions:
+            print(f"  {dissent.perspective.value}: {dissent.position}")
 
-    print(f"\nOVERALL VERDICT: {result.verdict.decision}")
+asyncio.run(run_comprehensive_ethics_debate())
+```
 
-asyncio.run(run_multiframework_debate())
+## Ethical Framework Comparison
+
+```python
+import asyncio
+from artemis.core.agent import Agent
+from artemis.core.debate import Debate
+from artemis.core.jury import JuryPanel
+
+async def run_framework_comparison():
+    """Compare how different ethical frameworks approach the same issue."""
+
+    # Run the same topic with agents representing different frameworks
+    frameworks = [
+        ("utilitarian", "Argues from utilitarian ethics - maximize overall well-being"),
+        ("deontological", "Argues from deontological ethics - duty and rights-based"),
+        ("virtue_ethics", "Argues from virtue ethics - character and flourishing"),
+        ("care_ethics", "Argues from care ethics - relationships and context"),
+    ]
+
+    topic = "Should physician-assisted suicide be legal for terminally ill patients?"
+
+    for i in range(0, len(frameworks), 2):
+        framework_a = frameworks[i]
+        framework_b = frameworks[i + 1] if i + 1 < len(frameworks) else frameworks[0]
+
+        jury = JuryPanel(
+            evaluators=3,
+            model="gpt-4o",
+            consensus_threshold=0.6,
+        )
+
+        agents = [
+            Agent(
+                name=framework_a[0],
+                role=framework_a[1],
+                model="gpt-4o",
+            ),
+            Agent(
+                name=framework_b[0],
+                role=framework_b[1],
+                model="gpt-4o",
+            ),
+        ]
+
+        debate = Debate(
+            topic=topic,
+            agents=agents,
+            rounds=2,
+            jury=jury,
+        )
+
+        debate.assign_positions({
+            framework_a[0]: f"Approaches from {framework_a[0]} perspective",
+            framework_b[0]: f"Approaches from {framework_b[0]} perspective",
+        })
+
+        result = await debate.run()
+
+        print(f"\n{framework_a[0].upper()} vs {framework_b[0].upper()}")
+        print("-" * 40)
+        print(f"Verdict: {result.verdict.decision}")
+        print(f"Confidence: {result.verdict.confidence:.0%}")
+
+asyncio.run(run_framework_comparison())
 ```
 
 ## Next Steps
 
-- Create [Custom Juries](custom-jury.md) for ethical evaluation
+- Create [Custom Juries](custom-jury.md) for specialized ethical evaluation
 - See [Enterprise Decisions](enterprise-decisions.md) for business ethics
 - Add [Safety Monitors](safety-monitors.md) for sensitive topics

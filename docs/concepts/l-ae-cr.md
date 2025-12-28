@@ -24,197 +24,197 @@ Arguments are evaluated not just on content but on the strength of causal reason
 
 ### Standard Criteria
 
-| Criterion | Description | Base Weight |
-|-----------|-------------|-------------|
+The `EvaluationCriteria` class defines the default weights:
+
+```python
+from artemis.core.types import EvaluationCriteria
+
+criteria = EvaluationCriteria(
+    logical_coherence=0.25,   # Internal consistency of argument
+    evidence_quality=0.25,    # Strength and relevance of evidence
+    causal_reasoning=0.20,    # Strength of causal reasoning
+    ethical_alignment=0.15,   # Ethical soundness
+    persuasiveness=0.15,      # Overall persuasiveness
+)
+```
+
+| Criterion | Description | Default Weight |
+|-----------|-------------|----------------|
 | `logical_coherence` | Internal consistency of argument | 0.25 |
 | `evidence_quality` | Strength and relevance of evidence | 0.25 |
-| `argument_strength` | Overall persuasiveness | 0.20 |
-| `ethical_considerations` | Ethical soundness | 0.15 |
-| `causal_validity` | Strength of causal reasoning | 0.15 |
+| `causal_reasoning` | Strength of causal reasoning | 0.20 |
+| `ethical_alignment` | Ethical soundness | 0.15 |
+| `persuasiveness` | Overall persuasiveness | 0.15 |
 
-### Domain-Specific Adaptations
+### Custom Weights
+
+You can customize evaluation weights in the debate configuration:
 
 ```python
-from artemis.core.evaluation import AdaptiveEvaluator
-
-evaluator = AdaptiveEvaluator()
+from artemis.core.types import DebateConfig, EvaluationCriteria
 
 # Technical domain: higher evidence weight
-technical_weights = evaluator.adapt_for_domain("technical")
-# {
-#     "logical_coherence": 0.30,
-#     "evidence_quality": 0.35,
-#     "argument_strength": 0.15,
-#     "ethical_considerations": 0.10,
-#     "causal_validity": 0.10,
-# }
+technical_criteria = EvaluationCriteria(
+    logical_coherence=0.30,
+    evidence_quality=0.35,
+    causal_reasoning=0.15,
+    ethical_alignment=0.10,
+    persuasiveness=0.10,
+)
 
 # Ethical domain: higher ethics weight
-ethical_weights = evaluator.adapt_for_domain("ethical")
-# {
-#     "logical_coherence": 0.20,
-#     "evidence_quality": 0.15,
-#     "argument_strength": 0.20,
-#     "ethical_considerations": 0.35,
-#     "causal_validity": 0.10,
-# }
+ethical_criteria = EvaluationCriteria(
+    logical_coherence=0.20,
+    evidence_quality=0.15,
+    causal_reasoning=0.15,
+    ethical_alignment=0.35,
+    persuasiveness=0.15,
+)
+
+config = DebateConfig(
+    evaluation_criteria=technical_criteria,
+    adaptation_enabled=True,
+    adaptation_rate=0.1,
+)
 ```
 
-## Round-Context Adaptation
+## Argument Evaluation
 
-Different rounds have different expectations:
-
-### Opening Round
+Each argument receives an `ArgumentEvaluation` with detailed scores:
 
 ```python
-opening_weights = evaluator.adapt_for_round(
-    round_type="opening",
-    round_number=1,
-)
-# Focus on thesis clarity and position establishment
+# After running a debate
+result = await debate.run()
+
+for turn in result.transcript:
+    if turn.evaluation:
+        eval = turn.evaluation
+        print(f"Agent: {turn.agent}")
+        print(f"Total Score: {eval.total_score:.2f}")
+        print("Criterion Scores:")
+        for criterion, score in eval.scores.items():
+            weight = eval.weights.get(criterion, 0)
+            print(f"  {criterion}: {score:.2f} (weight: {weight:.2f})")
+        print(f"Causal Score: {eval.causal_score:.2f}")
 ```
 
-### Rebuttal Rounds
+### ArgumentEvaluation Fields
 
-```python
-rebuttal_weights = evaluator.adapt_for_round(
-    round_type="rebuttal",
-    round_number=3,
-)
-# Focus on counter-argument effectiveness and evidence refutation
-```
-
-### Closing Round
-
-```python
-closing_weights = evaluator.adapt_for_round(
-    round_type="closing",
-    round_number=5,
-)
-# Focus on synthesis and overall argument coherence
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `argument_id` | str | ID of evaluated argument |
+| `scores` | dict | Score for each criterion |
+| `weights` | dict | Adapted weight for each criterion |
+| `criterion_details` | list | Detailed per-criterion breakdown |
+| `causal_score` | float | Score for causal reasoning |
+| `total_score` | float | Weighted total score |
 
 ## Causal Reasoning Analysis
 
-### Causal Chain Validation
+### CausalLink Structure
+
+Arguments contain causal links that are evaluated:
 
 ```python
-from artemis.core.types import CausalChain, CausalLink
+from artemis.core.types import CausalLink
 
-chain = CausalChain(
-    links=[
-        CausalLink(
-            source="increased_regulation",
-            target="reduced_innovation_speed",
-            relation="CAUSES",
-            strength=0.7,
-        ),
-        CausalLink(
-            source="reduced_innovation_speed",
-            target="competitive_disadvantage",
-            relation="CAUSES",
-            strength=0.5,
-        ),
-    ]
+# Causal links in arguments
+link = CausalLink(
+    cause="increased_regulation",
+    effect="reduced_innovation_speed",
+    mechanism="Compliance overhead diverts resources",
+    strength=0.7,
+    bidirectional=False,
 )
-
-# Evaluate chain validity
-validity = evaluator.validate_causal_chain(chain)
-# {
-#     "is_valid": True,
-#     "overall_strength": 0.35,  # 0.7 * 0.5
-#     "weak_links": ["reduced_innovation_speed -> competitive_disadvantage"],
-#     "missing_evidence": ["innovation speed metrics"],
-# }
 ```
 
-### Detecting Causal Fallacies
+### Causal Evaluation
 
-L-AE-CR detects common causal fallacies:
+The evaluation system assesses:
 
-| Fallacy | Description | Detection Method |
-|---------|-------------|------------------|
-| Post Hoc | Assumes causation from sequence | Temporal analysis |
-| Correlation | Treats correlation as causation | Statistical checks |
-| Single Cause | Ignores multiple factors | Complexity analysis |
-| Slippery Slope | Assumes inevitable escalation | Chain strength analysis |
+1. **Completeness**: Is the causal chain fully specified?
+2. **Strength**: How strong is each link?
+3. **Evidence**: Is there evidence supporting causation?
+4. **Validity**: Are there logical fallacies?
 
-```python
-# Detect fallacies in an argument
-fallacies = evaluator.detect_causal_fallacies(argument)
+### Common Causal Fallacies Detected
 
-for fallacy in fallacies:
-    print(f"Type: {fallacy.type}")
-    print(f"Location: {fallacy.claim}")
-    print(f"Severity: {fallacy.severity}")
-    print(f"Suggestion: {fallacy.correction}")
-```
+| Fallacy | Description |
+|---------|-------------|
+| **Post Hoc** | Assumes causation from sequence |
+| **Correlation** | Treats correlation as causation |
+| **Single Cause** | Ignores multiple factors |
+| **Slippery Slope** | Assumes inevitable escalation |
 
 ## Evaluation Flow
 
 ```mermaid
 graph TD
-    A[Receive Argument] --> B[Identify Domain]
-    B --> C[Identify Round Context]
-    C --> D[Adapt Criteria Weights]
-    D --> E[Extract Causal Chains]
-    E --> F[Validate Causality]
-    F --> G[Detect Fallacies]
-    G --> H[Score Each Criterion]
-    H --> I[Compute Weighted Score]
-    I --> J[Generate Feedback]
+    A[Receive Argument] --> B[Identify Context]
+    B --> C[Adapt Criteria Weights]
+    C --> D[Extract Causal Links]
+    D --> E[Score Each Criterion]
+    E --> F[Compute Causal Score]
+    F --> G[Compute Weighted Total]
+    G --> H[Return Evaluation]
 ```
 
-## Using L-AE-CR
+## Adaptive Weight Adjustment
 
-### Basic Evaluation
+When `adaptation_enabled=True`, weights are dynamically adjusted:
+
+```python
+from artemis.core.types import DebateConfig
+
+config = DebateConfig(
+    adaptation_enabled=True,
+    adaptation_rate=0.1,  # How fast weights adjust (0-0.5)
+)
+```
+
+### Adaptation Factors
+
+Weights adapt based on:
+
+- **Topic sensitivity**: Higher ethical weight for sensitive topics
+- **Topic complexity**: Higher causal weight for complex topics
+- **Round progress**: Different expectations for opening vs. closing
+- **Argument type**: Evidence-heavy arguments get higher evidence weight
+
+## Using the Evaluator
+
+The `AdaptiveEvaluator` is used internally but can be accessed:
 
 ```python
 from artemis.core.evaluation import AdaptiveEvaluator
+from artemis.core.types import DebateContext
 
-evaluator = AdaptiveEvaluator(
-    domain="policy",
-    enable_causal_analysis=True,
-)
+evaluator = AdaptiveEvaluator()
 
-result = await evaluator.evaluate(
+# Evaluate a single argument
+evaluation = await evaluator.evaluate_argument(
     argument=argument,
     context=debate_context,
 )
 
-print(f"Total Score: {result.total_score:.2f}")
-print(f"Breakdown:")
-for criterion, score in result.scores.items():
-    print(f"  {criterion}: {score:.2f}")
+print(f"Total Score: {evaluation.total_score:.2f}")
+print(f"Breakdown: {evaluation.scores}")
 ```
 
-### Detailed Feedback
+## Integration with Jury
+
+L-AE-CR provides scores to the jury mechanism:
 
 ```python
-result = await evaluator.evaluate(
-    argument=argument,
-    context=debate_context,
-    include_feedback=True,
-)
+from artemis.core.jury import JuryPanel
 
-print(f"Strengths: {result.feedback.strengths}")
-print(f"Weaknesses: {result.feedback.weaknesses}")
-print(f"Suggestions: {result.feedback.suggestions}")
-print(f"Causal Issues: {result.feedback.causal_issues}")
-```
+# Jury members receive evaluation results
+panel = JuryPanel(evaluators=5, model="gpt-4o")
 
-### Comparative Evaluation
-
-```python
-comparison = await evaluator.compare(
-    argument_a=pro_argument,
-    argument_b=con_argument,
-    context=debate_context,
-)
-
-print(f"Winner: {comparison.winner}")
-print(f"Margin: {comparison.margin:.2f}")
-print(f"Key Differentiators: {comparison.differentiators}")
+# Each jury member considers:
+# - Evaluation scores from L-AE-CR
+# - Their perspective-specific weights
+# - Argument content and structure
 ```
 
 ## Score Components
@@ -236,25 +236,7 @@ Evaluates supporting evidence:
 - Recency and accuracy
 - Diversity of sources
 
-### Argument Strength Score
-
-Evaluates persuasiveness:
-
-- Clarity of thesis
-- Effectiveness of rhetoric
-- Audience appropriateness
-- Counter-argument handling
-
-### Ethical Considerations Score
-
-Evaluates ethical soundness:
-
-- Fairness of reasoning
-- Consideration of stakeholders
-- Avoidance of harmful claims
-- Respect for values
-
-### Causal Validity Score
+### Causal Reasoning Score
 
 Evaluates causal reasoning:
 
@@ -263,71 +245,23 @@ Evaluates causal reasoning:
 - Evidence for causation
 - Fallacy absence
 
-## Configuration
+### Ethical Alignment Score
 
-### Customizing Evaluation
+Evaluates ethical soundness:
 
-```python
-from artemis.core.types import EvaluationConfig
+- Fairness of reasoning
+- Consideration of stakeholders
+- Avoidance of harmful claims
+- Respect for values
 
-config = EvaluationConfig(
-    # Custom weights
-    criteria_weights={
-        "logical_coherence": 0.3,
-        "evidence_quality": 0.3,
-        "argument_strength": 0.2,
-        "ethical_considerations": 0.1,
-        "causal_validity": 0.1,
-    },
+### Persuasiveness Score
 
-    # Causal analysis settings
-    min_causal_strength=0.3,
-    require_evidence_for_causal=True,
+Evaluates persuasiveness:
 
-    # Feedback settings
-    include_suggestions=True,
-    suggestion_count=3,
-)
-
-evaluator = AdaptiveEvaluator(config=config)
-```
-
-### Domain Profiles
-
-```python
-from artemis.core.evaluation import DomainProfile
-
-# Create custom domain profile
-scientific_profile = DomainProfile(
-    name="scientific",
-    weights={
-        "evidence_quality": 0.40,
-        "logical_coherence": 0.25,
-        "causal_validity": 0.20,
-        "argument_strength": 0.10,
-        "ethical_considerations": 0.05,
-    },
-    required_evidence_types=["empirical", "peer_reviewed"],
-    causal_requirements=["statistical_significance"],
-)
-
-evaluator = AdaptiveEvaluator(domain_profile=scientific_profile)
-```
-
-## Integration with Jury
-
-L-AE-CR provides scores to the jury mechanism:
-
-```python
-# Each jury member receives evaluation results
-for juror in jury.members:
-    evaluation = await evaluator.evaluate(
-        argument=argument,
-        context=debate_context,
-        perspective=juror.perspective,
-    )
-    juror.consider(evaluation)
-```
+- Clarity of thesis
+- Effectiveness of rhetoric
+- Audience appropriateness
+- Counter-argument handling
 
 ## Benefits of L-AE-CR
 
@@ -349,11 +283,11 @@ for juror in jury.members:
 - Detects logical fallacies
 - Measures chain strength
 
-### 4. Actionable Feedback
+### 4. Fair Assessment
 
-- Specific improvement suggestions
-- Identifies weak points
-- Highlights strengths
+- Multiple criteria considered
+- Weights prevent single-focus bias
+- Adaptation ensures relevance
 
 ## Next Steps
 

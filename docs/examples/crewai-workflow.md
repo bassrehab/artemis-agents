@@ -6,7 +6,7 @@ This example demonstrates comprehensive CrewAI integration patterns using ARTEMI
 
 ```python
 from crewai import Agent, Task, Crew, Process
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 # Create the debate tool
 debate_tool = ArtemisCrewTool(
@@ -31,7 +31,7 @@ debater = Agent(
     backstory="""You are an expert at using the ARTEMIS debate framework
     to analyze complex topics. You run debates and synthesize insights
     from multiple perspectives.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
     verbose=True,
 )
 
@@ -113,7 +113,7 @@ print(result)
 
 ```python
 from crewai import Agent, Task, Crew, Process
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 debate_tool = ArtemisCrewTool(model="gpt-4o")
 
@@ -124,7 +124,7 @@ technical_debater = Agent(
     backstory="""You focus on technical aspects: performance, scalability,
     reliability, and engineering complexity. You run debates specifically
     on technical trade-offs.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
 )
 
 business_debater = Agent(
@@ -133,7 +133,7 @@ business_debater = Agent(
     backstory="""You focus on business aspects: costs, revenue impact,
     time-to-market, and competitive advantage. You run debates on
     business trade-offs.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
 )
 
 risk_debater = Agent(
@@ -142,7 +142,7 @@ risk_debater = Agent(
     backstory="""You focus on risk aspects: security, compliance,
     operational risks, and failure modes. You run debates on
     risk trade-offs.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
 )
 
 synthesizer = Agent(
@@ -222,12 +222,61 @@ result = crew.kickoff(inputs={
 })
 ```
 
+## Multi-Agent Debates with CrewAI
+
+```python
+from crewai import Agent, Task, Crew, Process
+from artemis.integrations.crewai import ArtemisCrewTool
+
+# Create tool that supports multi-agent debates
+debate_tool = ArtemisCrewTool(
+    model="gpt-4o",
+    default_rounds=2,
+)
+
+debate_facilitator = Agent(
+    role="Debate Facilitator",
+    goal="Run multi-perspective debates using ARTEMIS",
+    backstory="""You facilitate debates with multiple agents representing
+    different viewpoints. You use the debate tool to get balanced analysis.""",
+    tools=[debate_tool.as_crewai_tool()],
+)
+
+# Task using multi-agent debate
+multi_agent_task = Task(
+    description="""
+    Run a multi-agent debate on: {topic}
+
+    Use the debate tool with multiple agents:
+    - agents: [
+        {{"name": "architect", "role": "System Architect", "position": "focus on technical excellence"}},
+        {{"name": "pragmatist", "role": "Pragmatic Engineer", "position": "focus on simplicity"}},
+        {{"name": "security", "role": "Security Expert", "position": "focus on security first"}}
+      ]
+    - rounds: 2
+
+    Summarize the verdict and key arguments from each perspective.
+    """,
+    agent=debate_facilitator,
+    expected_output="Multi-perspective debate analysis",
+)
+
+crew = Crew(
+    agents=[debate_facilitator],
+    tasks=[multi_agent_task],
+)
+
+result = crew.kickoff(inputs={
+    "topic": "How should we implement authentication for our new API?"
+})
+```
+
 ## Hierarchical Crew with Debate Manager
 
 ```python
 from crewai import Agent, Task, Crew, Process
 from langchain_openai import ChatOpenAI
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 debate_tool = ArtemisCrewTool(model="gpt-4o", default_rounds=2)
 
@@ -250,7 +299,7 @@ debate_runner = Agent(
     role="Debate Facilitator",
     goal="Run structured debates using ARTEMIS",
     backstory="Expert at facilitating productive debates.",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
 )
 
 report_writer = Agent(
@@ -319,7 +368,7 @@ result = crew.kickoff(inputs={
 
 ```python
 from crewai import Agent, Task, Crew, Process
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 debate_tool = ArtemisCrewTool(model="gpt-4o")
 
@@ -331,28 +380,20 @@ market_analyst = Agent(
     tools=[],  # market research tools
 )
 
-competitor_advocate = Agent(
-    role="Competitor Strategy Analyst",
-    goal="Analyze and advocate for competitor strategies",
-    backstory="""You analyze competitors objectively and can argue
-    why their strategies might succeed.""",
-    tools=[debate_tool],
-)
-
-our_strategist = Agent(
-    role="Internal Strategist",
-    goal="Develop and defend our strategic options",
-    backstory="""You develop strategic options for our company and
-    can argue their merits in competitive context.""",
-    tools=[debate_tool],
-)
-
 war_gamer = Agent(
     role="War Gaming Facilitator",
     goal="Facilitate competitive war games through debate",
     backstory="""You run debates that simulate competitive scenarios
     to stress-test strategies.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
+)
+
+strategist = Agent(
+    role="Internal Strategist",
+    goal="Develop and defend our strategic options",
+    backstory="""You develop strategic options for our company and
+    can argue their merits in competitive context.""",
+    tools=[],
 )
 
 # Tasks
@@ -396,13 +437,13 @@ strategy_recommendation = Task(
     - Key moves and timing
     - Response plans for competitor actions
     """,
-    agent=our_strategist,
+    agent=strategist,
     expected_output="Strategic recommendation with competitive playbook",
     context=[market_analysis, strategy_debate],
 )
 
 crew = Crew(
-    agents=[market_analyst, war_gamer, our_strategist],
+    agents=[market_analyst, war_gamer, strategist],
     tasks=[market_analysis, strategy_debate, strategy_recommendation],
     process=Process.sequential,
 )
@@ -416,13 +457,12 @@ result = crew.kickoff(inputs={
 
 ```python
 from crewai import Agent, Task, Crew, Process
-from artemis.integrations import ArtemisCrewTool
-from artemis.safety import CompositeMonitor
+from artemis.integrations.crewai import ArtemisCrewTool
 
-# Debate tool with safety monitoring
+# Debate tool
 debate_tool = ArtemisCrewTool(
     model="gpt-4o",
-    safety_monitor=CompositeMonitor.default(),
+    default_rounds=2,
 )
 
 # Product team agents
@@ -452,7 +492,7 @@ feature_debater = Agent(
     goal="Analyze feature trade-offs through debate",
     backstory="""You run debates to analyze feature decisions from
     multiple angles: user value, technical complexity, and business impact.""",
-    tools=[debate_tool],
+    tools=[debate_tool.as_crewai_tool()],
 )
 
 # Tasks for feature prioritization
@@ -533,7 +573,7 @@ result = crew.kickoff(inputs={
 ```python
 import asyncio
 from crewai import Agent, Task, Crew, Process
-from artemis.integrations import ArtemisCrewTool
+from artemis.integrations.crewai import ArtemisCrewTool
 
 async def run_async_crew():
     debate_tool = ArtemisCrewTool(model="gpt-4o")
@@ -541,7 +581,7 @@ async def run_async_crew():
     analyst = Agent(
         role="Analyst",
         goal="Analyze topics through structured debate",
-        tools=[debate_tool],
+        tools=[debate_tool.as_crewai_tool()],
     )
 
     task = Task(
@@ -574,6 +614,43 @@ async def run_async_crew():
         print(f"Result: {result}")
 
 asyncio.run(run_async_crew())
+```
+
+## Using DebateAnalyzer for Complex Decisions
+
+```python
+from artemis.integrations.crewai import DebateAnalyzer
+
+# Use the high-level analyzer for multi-faceted decisions
+analyzer = DebateAnalyzer(
+    model="gpt-4o",
+    rounds_per_debate=2,
+)
+
+# Single comprehensive analysis
+result = analyzer.analyze_decision(
+    decision="Should we migrate to cloud infrastructure?",
+)
+
+print(f"Verdict: {result['overall_verdict']}")
+print(f"Confidence: {result['confidence']:.0%}")
+print(f"Recommendation: {result['recommendation']}")
+
+# Multi-aspect analysis
+result = analyzer.analyze_decision(
+    decision="Should we adopt a new CRM platform?",
+    aspects=["cost", "functionality", "integration", "user_adoption"],
+)
+
+print("\nMulti-Aspect Analysis:")
+print(f"Decision: {result['decision']}")
+print(f"Overall Verdict: {result['overall_verdict']}")
+print(f"Verdict Distribution: {result['verdict_distribution']}")
+
+for aspect, data in result["aspect_results"].items():
+    print(f"\n{aspect.upper()}:")
+    print(f"  Verdict: {data['verdict']}")
+    print(f"  Confidence: {data['confidence']:.0%}")
 ```
 
 ## Next Steps
