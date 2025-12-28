@@ -7,8 +7,11 @@ from typing import Any
 from uuid import uuid4
 
 from artemis.core.agent import Agent
+from artemis.core.disagreement import DisagreementAnalyzer
 from artemis.core.evaluation import AdaptiveEvaluator
+from artemis.core.feedback import FeedbackSynthesizer
 from artemis.core.jury import JuryPanel
+from artemis.core.llm_evaluation import EvaluatorFactory
 from artemis.core.types import (
     ArgumentLevel,
     DebateConfig,
@@ -72,11 +75,33 @@ class Debate:
             evaluators=kwargs.get("jury_size", 3),
             model=kwargs.get("jury_model", "gpt-4o"),
         )
-        self._evaluator = evaluator or AdaptiveEvaluator()
+
+        # Create evaluator based on evaluation mode
+        if evaluator is not None:
+            self._evaluator = evaluator
+        else:
+            self._evaluator = EvaluatorFactory.create(
+                mode=self.config.evaluation_mode,
+                model=kwargs.get("evaluator_model", "gpt-4o-mini"),
+                api_key=kwargs.get("api_key"),
+            )
+
+        logger.debug(
+            "Evaluator created",
+            mode=self.config.evaluation_mode.value,
+            evaluator_type=type(self._evaluator).__name__,
+        )
 
         # Safety monitoring
         self._safety_monitors = safety_monitors or []
         self._safety_alerts: list[SafetyAlert] = []
+
+        # Feedback synthesis for closed-loop learning
+        self._feedback_synthesizer = FeedbackSynthesizer()
+        self._agent_feedback: dict[str, str] = {}
+
+        # Disagreement analysis for adaptive level selection
+        self._disagreement_analyzer = DisagreementAnalyzer()
 
         # State tracking
         self._state = DebateState.SETUP
@@ -258,6 +283,9 @@ class Debate:
             # Update context for next agent
             context = self._build_context()
 
+        # Synthesize feedback for next round (closed-loop learning)
+        self._synthesize_feedback()
+
         return round_turns
 
     async def _run_closing(self):
@@ -410,7 +438,42 @@ class Debate:
                 agent.observe_opponent(turn.argument)
 
     def _get_round_level(self, round_num):
-        # XXX: these thresholds are somewhat arbitrary
+        """Determine argument level for the current round.
+
+        Uses adaptive level selection based on disagreement analysis for
+        QUALITY and BALANCED modes. Falls back to mechanical round-based
+        assignment for FAST mode.
+        """
+        from artemis.core.types import EvaluationMode
+
+        # FAST mode uses mechanical assignment for speed
+        if self.config.evaluation_mode == EvaluationMode.FAST:
+            return self._mechanical_level(round_num)
+
+        # QUALITY and BALANCED modes use adaptive selection
+        disagreement = self._disagreement_analyzer.analyze(
+            transcript=self._transcript,
+            current_round=round_num,
+            total_rounds=self.total_rounds,
+        )
+
+        level = self._disagreement_analyzer.recommend_level(
+            disagreement=disagreement,
+            current_round=round_num,
+            total_rounds=self.total_rounds,
+        )
+
+        logger.debug(
+            "Adaptive level selected",
+            round=round_num,
+            disagreement=disagreement.value,
+            level=level.value,
+        )
+
+        return level
+
+    def _mechanical_level(self, round_num):
+        """Mechanical level selection based on round progress."""
         progress = round_num / self.total_rounds
 
         if progress <= 0.3:
@@ -431,6 +494,43 @@ class Debate:
             turn_in_round=len(self._get_round_turns(self._current_round)),
             transcript=self._transcript.copy(),
             agent_positions=self._agent_positions.copy(),
+            agent_feedback=self._agent_feedback.copy(),
+        )
+
+    def _synthesize_feedback(self):
+        """Synthesize feedback for all agents based on transcript.
+
+        Skipped in FAST mode for performance.
+        """
+        from artemis.core.types import EvaluationMode
+
+        # Skip feedback synthesis in FAST mode for performance
+        if self.config.evaluation_mode == EvaluationMode.FAST:
+            return
+
+        if not self._transcript:
+            return
+
+        for agent in self.agents:
+            # Get turns for this agent and opponents
+            own_turns = [t for t in self._transcript if t.agent == agent.name]
+            opponent_turns = [t for t in self._transcript if t.agent != agent.name]
+
+            # Synthesize feedback
+            feedback = self._feedback_synthesizer.synthesize(
+                agent_name=agent.name,
+                own_turns=own_turns,
+                opponent_turns=opponent_turns,
+            )
+
+            # Format for prompt and store
+            self._agent_feedback[agent.name] = self._feedback_synthesizer.format_for_prompt(
+                feedback
+            )
+
+        logger.debug(
+            "Feedback synthesized",
+            agents=list(self._agent_feedback.keys()),
         )
 
     def _build_result(self, verdict):

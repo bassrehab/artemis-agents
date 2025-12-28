@@ -19,6 +19,7 @@ from artemis.core.causal import (
     LinkType,
 )
 from artemis.core.debate import Debate, DebateError, DebateHaltedError
+from artemis.core.disagreement import DisagreementAnalyzer, DisagreementType
 from artemis.core.ethics import (
     EthicalConcern,
     EthicalFramework,
@@ -43,12 +44,17 @@ from artemis.core.evidence import (
     EvidenceType,
     ExtractedEvidence,
 )
+from artemis.core.feedback import FeedbackSummary, FeedbackSynthesizer
 from artemis.core.jury import (
     ConsensusResult,
     JurorEvaluation,
     JuryConfig,
     JuryMember,
     JuryPanel,
+)
+from artemis.core.llm_evaluation import (
+    EvaluatorFactory,
+    LLMCriterionEvaluator,
 )
 from artemis.core.types import (
     # Argument
@@ -72,6 +78,7 @@ from artemis.core.types import (
     # Verdict
     DissentingOpinion,
     EvaluationCriteria,
+    EvaluationMode,
     Evidence,
     JuryPerspective,
     # Messages
@@ -94,6 +101,7 @@ __all__ = [
     # Enums
     "ArgumentLevel",
     "DebateState",
+    "EvaluationMode",
     "JuryPerspective",
     "SafetyIndicatorType",
     "DebateStrategy",
@@ -154,6 +162,8 @@ __all__ = [
     "AdaptationConfig",
     "CriterionEvaluator",
     "EvaluationDimension",
+    "EvaluatorFactory",
+    "LLMCriterionEvaluator",
     "RoundEvaluator",
     "TopicAnalysis",
     # Jury
@@ -174,4 +184,10 @@ __all__ = [
     "FrameworkScore",
     "StakeholderImpact",
     "StakeholderType",
+    # Feedback
+    "FeedbackSummary",
+    "FeedbackSynthesizer",
+    # Disagreement Analysis
+    "DisagreementAnalyzer",
+    "DisagreementType",
 ]

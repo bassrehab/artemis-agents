@@ -1,7 +1,6 @@
 """ARTEMIS framework adapter for benchmarks."""
 
 import time
-from typing import Any
 
 from benchmarks.adapters.base import DebateAdapter, DebateResult
 
@@ -14,8 +13,8 @@ class ArtemisAdapter(DebateAdapter):
     def is_available(self) -> bool:
         """Check if ARTEMIS is available."""
         try:
-            from artemis.core.agent import Agent
-            from artemis.core.debate import Debate
+            from artemis.core.agent import Agent  # noqa: F401
+            from artemis.core.debate import Debate  # noqa: F401
 
             return True
         except ImportError:
@@ -52,11 +51,19 @@ class ArtemisAdapter(DebateAdapter):
                 model=model,
             )
 
+            # Create config with QUALITY mode for benchmarking
+            from artemis.core.types import DebateConfig, EvaluationMode
+
+            config = DebateConfig(
+                evaluation_mode=EvaluationMode.QUALITY,
+            )
+
             # Create and run debate
             debate = Debate(
                 topic=topic,
                 agents=[pro_agent, con_agent],
                 rounds=self.rounds,
+                config=config,
             )
 
             debate.assign_positions({
@@ -97,11 +104,16 @@ class ArtemisAdapter(DebateAdapter):
                 metadata={
                     "model": self.model,
                     "rounds": self.rounds,
+                    "evaluation_mode": "quality",
                     "features": [
                         "H-L-DAG",
                         "L-AE-CR",
                         "jury_verdict",
                         "evidence_tracking",
+                        "llm_evaluation",
+                        "closed_loop_feedback",
+                        "adaptive_level_selection",
+                        "perspective_weighting",
                     ],
                 },
                 tokens_used=tokens_used,

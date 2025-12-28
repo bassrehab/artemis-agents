@@ -29,6 +29,50 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
+# Perspective-specific criterion weights
+# Each perspective emphasizes different aspects of argument quality
+PERSPECTIVE_WEIGHTS: dict[JuryPerspective, dict[str, float]] = {
+    JuryPerspective.ANALYTICAL: {
+        "logical_coherence": 0.35,
+        "evidence_quality": 0.30,
+        "causal_reasoning": 0.25,
+        "ethical_alignment": 0.05,
+        "persuasiveness": 0.05,
+    },
+    JuryPerspective.ETHICAL: {
+        "logical_coherence": 0.15,
+        "evidence_quality": 0.15,
+        "causal_reasoning": 0.15,
+        "ethical_alignment": 0.40,
+        "persuasiveness": 0.15,
+    },
+    JuryPerspective.PRACTICAL: {
+        "logical_coherence": 0.20,
+        "evidence_quality": 0.30,
+        "causal_reasoning": 0.25,
+        "ethical_alignment": 0.10,
+        "persuasiveness": 0.15,
+    },
+    JuryPerspective.ADVERSARIAL: {
+        # Adversarial perspective focuses on finding weaknesses
+        # High weight on logical coherence to catch fallacies
+        "logical_coherence": 0.35,
+        "evidence_quality": 0.25,
+        "causal_reasoning": 0.25,
+        "ethical_alignment": 0.05,
+        "persuasiveness": 0.10,
+    },
+    JuryPerspective.SYNTHESIZING: {
+        # Synthesizing looks for balanced, well-rounded arguments
+        "logical_coherence": 0.20,
+        "evidence_quality": 0.20,
+        "causal_reasoning": 0.20,
+        "ethical_alignment": 0.20,
+        "persuasiveness": 0.20,
+    },
+}
+
+
 # Default criteria for jury evaluation
 DEFAULT_JURY_CRITERIA = [
     "argument_quality",
@@ -121,11 +165,11 @@ class JuryMember:
             )
             argument_evaluations[turn.agent].append(evaluation)
 
-        # Compute agent scores
-        agent_scores = self._compute_agent_scores(argument_evaluations)
+        # Compute criterion-level scores per agent
+        criterion_scores = self._compute_criterion_scores(argument_evaluations)
 
-        # Apply perspective weighting
-        weighted_scores = self._apply_perspective_weighting(agent_scores)
+        # Apply perspective weighting to get final agent scores
+        weighted_scores = self._apply_perspective_weighting(criterion_scores)
 
         # Handle empty transcript case
         if not weighted_scores:
@@ -155,7 +199,7 @@ class JuryMember:
             juror_id=self.juror_id,
             perspective=self.perspective,
             agent_scores=weighted_scores,
-            criterion_scores=self._compute_criterion_scores(argument_evaluations),
+            criterion_scores=criterion_scores,
             winner=winner,
             confidence=confidence,
             reasoning=reasoning,
@@ -197,9 +241,52 @@ class JuryMember:
 
         return result
 
-    def _apply_perspective_weighting(self, scores):
-        # TODO: actually implement perspective weighting
-        return scores
+    def _apply_perspective_weighting(
+        self, criterion_scores: dict[str, dict[str, float]]
+    ) -> dict[str, float]:
+        """Apply perspective-specific weights to criterion scores.
+
+        Args:
+            criterion_scores: Dict of agent -> {criterion: score}
+
+        Returns:
+            Dict of agent -> weighted total score
+        """
+        weights = PERSPECTIVE_WEIGHTS.get(self.perspective, {})
+        if not weights:
+            # Fallback to equal weights if perspective not found
+            weights = {
+                "logical_coherence": 0.20,
+                "evidence_quality": 0.20,
+                "causal_reasoning": 0.20,
+                "ethical_alignment": 0.20,
+                "persuasiveness": 0.20,
+            }
+
+        weighted_scores: dict[str, float] = {}
+
+        for agent, scores in criterion_scores.items():
+            if not scores:
+                weighted_scores[agent] = 0.0
+                continue
+
+            # Compute weighted sum
+            total = 0.0
+            weight_sum = 0.0
+
+            for criterion, weight in weights.items():
+                if criterion in scores:
+                    total += scores[criterion] * weight
+                    weight_sum += weight
+
+            # Normalize if we didn't have all criteria
+            if weight_sum > 0:
+                weighted_scores[agent] = total / weight_sum
+            else:
+                # Fallback to simple average
+                weighted_scores[agent] = sum(scores.values()) / len(scores)
+
+        return weighted_scores
 
     async def _generate_reasoning(self, transcript, context, scores, winner):
         # Summarize arguments
@@ -396,15 +483,29 @@ class JuryPanel:
         supporting = [e.juror_id for e in evaluations if e.winner == decision]
         dissenting = [e.juror_id for e in evaluations if e.winner != decision]
 
-        # Check for draw conditions
+        # Check for draw conditions with tiebreaker logic
         if agreement_score < self.consensus_threshold:
-            # Check if it's a close call
             sorted_scores = sorted(vote_scores.values(), reverse=True)
             if len(sorted_scores) >= 2:
                 margin = sorted_scores[0] - sorted_scores[1]
-                if margin < 0.1:  # Very close
-                    decision = "draw"
-                    agreement_score = 1.0 - margin
+                # Increased threshold from 0.1 to 0.25 to reduce false draws
+                if margin < 0.25:
+                    # Apply tiebreaker: highest-confidence juror's vote wins
+                    highest_confidence_eval = max(evaluations, key=lambda e: e.confidence)
+                    if highest_confidence_eval.confidence >= 0.6:
+                        # Strong enough confidence to break tie
+                        decision = highest_confidence_eval.winner
+                        agreement_score = highest_confidence_eval.confidence
+                        logger.debug(
+                            "Tiebreaker applied",
+                            winner=decision,
+                            tiebreaker_juror=highest_confidence_eval.juror_id,
+                            confidence=highest_confidence_eval.confidence,
+                        )
+                    else:
+                        # No juror confident enough, declare draw
+                        decision = "draw"
+                        agreement_score = 1.0 - margin
 
         return ConsensusResult(
             decision=decision,

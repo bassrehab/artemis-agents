@@ -201,18 +201,48 @@ class TestDebateHelperMethods:
         assert len(alerts) == 0
 
     def test_get_round_level_early(self, debate: Debate) -> None:
-        """Test argument level for early rounds."""
+        """Test argument level for early rounds.
+
+        With adaptive selection and no transcript, defaults to strategic.
+        """
         level = debate._get_round_level(1)
         assert level == ArgumentLevel.STRATEGIC
 
-    def test_get_round_level_middle(self, debate: Debate) -> None:
-        """Test argument level for middle rounds."""
+    def test_get_round_level_middle_adaptive(self, debate: Debate) -> None:
+        """Test that adaptive level selection is active in BALANCED mode.
+
+        Without transcript, fallback to round-based returns strategic for
+        rounds 1-3 (progress <= 0.7 with strategic disagreement).
+        """
         level = debate._get_round_level(3)
+        # With empty transcript, disagreeement defaults to STRATEGIC
+        # and recommend_level returns STRATEGIC for progress <= 0.7
+        assert level == ArgumentLevel.STRATEGIC
+
+    def test_get_round_level_late_adaptive(self, debate: Debate) -> None:
+        """Test adaptive level selection for late rounds.
+
+        Without transcript and strategic disagreement, returns TACTICAL
+        for late rounds (progress > 0.7).
+        """
+        level = debate._get_round_level(5)
+        # With empty transcript, disagreement defaults to STRATEGIC
+        # and recommend_level returns TACTICAL for progress > 0.7
         assert level == ArgumentLevel.TACTICAL
 
-    def test_get_round_level_late(self, debate: Debate) -> None:
-        """Test argument level for late rounds."""
-        level = debate._get_round_level(5)
+    def test_mechanical_level_early(self, debate: Debate) -> None:
+        """Test mechanical level selection for early rounds."""
+        level = debate._mechanical_level(1)
+        assert level == ArgumentLevel.STRATEGIC
+
+    def test_mechanical_level_middle(self, debate: Debate) -> None:
+        """Test mechanical level selection for middle rounds."""
+        level = debate._mechanical_level(3)
+        assert level == ArgumentLevel.TACTICAL
+
+    def test_mechanical_level_late(self, debate: Debate) -> None:
+        """Test mechanical level selection for late rounds."""
+        level = debate._mechanical_level(5)
         assert level == ArgumentLevel.OPERATIONAL
 
 

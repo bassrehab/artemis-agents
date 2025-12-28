@@ -295,10 +295,17 @@ class Agent:
             if strategy:
                 strategy_instructions = self.build_strategy_instructions(strategy)
 
-            # Combine with any additional instructions
+            # Get performance feedback from context (closed-loop learning)
+            feedback_instructions = ""
+            if context.agent_feedback and self.name in context.agent_feedback:
+                feedback_instructions = context.agent_feedback[self.name]
+
+            # Combine all instructions
             combined_instructions = strategy_instructions
+            if feedback_instructions:
+                combined_instructions = f"{combined_instructions}\n\n{feedback_instructions}"
             if additional_instructions:
-                combined_instructions = f"{strategy_instructions}\n\n{additional_instructions}"
+                combined_instructions = f"{combined_instructions}\n\n{additional_instructions}"
 
             # Build prompts
             system_prompt, user_prompt = build_generation_prompt(

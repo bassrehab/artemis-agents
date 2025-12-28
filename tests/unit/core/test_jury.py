@@ -12,7 +12,7 @@ from artemis.core.jury import (
     JuryConfig,
     JuryMember,
     JuryPanel,
-    PERSPECTIVE_PROMPTS,
+    PERSPECTIVE_WEIGHTS,
 )
 from artemis.core.types import (
     Argument,
@@ -221,11 +221,15 @@ class TestJuryMember:
         assert juror.juror_id == "juror_1"
         mock_create_model.assert_called_once()
 
-    def test_perspective_prompts_defined(self) -> None:
-        """Test that all perspectives have prompts."""
+    def test_perspective_weights_defined(self) -> None:
+        """Test that all perspectives have criterion weights."""
         for perspective in JuryPerspective:
-            assert perspective in PERSPECTIVE_PROMPTS
-            assert len(PERSPECTIVE_PROMPTS[perspective]) > 0
+            assert perspective in PERSPECTIVE_WEIGHTS
+            weights = PERSPECTIVE_WEIGHTS[perspective]
+            assert len(weights) > 0
+            # Weights should sum to approximately 1.0
+            total = sum(weights.values())
+            assert abs(total - 1.0) < 0.01
 
     @pytest.mark.asyncio
     async def test_evaluate_transcript(
@@ -375,12 +379,32 @@ class TestJuryMemberScoring:
 
     def test_apply_perspective_weighting(self, juror: JuryMember) -> None:
         """Test perspective-based score weighting."""
-        scores = {"Agent1": 0.8, "Agent2": 0.6}
+        # Criterion scores per agent
+        criterion_scores = {
+            "Agent1": {
+                "logical_coherence": 0.9,
+                "evidence_quality": 0.8,
+                "causal_reasoning": 0.7,
+                "ethical_alignment": 0.6,
+                "persuasiveness": 0.5,
+            },
+            "Agent2": {
+                "logical_coherence": 0.5,
+                "evidence_quality": 0.6,
+                "causal_reasoning": 0.7,
+                "ethical_alignment": 0.8,
+                "persuasiveness": 0.9,
+            },
+        }
 
-        weighted = juror._apply_perspective_weighting(scores)
+        weighted = juror._apply_perspective_weighting(criterion_scores)
 
-        # Currently returns unweighted, but should still work
-        assert weighted == scores
+        # Check that weighted scores are returned for each agent
+        assert "Agent1" in weighted
+        assert "Agent2" in weighted
+        # Analytical perspective should weight logical_coherence higher
+        # Agent1 should score higher since they have better logical scores
+        assert weighted["Agent1"] > weighted["Agent2"]
 
 
 class TestJuryPanel:

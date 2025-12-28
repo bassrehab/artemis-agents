@@ -88,6 +88,29 @@ class JuryPerspective(str, Enum):
     """Find common ground."""
 
 
+class EvaluationMode(str, Enum):
+    """Evaluation mode controlling accuracy vs cost tradeoff.
+
+    QUALITY: LLM-native evaluation for all criteria. Highest accuracy, highest cost.
+             Use for benchmarking and when accuracy is critical.
+
+    BALANCED: Selective LLM use (jury verdict + key decisions).
+              Good accuracy with moderate cost. Default for production.
+
+    FAST: Heuristic-only evaluation. Lowest cost, maintains backwards compatibility.
+          Use for development, testing, or cost-sensitive deployments.
+    """
+
+    QUALITY = "quality"
+    """LLM-native evaluation for maximum accuracy."""
+
+    BALANCED = "balanced"
+    """Selective LLM use for good accuracy/cost balance."""
+
+    FAST = "fast"
+    """Heuristic-only for minimum cost."""
+
+
 class JurorConfig(BaseModel):
     """Configuration for an individual juror."""
 
@@ -411,6 +434,8 @@ class DebateConfig(BaseModel):
     min_evidence_per_argument: int = Field(default=0, ge=0, le=5)
 
     # Evaluation
+    evaluation_mode: EvaluationMode = EvaluationMode.BALANCED
+    """Evaluation mode: QUALITY (LLM), BALANCED (selective LLM), FAST (heuristic)."""
     evaluation_criteria: EvaluationCriteria = Field(default_factory=EvaluationCriteria)
     adaptation_enabled: bool = True
     """Enable dynamic criteria weight adaptation."""
@@ -490,3 +515,5 @@ class DebateContext(BaseModel):
     """Complexity level (affects causal reasoning weighting)."""
     causal_graph: dict[str, list[CausalLink]] = Field(default_factory=dict)
     """Accumulated causal links by agent."""
+    agent_feedback: dict[str, str] = Field(default_factory=dict)
+    """Performance feedback per agent (from FeedbackSynthesizer)."""
