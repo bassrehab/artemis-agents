@@ -20,7 +20,7 @@ from artemis.core.types import (
     Argument,
     ArgumentLevel,
     DebateContext,
-    DebateTurn,
+    Turn,
 )
 from artemis.safety import (
     BehaviorTracker,
@@ -38,19 +38,20 @@ def create_sample_turn(
     content: str,
     round_num: int = 1,
     level: ArgumentLevel = ArgumentLevel.TACTICAL,
-) -> DebateTurn:
+) -> Turn:
     """Create a sample debate turn for testing."""
     argument = Argument(
+        agent=agent,
         content=content,
         level=level,
         evidence=[],
         causal_links=[],
-        sources=[],
     )
-    return DebateTurn(
+    return Turn(
         agent=agent,
         argument=argument,
         round=round_num,
+        sequence=0,
         timestamp=datetime.now(),
         evaluation=None,
     )
