@@ -33,7 +33,7 @@ class CrewAIAdapter(DebateAdapter):
         try:
             from crewai import Agent, Task, Crew, Process
 
-            # Create pro agent
+            # Create pro agent with explicit model for fair comparison
             pro_agent = Agent(
                 role="Proponent",
                 goal=f"Argue convincingly FOR: {pro_position}",
@@ -42,9 +42,10 @@ class CrewAIAdapter(DebateAdapter):
 You must present compelling arguments, use evidence, and address counterarguments.""",
                 verbose=False,
                 allow_delegation=False,
+                llm=self.model,  # Use same model as ARTEMIS
             )
 
-            # Create con agent
+            # Create con agent with explicit model for fair comparison
             con_agent = Agent(
                 role="Opponent",
                 goal=f"Argue convincingly AGAINST: {con_position}",
@@ -53,6 +54,7 @@ You must present compelling arguments, use evidence, and address counterargument
 You must present compelling arguments, use evidence, and address counterarguments.""",
                 verbose=False,
                 allow_delegation=False,
+                llm=self.model,  # Use same model as ARTEMIS
             )
 
             # Create debate tasks for each round
