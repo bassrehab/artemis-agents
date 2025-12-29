@@ -34,6 +34,11 @@ Unlike general-purpose multi-agent frameworks, ARTEMIS is **purpose-built for de
 | Sandbagging detection | No | No | No | **Metacognition** |
 | Reasoning model support | Limited | Limited | No | **o1/R1 native** |
 | MCP server mode | No | No | No | **Yes** |
+| Real-time streaming | Limited | No | No | **v2** |
+| Hierarchical debates | No | No | No | **v2** |
+| Multimodal evidence | Limited | Limited | No | **v2** |
+| Steering vectors | No | No | No | **v2** |
+| Argument verification | No | No | No | **v2** |
 
 ## Quick Example
 
@@ -58,6 +63,18 @@ result = await debate.run()
 print(f"Verdict: {result.verdict.decision}")
 print(f"Confidence: {result.verdict.confidence:.0%}")
 ```
+
+## What's New in v2.0
+
+ARTEMIS v2.0 introduces five major features:
+
+- **Hierarchical Debates**: Automatically decompose complex topics into sub-debates
+- **Real-Time Streaming**: Stream argument generation with async iterators
+- **Steering Vectors**: Control agent behavior (formality, aggression, evidence focus)
+- **Multimodal Evidence**: Analyze images, charts, and documents as evidence
+- **Formal Verification**: Validate argument logic, citations, and causal chains
+
+See the [v2 Examples](examples/streaming.md) and [Changelog](https://github.com/bassrehab/artemis-agents/blob/main/CHANGELOG.md) for details.
 
 ## Key Features
 

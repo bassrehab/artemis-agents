@@ -5,6 +5,50 @@ All notable changes to ARTEMIS Agents will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-12-29
+
+### Added
+- **Hierarchical Debates**: Sub-debates for complex topics with automatic decomposition
+  - `HierarchicalDebate` class for orchestrating nested debates
+  - `LLMTopicDecomposer` for intelligent topic breakdown
+  - `WeightedAverageAggregator` and other verdict aggregation strategies
+
+- **Real-Time Streaming**: Stream argument generation in real-time
+  - `StreamingDebate` with async iterator support
+  - `StreamEvent` types for granular progress tracking
+  - Callback system for custom event handling
+
+- **Steering Vectors**: Runtime behavior modification
+  - `SteeringVector` for controlling formality, aggression, evidence emphasis
+  - `SteeringController` for applying vectors to prompts
+  - Pre-configured presets (formal, aggressive, evidence-focused)
+
+- **Multimodal Evidence**: Support for images and documents
+  - `MultimodalEvidenceExtractor` for chart/image analysis
+  - Provider-specific content adapters (OpenAI, Anthropic, Google)
+  - `DocumentProcessor` for PDF and text extraction
+
+- **Formal Verification**: Argument validity checking
+  - `ArgumentVerifier` with configurable rule sets
+  - Causal chain validation
+  - Citation quality checking
+  - Logical consistency verification
+
+- **Causal Analysis**: Enhanced causal reasoning
+  - `CausalGraph` for building argument dependency graphs
+  - `CausalAnalyzer` for finding weak links and contradictions
+  - `CausalVisualizer` for DOT, Mermaid, and HTML exports
+  - `CausalStrategy` for attack/defense planning
+
+### Changed
+- Updated benchmarks showing ARTEMIS leadership in decision accuracy (86%)
+- Simplified docstrings across codebase for better readability
+- Improved code consistency and reduced AI-generated patterns
+
+### Fixed
+- Various edge cases in safety monitors
+- Improved error handling in model adapters
+
 ## [1.0.1] - 2025-12-29
 
 ### Fixed
