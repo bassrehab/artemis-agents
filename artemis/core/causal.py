@@ -220,10 +220,7 @@ class CausalGraph:
         visited: set[str] = set()
         rec_stack: set[str] = set()
 
-        return any(
-            self._has_cycle_dfs(node_id, visited, rec_stack)
-            for node_id in self._nodes
-        )
+        return any(self._has_cycle_dfs(node_id, visited, rec_stack) for node_id in self._nodes)
 
     def _has_cycle_dfs(self, node, visited, rec_stack):
         visited.add(node)
@@ -287,7 +284,7 @@ class CausalGraph:
         edges = list(self._edges.values())
 
         for i, e1 in enumerate(edges):
-            for e2 in edges[i + 1:]:
+            for e2 in edges[i + 1 :]:
                 # Same cause-effect pair with opposite types
                 if e1.source_id == e2.source_id and e1.target_id == e2.target_id:
                     if self._are_contradictory_types(e1.link_type, e2.link_type):
@@ -498,7 +495,10 @@ class CausalExtractor:
     CAUSAL_PATTERNS = [
         # Direct causation
         (r"(.+?)\s+(?:causes?|leads?\s+to|results?\s+in)\s+(.+?)(?:\.|,|$)", LinkType.CAUSES),
-        (r"(.+?)\s+(?:is\s+the\s+cause\s+of|is\s+responsible\s+for)\s+(.+?)(?:\.|,|$)", LinkType.CAUSES),
+        (
+            r"(.+?)\s+(?:is\s+the\s+cause\s+of|is\s+responsible\s+for)\s+(.+?)(?:\.|,|$)",
+            LinkType.CAUSES,
+        ),
         (r"because\s+(?:of\s+)?(.+?),?\s+(.+?)(?:\.|$)", LinkType.CAUSES),
         (r"(.+?)\s+therefore\s+(.+?)(?:\.|$)", LinkType.CAUSES),
         (r"(.+?)\s+consequently\s+(.+?)(?:\.|$)", LinkType.CAUSES),
@@ -512,7 +512,10 @@ class CausalExtractor:
         (r"(.+?)\s+(?:prevents?|stops?|blocks?)\s+(.+?)(?:\.|,|$)", LinkType.PREVENTS),
         (r"without\s+(.+?),?\s+(.+?)\s+would(?:n't|\s+not)\s+(.+?)(?:\.|$)", LinkType.PREVENTS),
         # Correlation
-        (r"(.+?)\s+(?:is\s+)?(?:correlated|associated)\s+with\s+(.+?)(?:\.|,|$)", LinkType.CORRELATES),
+        (
+            r"(.+?)\s+(?:is\s+)?(?:correlated|associated)\s+with\s+(.+?)(?:\.|,|$)",
+            LinkType.CORRELATES,
+        ),
         # Implication
         (r"if\s+(.+?),?\s+then\s+(.+?)(?:\.|$)", LinkType.IMPLIES),
         (r"(.+?)\s+implies\s+(?:that\s+)?(.+?)(?:\.|$)", LinkType.IMPLIES),

@@ -126,9 +126,7 @@ class ArtemisDebateNode:
             ),
         ]
 
-    def _get_positions(
-        self, state: DebateNodeState, agents: list[Agent]
-    ) -> dict[str, str]:
+    def _get_positions(self, state: DebateNodeState, agents: list[Agent]) -> dict[str, str]:
         """Get positions mapping for agents."""
         # From explicit positions in state
         if state.get("positions"):
@@ -311,10 +309,7 @@ class ArtemisDebateNode:
                     scores[turn.agent] = []
                 scores[turn.agent].append(turn.evaluation.total_score)
 
-        avg_scores = {
-            agent: (sum(s) / len(s) if s else 0.0)
-            for agent, s in scores.items()
-        }
+        avg_scores = {agent: (sum(s) / len(s) if s else 0.0) for agent, s in scores.items()}
 
         return {
             **state,
@@ -332,14 +327,10 @@ class ArtemisDebateNode:
                 **state.get("metadata", {}),
                 "total_turns": len(result.transcript),
                 "started_at": (
-                    result.metadata.started_at.isoformat()
-                    if result.metadata.started_at
-                    else None
+                    result.metadata.started_at.isoformat() if result.metadata.started_at else None
                 ),
                 "ended_at": (
-                    result.metadata.ended_at.isoformat()
-                    if result.metadata.ended_at
-                    else None
+                    result.metadata.ended_at.isoformat() if result.metadata.ended_at else None
                 ),
             },
         }
@@ -353,14 +344,13 @@ class ArtemisDebateNode:
             "agent": turn.agent,
             "content": turn.argument.content,
             "level": turn.argument.level.value,
-            "score": (
-                turn.evaluation.total_score if turn.evaluation else None
-            ),
+            "score": (turn.evaluation.total_score if turn.evaluation else None),
             "timestamp": turn.timestamp.isoformat(),
         }
 
     def get_routing_function(self):
         """Get routing function for conditional edges."""
+
         def router(state: DebateNodeState) -> str:
             current = state.get("current_round", 0)
             total = state.get("rounds", 3)
@@ -389,8 +379,7 @@ def create_debate_workflow(model="gpt-4o", step_by_step=False, agents=None):
         from langgraph.graph import END, StateGraph
     except ImportError as e:
         raise ImportError(
-            "langgraph is required for LangGraph integration. "
-            "Install with: pip install langgraph"
+            "langgraph is required for LangGraph integration. Install with: pip install langgraph"
         ) from e
 
     node = ArtemisDebateNode(model=model, agents=agents)

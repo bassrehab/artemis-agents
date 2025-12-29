@@ -27,31 +27,31 @@ def _md_to_html(text: str) -> str:
     text = html.escape(text)
 
     # Headers: ## Header -> <h4>Header</h4>
-    text = re.sub(r'^## (.+)$', r'<h4>\1</h4>', text, flags=re.MULTILINE)
-    text = re.sub(r'^### (.+)$', r'<h5>\1</h5>', text, flags=re.MULTILINE)
+    text = re.sub(r"^## (.+)$", r"<h4>\1</h4>", text, flags=re.MULTILINE)
+    text = re.sub(r"^### (.+)$", r"<h5>\1</h5>", text, flags=re.MULTILINE)
 
     # Bold: **text** -> <strong>text</strong>
-    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
 
     # Italic: *text* -> <em>text</em>
-    text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+    text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", text)
 
     # Bullet points: - item -> <li>item</li>
-    text = re.sub(r'^- (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    text = re.sub(r"^- (.+)$", r"<li>\1</li>", text, flags=re.MULTILINE)
 
     # Wrap consecutive <li> in <ul>
-    text = re.sub(r'((?:<li>.*?</li>\n?)+)', r'<ul>\1</ul>', text)
+    text = re.sub(r"((?:<li>.*?</li>\n?)+)", r"<ul>\1</ul>", text)
 
     # Numbered lists: 1. item -> <li>item</li>
-    text = re.sub(r'^\d+\. (.+)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+    text = re.sub(r"^\d+\. (.+)$", r"<li>\1</li>", text, flags=re.MULTILINE)
 
     # Line breaks for paragraphs
-    text = re.sub(r'\n\n+', '</p><p>', text)
-    text = re.sub(r'\n', '<br>', text)
+    text = re.sub(r"\n\n+", "</p><p>", text)
+    text = re.sub(r"\n", "<br>", text)
 
     # Wrap in paragraph if not already structured
-    if not text.startswith('<'):
-        text = f'<p>{text}</p>'
+    if not text.startswith("<"):
+        text = f"<p>{text}</p>"
 
     return text
 
@@ -83,17 +83,19 @@ class AuditLog:
         entries = []
 
         # Add debate start entry
-        entries.append(AuditEntry(
-            timestamp=result.metadata.started_at,
-            debate_id=result.debate_id,
-            event_type="debate_started",
-            details={
-                "topic": result.topic,
-                "agents": result.metadata.agents,
-                "total_rounds": result.metadata.total_rounds,
-                "jury_size": result.metadata.jury_size,
-            },
-        ))
+        entries.append(
+            AuditEntry(
+                timestamp=result.metadata.started_at,
+                debate_id=result.debate_id,
+                event_type="debate_started",
+                details={
+                    "topic": result.topic,
+                    "agents": result.metadata.agents,
+                    "total_rounds": result.metadata.total_rounds,
+                    "jury_size": result.metadata.jury_size,
+                },
+            )
+        )
 
         # Add entries for each turn
         for turn in result.transcript:
@@ -101,42 +103,46 @@ class AuditLog:
 
             # Add evaluation entry with full details
             if turn.evaluation:
-                entries.append(AuditEntry(
-                    timestamp=turn.timestamp,
-                    debate_id=result.debate_id,
-                    event_type="argument_evaluated",
-                    agent=turn.agent,
-                    round=turn.round,
-                    details={
-                        "total_score": turn.evaluation.total_score,
-                        "scores": turn.evaluation.scores,
-                        "weights": turn.evaluation.weights,
-                        "feedback": getattr(turn.evaluation, "feedback", None),
-                        "strengths": getattr(turn.evaluation, "strengths", []),
-                        "weaknesses": getattr(turn.evaluation, "weaknesses", []),
-                        "criteria_met": getattr(turn.evaluation, "criteria_met", []),
-                    },
-                ))
+                entries.append(
+                    AuditEntry(
+                        timestamp=turn.timestamp,
+                        debate_id=result.debate_id,
+                        event_type="argument_evaluated",
+                        agent=turn.agent,
+                        round=turn.round,
+                        details={
+                            "total_score": turn.evaluation.total_score,
+                            "scores": turn.evaluation.scores,
+                            "weights": turn.evaluation.weights,
+                            "feedback": getattr(turn.evaluation, "feedback", None),
+                            "strengths": getattr(turn.evaluation, "strengths", []),
+                            "weaknesses": getattr(turn.evaluation, "weaknesses", []),
+                            "criteria_met": getattr(turn.evaluation, "criteria_met", []),
+                        },
+                    )
+                )
 
             # Add safety results - include ALL results for audit trail
             for safety in turn.safety_results:
-                entries.append(AuditEntry(
-                    timestamp=turn.timestamp,
-                    debate_id=result.debate_id,
-                    event_type="safety_check",
-                    agent=turn.agent,
-                    round=turn.round,
-                    details={
-                        "monitor": safety.monitor,
-                        "passed": safety.severity == 0,
-                        "severity": safety.severity,
-                        "should_alert": safety.should_alert,
-                        "analysis_notes": safety.analysis_notes,
-                        "indicators": getattr(safety, "indicators", []),
-                        "recommendation": getattr(safety, "recommendation", None),
-                        "confidence": getattr(safety, "confidence", None),
-                    },
-                ))
+                entries.append(
+                    AuditEntry(
+                        timestamp=turn.timestamp,
+                        debate_id=result.debate_id,
+                        event_type="safety_check",
+                        agent=turn.agent,
+                        round=turn.round,
+                        details={
+                            "monitor": safety.monitor,
+                            "passed": safety.severity == 0,
+                            "severity": safety.severity,
+                            "should_alert": safety.should_alert,
+                            "analysis_notes": safety.analysis_notes,
+                            "indicators": getattr(safety, "indicators", []),
+                            "recommendation": getattr(safety, "recommendation", None),
+                            "confidence": getattr(safety, "confidence", None),
+                        },
+                    )
+                )
 
         # Add safety alerts
         for alert in result.safety_alerts:
@@ -144,80 +150,92 @@ class AuditLog:
 
         # Add verdict entry
         if result.verdict:
-            entries.append(AuditEntry(
-                timestamp=result.metadata.ended_at or datetime.utcnow(),
-                debate_id=result.debate_id,
-                event_type="verdict_issued",
-                details={
-                    "decision": result.verdict.decision,
-                    "confidence": result.verdict.confidence,
-                    "reasoning": result.verdict.reasoning,
-                    "unanimous": result.verdict.unanimous,
-                    "score_breakdown": result.verdict.score_breakdown,
-                    "dissenting_count": len(result.verdict.dissenting_opinions),
-                },
-            ))
+            entries.append(
+                AuditEntry(
+                    timestamp=result.metadata.ended_at or datetime.utcnow(),
+                    debate_id=result.debate_id,
+                    event_type="verdict_issued",
+                    details={
+                        "decision": result.verdict.decision,
+                        "confidence": result.verdict.confidence,
+                        "reasoning": result.verdict.reasoning,
+                        "unanimous": result.verdict.unanimous,
+                        "score_breakdown": result.verdict.score_breakdown,
+                        "dissenting_count": len(result.verdict.dissenting_opinions),
+                    },
+                )
+            )
 
         # Add debate end entry
-        entries.append(AuditEntry(
-            timestamp=result.metadata.ended_at or datetime.utcnow(),
-            debate_id=result.debate_id,
-            event_type="debate_completed",
-            details={
-                "final_state": result.final_state.value,
-                "total_turns": result.metadata.total_turns,
-            },
-        ))
+        entries.append(
+            AuditEntry(
+                timestamp=result.metadata.ended_at or datetime.utcnow(),
+                debate_id=result.debate_id,
+                event_type="debate_completed",
+                details={
+                    "final_state": result.final_state.value,
+                    "total_turns": result.metadata.total_turns,
+                },
+            )
+        )
 
         # Add verification reports
         for report in result.verification_reports:
-            entries.append(AuditEntry(
-                timestamp=result.metadata.ended_at or datetime.utcnow(),
-                debate_id=result.debate_id,
-                event_type="verification_report",
-                details={
-                    "argument_id": report.argument_id,
-                    "overall_passed": report.overall_passed,
-                    "overall_score": report.overall_score,
-                    "results": [
-                        {
-                            "rule_type": r.rule_type.value if hasattr(r.rule_type, 'value') else str(r.rule_type),
-                            "passed": r.passed,
-                            "score": r.score,
-                            "violations": [
-                                {"severity": v.severity, "description": v.description}
-                                for v in r.violations
-                            ],
-                        }
-                        for r in report.results
-                    ],
-                },
-            ))
+            entries.append(
+                AuditEntry(
+                    timestamp=result.metadata.ended_at or datetime.utcnow(),
+                    debate_id=result.debate_id,
+                    event_type="verification_report",
+                    details={
+                        "argument_id": report.argument_id,
+                        "overall_passed": report.overall_passed,
+                        "overall_score": report.overall_score,
+                        "results": [
+                            {
+                                "rule_type": r.rule_type.value
+                                if hasattr(r.rule_type, "value")
+                                else str(r.rule_type),
+                                "passed": r.passed,
+                                "score": r.score,
+                                "violations": [
+                                    {"severity": v.severity, "description": v.description}
+                                    for v in r.violations
+                                ],
+                            }
+                            for r in report.results
+                        ],
+                    },
+                )
+            )
 
         # Add sub-debate entries for hierarchical debates
         for sub_debate in result.sub_debates:
-            entries.append(AuditEntry(
-                timestamp=result.metadata.ended_at or datetime.utcnow(),
-                debate_id=result.debate_id,
-                event_type="sub_debate",
-                details=sub_debate,
-            ))
+            entries.append(
+                AuditEntry(
+                    timestamp=result.metadata.ended_at or datetime.utcnow(),
+                    debate_id=result.debate_id,
+                    event_type="sub_debate",
+                    details=sub_debate,
+                )
+            )
 
         # Add compound verdict for hierarchical debates
         if result.compound_verdict:
-            entries.append(AuditEntry(
-                timestamp=result.metadata.ended_at or datetime.utcnow(),
-                debate_id=result.debate_id,
-                event_type="compound_verdict",
-                details={
-                    "final_decision": result.compound_verdict.final_decision,
-                    "confidence": result.compound_verdict.confidence,
-                    "reasoning": result.compound_verdict.reasoning,
-                    "aggregation_method": result.compound_verdict.aggregation_method,
-                    "sub_verdicts_count": len(result.compound_verdict.sub_verdicts),
-                    "aggregation_weights": result.compound_verdict.aggregation_weights,
-                },
-            ))
+            entries.append(
+                AuditEntry(
+                    timestamp=result.metadata.ended_at or datetime.utcnow(),
+                    debate_id=result.debate_id,
+                    event_type="compound_verdict",
+                    details={
+                        "final_decision": result.compound_verdict.final_decision,
+                        "confidence": result.compound_verdict.confidence,
+                        "reasoning": result.compound_verdict.reasoning,
+                        "aggregation_method": result.compound_verdict.aggregation_method,
+                        "sub_verdicts_count": len(result.compound_verdict.sub_verdicts),
+                        "aggregation_weights": result.compound_verdict.aggregation_weights,
+                    },
+                )
+            )
 
         # Build metadata
         metadata = {
@@ -256,27 +274,33 @@ class AuditLog:
                 "verified": getattr(e, "verified", None),
             }
             # Add multimodal fields if present
-            if hasattr(e, 'content_type') and e.content_type:
-                ev_entry["content_type"] = e.content_type.value if hasattr(e.content_type, 'value') else str(e.content_type)
-            if hasattr(e, 'url') and e.url:
+            if hasattr(e, "content_type") and e.content_type:
+                ev_entry["content_type"] = (
+                    e.content_type.value
+                    if hasattr(e.content_type, "value")
+                    else str(e.content_type)
+                )
+            if hasattr(e, "url") and e.url:
                 ev_entry["url"] = e.url
-            if hasattr(e, 'media_type') and e.media_type:
+            if hasattr(e, "media_type") and e.media_type:
                 ev_entry["media_type"] = e.media_type
-            if hasattr(e, 'alt_text') and e.alt_text:
+            if hasattr(e, "alt_text") and e.alt_text:
                 ev_entry["alt_text"] = e.alt_text
-            if hasattr(e, 'filename') and e.filename:
+            if hasattr(e, "filename") and e.filename:
                 ev_entry["filename"] = e.filename
             evidence_full.append(ev_entry)
 
         # Full causal links
         causal_links = []
         for link in turn.argument.causal_links:
-            causal_links.append({
-                "cause": link.cause,
-                "effect": link.effect,
-                "strength": getattr(link, "strength", None),
-                "mechanism": getattr(link, "mechanism", None),
-            })
+            causal_links.append(
+                {
+                    "cause": link.cause,
+                    "effect": link.effect,
+                    "strength": getattr(link, "strength", None),
+                    "mechanism": getattr(link, "mechanism", None),
+                }
+            )
 
         return AuditEntry(
             timestamp=turn.timestamp,
@@ -364,11 +388,13 @@ class AuditLog:
         lines.append(f"| Turns | {self.metadata.get('total_turns', 'N/A')} |")
         lines.append(f"| Agents | {', '.join(self.metadata.get('agents', []))} |")
         lines.append(f"| Jury Size | {self.metadata.get('jury_size', 'N/A')} |")
-        lines.append(f"| Safety Monitors | {', '.join(self.metadata.get('safety_monitors', [])) or 'None'} |")
+        lines.append(
+            f"| Safety Monitors | {', '.join(self.metadata.get('safety_monitors', [])) or 'None'} |"
+        )
         lines.append("")
 
         # Model usage if available
-        model_usage = self.metadata.get('model_usage', {})
+        model_usage = self.metadata.get("model_usage", {})
         if model_usage:
             lines.append("### Model Usage")
             lines.append("")
@@ -378,9 +404,9 @@ class AuditLog:
             lines.append("")
 
         # V2 Features Configuration
-        steering_config = self.metadata.get('steering_config')
-        hierarchical_config = self.metadata.get('hierarchical_config')
-        verification_spec = self.metadata.get('verification_spec')
+        steering_config = self.metadata.get("steering_config")
+        hierarchical_config = self.metadata.get("hierarchical_config")
+        verification_spec = self.metadata.get("verification_spec")
 
         if steering_config or hierarchical_config or verification_spec:
             lines.append("## V2 Features Configuration")
@@ -389,16 +415,16 @@ class AuditLog:
             if steering_config:
                 lines.append("### Steering Configuration")
                 lines.append("")
-                vector = steering_config.get('vector', {})
+                vector = steering_config.get("vector", {})
                 if vector:
                     lines.append("| Dimension | Value |")
                     lines.append("|-----------|-------|")
                     for dim, val in vector.items():
                         lines.append(f"| {dim} | {val:.2f} |")
                     lines.append("")
-                mode = steering_config.get('mode', 'prompt')
-                strength = steering_config.get('strength', 1.0)
-                adaptive = steering_config.get('adaptive', False)
+                mode = steering_config.get("mode", "prompt")
+                strength = steering_config.get("strength", 1.0)
+                adaptive = steering_config.get("adaptive", False)
                 lines.append(f"- **Mode:** {mode}")
                 lines.append(f"- **Strength:** {strength:.2f}")
                 lines.append(f"- **Adaptive:** {'Yes' if adaptive else 'No'}")
@@ -407,9 +433,9 @@ class AuditLog:
             if hierarchical_config:
                 lines.append("### Hierarchical Debate Configuration")
                 lines.append("")
-                max_depth = hierarchical_config.get('max_depth', 2)
-                decomposer = hierarchical_config.get('decomposer', 'LLM')
-                aggregator = hierarchical_config.get('aggregator', 'weighted_average')
+                max_depth = hierarchical_config.get("max_depth", 2)
+                decomposer = hierarchical_config.get("decomposer", "LLM")
+                aggregator = hierarchical_config.get("aggregator", "weighted_average")
                 lines.append(f"- **Max Depth:** {max_depth}")
                 lines.append(f"- **Decomposer:** {decomposer}")
                 lines.append(f"- **Aggregator:** {aggregator}")
@@ -418,18 +444,20 @@ class AuditLog:
             if verification_spec:
                 lines.append("### Verification Specification")
                 lines.append("")
-                rules = verification_spec.get('rules', [])
-                strict_mode = verification_spec.get('strict_mode', False)
-                min_score = verification_spec.get('min_score', 0.6)
+                rules = verification_spec.get("rules", [])
+                strict_mode = verification_spec.get("strict_mode", False)
+                min_score = verification_spec.get("min_score", 0.6)
                 lines.append(f"- **Strict Mode:** {'Yes' if strict_mode else 'No'}")
                 lines.append(f"- **Minimum Score:** {min_score:.2f}")
                 if rules:
                     lines.append("- **Rules:**")
                     for rule in rules:
-                        rule_type = rule.get('rule_type', 'unknown')
-                        enabled = rule.get('enabled', True)
-                        severity = rule.get('severity', 1.0)
-                        lines.append(f"  - {rule_type} (enabled: {enabled}, severity: {severity:.2f})")
+                        rule_type = rule.get("rule_type", "unknown")
+                        enabled = rule.get("enabled", True)
+                        severity = rule.get("severity", 1.0)
+                        lines.append(
+                            f"  - {rule_type} (enabled: {enabled}, severity: {severity:.2f})"
+                        )
                 lines.append("")
 
         # Full Transcript
@@ -441,16 +469,18 @@ class AuditLog:
             if entry.event_type == "argument_generated":
                 if entry.round != current_round:
                     current_round = entry.round
-                    round_label = "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    round_label = (
+                        "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    )
                     lines.append(f"### {round_label}")
                     lines.append("")
                     lines.append("---")
                     lines.append("")
 
                 # Agent header with full details
-                turn_id = entry.details.get('turn_id', 'N/A')
-                level = entry.details.get('level', 'N/A')
-                ethical_score = entry.details.get('ethical_score')
+                turn_id = entry.details.get("turn_id", "N/A")
+                level = entry.details.get("level", "N/A")
+                ethical_score = entry.details.get("ethical_score")
                 ethical_str = f" | Ethical Score: {ethical_score:.2f}" if ethical_score else ""
 
                 lines.append(f"#### {entry.agent}")
@@ -459,13 +489,13 @@ class AuditLog:
                 lines.append("")
 
                 # FULL argument content
-                content = entry.details.get('content', '')
+                content = entry.details.get("content", "")
                 lines.append(content)
                 lines.append("")
 
                 # Rebuts/Supports
-                rebuts = entry.details.get('rebuts', [])
-                supports = entry.details.get('supports', [])
+                rebuts = entry.details.get("rebuts", [])
+                supports = entry.details.get("supports", [])
                 if rebuts:
                     lines.append(f"**Rebuts:** {', '.join(f'`{r}`' for r in rebuts)}")
                     lines.append("")
@@ -474,51 +504,57 @@ class AuditLog:
                     lines.append("")
 
                 # Full Evidence with multimodal support
-                evidence = entry.details.get('evidence', [])
+                evidence = entry.details.get("evidence", [])
                 if evidence:
                     lines.append(f"**Evidence ({len(evidence)}):**")
                     lines.append("")
                     for i, e in enumerate(evidence, 1):
-                        verified = " (verified)" if e.get('verified') else ""
-                        content_type = e.get('content_type', 'text')
+                        verified = " (verified)" if e.get("verified") else ""
+                        content_type = e.get("content_type", "text")
                         type_badge = f"[{e.get('type')}]"
-                        if content_type and content_type != 'text':
+                        if content_type and content_type != "text":
                             type_badge = f"[{e.get('type')} - {content_type}]"
                         lines.append(f"{i}. **{type_badge}** {e.get('content')}")
                         lines.append(f"   - Source: {e.get('source', 'N/A')}")
                         lines.append(f"   - Confidence: {e.get('confidence', 0):.2f}{verified}")
                         # Multimodal fields
-                        if e.get('url'):
+                        if e.get("url"):
                             lines.append(f"   - URL: {e.get('url')}")
-                        if e.get('media_type'):
+                        if e.get("media_type"):
                             lines.append(f"   - Media Type: {e.get('media_type')}")
-                        if e.get('filename'):
+                        if e.get("filename"):
                             lines.append(f"   - Filename: {e.get('filename')}")
-                        if e.get('alt_text'):
+                        if e.get("alt_text"):
                             lines.append(f"   - Alt Text: {e.get('alt_text')}")
                     lines.append("")
 
                 # Causal Links
-                causal_links = entry.details.get('causal_links', [])
+                causal_links = entry.details.get("causal_links", [])
                 if causal_links:
                     lines.append(f"**Causal Links ({len(causal_links)}):**")
                     lines.append("")
                     for link in causal_links:
-                        strength = f" (strength: {link.get('strength', 'N/A')})" if link.get('strength') else ""
+                        strength = (
+                            f" (strength: {link.get('strength', 'N/A')})"
+                            if link.get("strength")
+                            else ""
+                        )
                         lines.append(f"- {link.get('cause')} → {link.get('effect')}{strength}")
-                        if link.get('mechanism'):
+                        if link.get("mechanism"):
                             lines.append(f"  - Mechanism: {link.get('mechanism')}")
                     lines.append("")
 
             # Evaluation details
             elif entry.event_type == "argument_evaluated":
                 lines.append("<details>")
-                lines.append(f"<summary><strong>Evaluation</strong> (Score: {entry.details.get('total_score', 0):.2f})</summary>")
+                lines.append(
+                    f"<summary><strong>Evaluation</strong> (Score: {entry.details.get('total_score', 0):.2f})</summary>"
+                )
                 lines.append("")
 
                 # Score breakdown
-                scores = entry.details.get('scores', {})
-                weights = entry.details.get('weights', {})
+                scores = entry.details.get("scores", {})
+                weights = entry.details.get("weights", {})
                 if scores:
                     lines.append("| Criterion | Score | Weight |")
                     lines.append("|-----------|-------|--------|")
@@ -528,14 +564,14 @@ class AuditLog:
                     lines.append("")
 
                 # Feedback
-                feedback = entry.details.get('feedback')
+                feedback = entry.details.get("feedback")
                 if feedback:
                     lines.append(f"**Feedback:** {feedback}")
                     lines.append("")
 
                 # Strengths and Weaknesses
-                strengths = entry.details.get('strengths', [])
-                weaknesses = entry.details.get('weaknesses', [])
+                strengths = entry.details.get("strengths", [])
+                weaknesses = entry.details.get("weaknesses", [])
                 if strengths:
                     lines.append("**Strengths:**")
                     for s in strengths:
@@ -552,16 +588,18 @@ class AuditLog:
 
             # Safety check details
             elif entry.event_type == "safety_check":
-                passed = entry.details.get('passed', True)
-                severity = entry.details.get('severity', 0)
+                passed = entry.details.get("passed", True)
+                severity = entry.details.get("severity", 0)
                 if not passed or severity > 0:
                     icon = "🔴" if severity > 0.7 else "🟡" if severity > 0.3 else "🟢"
-                    lines.append(f"{icon} **Safety Check** ({entry.details.get('monitor', 'Unknown')})")
+                    lines.append(
+                        f"{icon} **Safety Check** ({entry.details.get('monitor', 'Unknown')})"
+                    )
                     lines.append(f"- Severity: {severity:.2f}")
-                    notes = entry.details.get('analysis_notes')
+                    notes = entry.details.get("analysis_notes")
                     if notes:
                         lines.append(f"- Notes: {notes}")
-                    recommendation = entry.details.get('recommendation')
+                    recommendation = entry.details.get("recommendation")
                     if recommendation:
                         lines.append(f"- Recommendation: {recommendation}")
                     lines.append("")
@@ -582,7 +620,7 @@ class AuditLog:
             lines.append("")
 
             # Score breakdown
-            scores = verdict.details.get('score_breakdown', {})
+            scores = verdict.details.get("score_breakdown", {})
             if scores:
                 lines.append("### Score Breakdown")
                 lines.append("")
@@ -598,7 +636,7 @@ class AuditLog:
             lines.append("## Safety Alerts")
             lines.append("")
             for alert in alert_entries:
-                severity = alert.details.get('severity', 0)
+                severity = alert.details.get("severity", 0)
                 severity_label = "HIGH" if severity > 0.7 else "MEDIUM" if severity > 0.4 else "LOW"
                 lines.append(f"### [{severity_label}] {alert.details.get('type', 'Unknown')}")
                 lines.append("")
@@ -620,16 +658,16 @@ class AuditLog:
                 lines.append("### Sub-Debates")
                 lines.append("")
                 for i, sub in enumerate(sub_debate_entries, 1):
-                    aspect = sub.details.get('aspect', f'Sub-debate {i}')
-                    weight = sub.details.get('weight', 1.0)
-                    sub_verdict = sub.details.get('verdict', {})
+                    aspect = sub.details.get("aspect", f"Sub-debate {i}")
+                    weight = sub.details.get("weight", 1.0)
+                    sub_verdict = sub.details.get("verdict", {})
                     lines.append(f"#### {i}. {aspect}")
                     lines.append("")
                     lines.append(f"- **Weight:** {weight:.2f}")
                     if sub_verdict:
                         lines.append(f"- **Decision:** {sub_verdict.get('decision', 'N/A')}")
                         lines.append(f"- **Confidence:** {sub_verdict.get('confidence', 0):.0%}")
-                        reasoning = sub_verdict.get('reasoning', '')
+                        reasoning = sub_verdict.get("reasoning", "")
                         if reasoning:
                             lines.append(f"- **Reasoning:** {reasoning[:200]}...")
                     lines.append("")
@@ -640,10 +678,12 @@ class AuditLog:
                 lines.append("")
                 lines.append(f"**Final Decision:** {cv.details.get('final_decision', 'N/A')}")
                 lines.append(f"**Confidence:** {cv.details.get('confidence', 0):.0%}")
-                lines.append(f"**Aggregation Method:** {cv.details.get('aggregation_method', 'N/A')}")
+                lines.append(
+                    f"**Aggregation Method:** {cv.details.get('aggregation_method', 'N/A')}"
+                )
                 lines.append(f"**Sub-Verdicts Count:** {cv.details.get('sub_verdicts_count', 0)}")
                 lines.append("")
-                weights = cv.details.get('aggregation_weights', {})
+                weights = cv.details.get("aggregation_weights", {})
                 if weights:
                     lines.append("**Aggregation Weights:**")
                     lines.append("")
@@ -652,7 +692,7 @@ class AuditLog:
                     for aspect, w in weights.items():
                         lines.append(f"| {aspect} | {w:.2f} |")
                     lines.append("")
-                reasoning = cv.details.get('reasoning', '')
+                reasoning = cv.details.get("reasoning", "")
                 if reasoning:
                     lines.append(f"**Reasoning:** {reasoning}")
                     lines.append("")
@@ -663,9 +703,9 @@ class AuditLog:
             lines.append("## Verification Results")
             lines.append("")
             for ver in verification_entries:
-                arg_id = ver.details.get('argument_id', 'Unknown')
-                passed = ver.details.get('overall_passed', False)
-                score = ver.details.get('overall_score', 0)
+                arg_id = ver.details.get("argument_id", "Unknown")
+                passed = ver.details.get("overall_passed", False)
+                score = ver.details.get("overall_score", 0)
                 status_icon = "Passed" if passed else "Failed"
                 lines.append(f"### Argument `{arg_id}` - {status_icon}")
                 lines.append("")
@@ -673,28 +713,30 @@ class AuditLog:
                 lines.append(f"- **Passed:** {'Yes' if passed else 'No'}")
                 lines.append("")
 
-                results = ver.details.get('results', [])
+                results = ver.details.get("results", [])
                 if results:
                     lines.append("| Rule Type | Passed | Score | Violations |")
                     lines.append("|-----------|--------|-------|------------|")
                     for r in results:
-                        rule_type = r.get('rule_type', 'unknown')
-                        r_passed = 'Yes' if r.get('passed') else 'No'
-                        r_score = r.get('score', 0)
-                        violations = r.get('violations', [])
+                        rule_type = r.get("rule_type", "unknown")
+                        r_passed = "Yes" if r.get("passed") else "No"
+                        r_score = r.get("score", 0)
+                        violations = r.get("violations", [])
                         violation_count = len(violations)
-                        lines.append(f"| {rule_type} | {r_passed} | {r_score:.2f} | {violation_count} |")
+                        lines.append(
+                            f"| {rule_type} | {r_passed} | {r_score:.2f} | {violation_count} |"
+                        )
                     lines.append("")
 
                     # Show violations if any
                     for r in results:
-                        violations = r.get('violations', [])
+                        violations = r.get("violations", [])
                         if violations:
-                            rule_type = r.get('rule_type', 'unknown')
+                            rule_type = r.get("rule_type", "unknown")
                             lines.append(f"**{rule_type} Violations:**")
                             for v in violations:
-                                sev = v.get('severity', 0)
-                                desc = v.get('description', 'No description')
+                                sev = v.get("severity", 0)
+                                desc = v.get("description", "No description")
                                 lines.append(f"- [{sev:.2f}] {desc}")
                             lines.append("")
 
@@ -842,9 +884,9 @@ class AuditLog:
         ]
 
         # Check for v2 features
-        steering_config = self.metadata.get('steering_config')
-        hierarchical_config = self.metadata.get('hierarchical_config')
-        verification_spec = self.metadata.get('verification_spec')
+        steering_config = self.metadata.get("steering_config")
+        hierarchical_config = self.metadata.get("hierarchical_config")
+        verification_spec = self.metadata.get("verification_spec")
         has_v2_config = steering_config or hierarchical_config or verification_spec
         sub_debate_entries = [e for e in self.entries if e.event_type == "sub_debate"]
         compound_verdict_entries = [e for e in self.entries if e.event_type == "compound_verdict"]
@@ -866,14 +908,26 @@ class AuditLog:
 
         # Metadata section
         html_parts.append("<div class='metadata' id='metadata'><h2>Metadata</h2><table>")
-        html_parts.append(f"<tr><td>Started</td><td>{self.metadata.get('started_at', 'N/A')}</td></tr>")
+        html_parts.append(
+            f"<tr><td>Started</td><td>{self.metadata.get('started_at', 'N/A')}</td></tr>"
+        )
         html_parts.append(f"<tr><td>Ended</td><td>{self.metadata.get('ended_at', 'N/A')}</td></tr>")
-        html_parts.append(f"<tr><td>Total Rounds</td><td>{self.metadata.get('total_rounds', 'N/A')}</td></tr>")
-        html_parts.append(f"<tr><td>Total Turns</td><td>{self.metadata.get('total_turns', 'N/A')}</td></tr>")
-        html_parts.append(f"<tr><td>Agents</td><td>{', '.join(self.metadata.get('agents', []))}</td></tr>")
-        html_parts.append(f"<tr><td>Jury Size</td><td>{self.metadata.get('jury_size', 'N/A')}</td></tr>")
-        monitors = self.metadata.get('safety_monitors', [])
-        html_parts.append(f"<tr><td>Safety Monitors</td><td>{', '.join(monitors) if monitors else 'None'}</td></tr>")
+        html_parts.append(
+            f"<tr><td>Total Rounds</td><td>{self.metadata.get('total_rounds', 'N/A')}</td></tr>"
+        )
+        html_parts.append(
+            f"<tr><td>Total Turns</td><td>{self.metadata.get('total_turns', 'N/A')}</td></tr>"
+        )
+        html_parts.append(
+            f"<tr><td>Agents</td><td>{', '.join(self.metadata.get('agents', []))}</td></tr>"
+        )
+        html_parts.append(
+            f"<tr><td>Jury Size</td><td>{self.metadata.get('jury_size', 'N/A')}</td></tr>"
+        )
+        monitors = self.metadata.get("safety_monitors", [])
+        html_parts.append(
+            f"<tr><td>Safety Monitors</td><td>{', '.join(monitors) if monitors else 'None'}</td></tr>"
+        )
         html_parts.append("</table></div>")
 
         # V2 Features Configuration
@@ -885,39 +939,61 @@ class AuditLog:
             if steering_config:
                 html_parts.append("<div class='config-card'>")
                 html_parts.append("<h4>Steering Configuration</h4>")
-                vector = steering_config.get('vector', {})
+                vector = steering_config.get("vector", {})
                 for dim, val in vector.items():
                     pct = val * 100
-                    html_parts.append(f"<div class='config-item'><span class='config-label'>{html.escape(dim)}</span><span class='config-value'>{val:.2f}</span></div>")
-                    html_parts.append(f"<div class='steering-bar'><div class='steering-bar-fill' style='width: {pct:.0f}%'></div></div>")
-                mode = steering_config.get('mode', 'prompt')
-                strength = steering_config.get('strength', 1.0)
-                adaptive = steering_config.get('adaptive', False)
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Mode</span><span class='config-value'>{html.escape(str(mode))}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Strength</span><span class='config-value'>{strength:.2f}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Adaptive</span><span class='config-value'>{'Yes' if adaptive else 'No'}</span></div>")
+                    html_parts.append(
+                        f"<div class='config-item'><span class='config-label'>{html.escape(dim)}</span><span class='config-value'>{val:.2f}</span></div>"
+                    )
+                    html_parts.append(
+                        f"<div class='steering-bar'><div class='steering-bar-fill' style='width: {pct:.0f}%'></div></div>"
+                    )
+                mode = steering_config.get("mode", "prompt")
+                strength = steering_config.get("strength", 1.0)
+                adaptive = steering_config.get("adaptive", False)
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Mode</span><span class='config-value'>{html.escape(str(mode))}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Strength</span><span class='config-value'>{strength:.2f}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Adaptive</span><span class='config-value'>{'Yes' if adaptive else 'No'}</span></div>"
+                )
                 html_parts.append("</div>")
 
             if hierarchical_config:
                 html_parts.append("<div class='config-card'>")
                 html_parts.append("<h4>Hierarchical Debate</h4>")
-                max_depth = hierarchical_config.get('max_depth', 2)
-                decomposer = hierarchical_config.get('decomposer', 'LLM')
-                aggregator = hierarchical_config.get('aggregator', 'weighted_average')
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Max Depth</span><span class='config-value'>{max_depth}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Decomposer</span><span class='config-value'>{html.escape(str(decomposer))}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Aggregator</span><span class='config-value'>{html.escape(str(aggregator))}</span></div>")
+                max_depth = hierarchical_config.get("max_depth", 2)
+                decomposer = hierarchical_config.get("decomposer", "LLM")
+                aggregator = hierarchical_config.get("aggregator", "weighted_average")
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Max Depth</span><span class='config-value'>{max_depth}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Decomposer</span><span class='config-value'>{html.escape(str(decomposer))}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Aggregator</span><span class='config-value'>{html.escape(str(aggregator))}</span></div>"
+                )
                 html_parts.append("</div>")
 
             if verification_spec:
                 html_parts.append("<div class='config-card'>")
                 html_parts.append("<h4>Verification Specification</h4>")
-                strict_mode = verification_spec.get('strict_mode', False)
-                min_score = verification_spec.get('min_score', 0.6)
-                rules = verification_spec.get('rules', [])
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Strict Mode</span><span class='config-value'>{'Yes' if strict_mode else 'No'}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Min Score</span><span class='config-value'>{min_score:.2f}</span></div>")
-                html_parts.append(f"<div class='config-item'><span class='config-label'>Rules</span><span class='config-value'>{len(rules)}</span></div>")
+                strict_mode = verification_spec.get("strict_mode", False)
+                min_score = verification_spec.get("min_score", 0.6)
+                rules = verification_spec.get("rules", [])
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Strict Mode</span><span class='config-value'>{'Yes' if strict_mode else 'No'}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Min Score</span><span class='config-value'>{min_score:.2f}</span></div>"
+                )
+                html_parts.append(
+                    f"<div class='config-item'><span class='config-label'>Rules</span><span class='config-value'>{len(rules)}</span></div>"
+                )
                 html_parts.append("</div>")
 
             html_parts.append("</div>")  # config-grid
@@ -927,36 +1003,40 @@ class AuditLog:
         html_parts.append("<h2 id='transcript'>Full Transcript</h2>")
 
         current_round = None
-        agents_list = self.metadata.get('agents', [])
+        agents_list = self.metadata.get("agents", [])
         agent_index_map = {a: i for i, a in enumerate(agents_list)}
 
         for entry in self.entries:
             if entry.event_type == "argument_generated":
                 if entry.round != current_round:
                     current_round = entry.round
-                    round_label = "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    round_label = (
+                        "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    )
                     html_parts.append(f"<h3>{round_label}</h3>")
 
                 agent_idx = agent_index_map.get(entry.agent, 0)
-                turn_id = entry.details.get('turn_id', 'N/A')
-                level = entry.details.get('level', 'N/A')
-                ethical_score = entry.details.get('ethical_score')
+                turn_id = entry.details.get("turn_id", "N/A")
+                level = entry.details.get("level", "N/A")
+                ethical_score = entry.details.get("ethical_score")
 
                 html_parts.append(f"<div class='turn agent-{agent_idx}'>")
                 html_parts.append("<div class='turn-header'>")
                 html_parts.append(f"<h4>{html.escape(entry.agent or 'Unknown')}</h4>")
                 ethical_str = f" | Ethical: {ethical_score:.2f}" if ethical_score else ""
-                html_parts.append(f"<div class='turn-meta'>Level: <strong>{level}</strong>{ethical_str} | ID: <code>{turn_id}</code></div>")
+                html_parts.append(
+                    f"<div class='turn-meta'>Level: <strong>{level}</strong>{ethical_str} | ID: <code>{turn_id}</code></div>"
+                )
                 html_parts.append("</div>")
 
                 # FULL argument content
-                content = entry.details.get('content', '')
+                content = entry.details.get("content", "")
                 content_html = _md_to_html(content)
                 html_parts.append(f"<div class='turn-content'>{content_html}</div>")
 
                 # Rebuts/Supports
-                rebuts = entry.details.get('rebuts', [])
-                supports = entry.details.get('supports', [])
+                rebuts = entry.details.get("rebuts", [])
+                supports = entry.details.get("supports", [])
                 if rebuts or supports:
                     html_parts.append("<div class='rebuts-supports'>")
                     if rebuts:
@@ -972,50 +1052,64 @@ class AuditLog:
                     html_parts.append("</div>")
 
                 # Full Evidence with multimodal support
-                evidence = entry.details.get('evidence', [])
+                evidence = entry.details.get("evidence", [])
                 if evidence:
                     html_parts.append(f"<div class='evidence'><h5>Evidence ({len(evidence)})</h5>")
                     for e in evidence:
-                        verified = " (Verified)" if e.get('verified') else ""
-                        content_type = e.get('content_type', 'text')
-                        badge_class = 'text'
-                        if content_type == 'image':
-                            badge_class = 'image'
-                        elif content_type == 'document':
-                            badge_class = 'document'
+                        verified = " (Verified)" if e.get("verified") else ""
+                        content_type = e.get("content_type", "text")
+                        badge_class = "text"
+                        if content_type == "image":
+                            badge_class = "image"
+                        elif content_type == "document":
+                            badge_class = "document"
                         html_parts.append("<div class='evidence-item'>")
                         html_parts.append("<div class='evidence-multimodal'>")
-                        html_parts.append(f"<div class='type'>{html.escape(str(e.get('type', 'Unknown')))}</div>")
-                        if content_type and content_type != 'text':
-                            html_parts.append(f"<span class='evidence-type-badge {badge_class}'>{html.escape(content_type)}</span>")
+                        html_parts.append(
+                            f"<div class='type'>{html.escape(str(e.get('type', 'Unknown')))}</div>"
+                        )
+                        if content_type and content_type != "text":
+                            html_parts.append(
+                                f"<span class='evidence-type-badge {badge_class}'>{html.escape(content_type)}</span>"
+                            )
                         html_parts.append("</div>")
-                        html_parts.append(f"<div class='content'>{html.escape(str(e.get('content', '')))}</div>")
+                        html_parts.append(
+                            f"<div class='content'>{html.escape(str(e.get('content', '')))}</div>"
+                        )
                         # Build meta string with multimodal fields
                         meta_parts = [f"Source: {html.escape(str(e.get('source', 'N/A')))}"]
                         meta_parts.append(f"Confidence: {e.get('confidence', 0):.2f}{verified}")
-                        if e.get('url'):
+                        if e.get("url"):
                             meta_parts.append(f"URL: {html.escape(str(e.get('url')))}")
-                        if e.get('media_type'):
+                        if e.get("media_type"):
                             meta_parts.append(f"Media: {html.escape(str(e.get('media_type')))}")
-                        if e.get('filename'):
+                        if e.get("filename"):
                             meta_parts.append(f"File: {html.escape(str(e.get('filename')))}")
                         html_parts.append(f"<div class='meta'>{' | '.join(meta_parts)}</div>")
-                        if e.get('alt_text'):
-                            html_parts.append(f"<div class='meta'><em>Alt: {html.escape(str(e.get('alt_text')))}</em></div>")
+                        if e.get("alt_text"):
+                            html_parts.append(
+                                f"<div class='meta'><em>Alt: {html.escape(str(e.get('alt_text')))}</em></div>"
+                            )
                         html_parts.append("</div>")
                     html_parts.append("</div>")
 
                 # Causal Links
-                causal_links = entry.details.get('causal_links', [])
+                causal_links = entry.details.get("causal_links", [])
                 if causal_links:
-                    html_parts.append(f"<div class='causal-links'><h5>Causal Links ({len(causal_links)})</h5>")
+                    html_parts.append(
+                        f"<div class='causal-links'><h5>Causal Links ({len(causal_links)})</h5>"
+                    )
                     for link in causal_links:
-                        strength = link.get('strength')
+                        strength = link.get("strength")
                         strength_str = f" (strength: {strength})" if strength else ""
                         html_parts.append("<div class='causal-link'>")
-                        html_parts.append(f"<span class='cause'>{html.escape(str(link.get('cause', '')))}</span>")
+                        html_parts.append(
+                            f"<span class='cause'>{html.escape(str(link.get('cause', '')))}</span>"
+                        )
                         html_parts.append("<span class='arrow'>→</span>")
-                        html_parts.append(f"<span class='effect'>{html.escape(str(link.get('effect', '')))}</span>")
+                        html_parts.append(
+                            f"<span class='effect'>{html.escape(str(link.get('effect', '')))}</span>"
+                        )
                         html_parts.append(f"<span class='meta'>{strength_str}</span>")
                         html_parts.append("</div>")
                     html_parts.append("</div>")
@@ -1024,28 +1118,32 @@ class AuditLog:
 
             # Evaluation details
             elif entry.event_type == "argument_evaluated":
-                total_score = entry.details.get('total_score', 0)
+                total_score = entry.details.get("total_score", 0)
                 html_parts.append("<div class='evaluation'>")
-                html_parts.append(f"<details><summary>Evaluation Score: {total_score:.2f}</summary>")
+                html_parts.append(
+                    f"<details><summary>Evaluation Score: {total_score:.2f}</summary>"
+                )
 
                 # Score grid
-                scores = entry.details.get('scores', {})
-                weights = entry.details.get('weights', {})
+                scores = entry.details.get("scores", {})
+                weights = entry.details.get("weights", {})
                 if scores:
                     html_parts.append("<div class='evaluation-grid'>")
                     for criterion, score in scores.items():
                         weight = weights.get(criterion, 0)
-                        html_parts.append(f"<div class='eval-metric'><div class='value'>{score:.2f}</div><div class='label'>{html.escape(criterion)} (w: {weight:.2f})</div></div>")
+                        html_parts.append(
+                            f"<div class='eval-metric'><div class='value'>{score:.2f}</div><div class='label'>{html.escape(criterion)} (w: {weight:.2f})</div></div>"
+                        )
                     html_parts.append("</div>")
 
                 # Feedback
-                feedback = entry.details.get('feedback')
+                feedback = entry.details.get("feedback")
                 if feedback:
                     html_parts.append(f"<p><strong>Feedback:</strong> {html.escape(feedback)}</p>")
 
                 # Strengths and Weaknesses
-                strengths = entry.details.get('strengths', [])
-                weaknesses = entry.details.get('weaknesses', [])
+                strengths = entry.details.get("strengths", [])
+                weaknesses = entry.details.get("weaknesses", [])
                 if strengths or weaknesses:
                     html_parts.append("<div class='strengths-weaknesses'>")
                     if strengths:
@@ -1064,10 +1162,10 @@ class AuditLog:
 
             # Safety check inline
             elif entry.event_type == "safety_check":
-                entry.details.get('passed', True)
-                severity = entry.details.get('severity', 0)
-                monitor = entry.details.get('monitor', 'Unknown')
-                notes = entry.details.get('analysis_notes', '')
+                entry.details.get("passed", True)
+                severity = entry.details.get("severity", 0)
+                monitor = entry.details.get("monitor", "Unknown")
+                notes = entry.details.get("analysis_notes", "")
 
                 if severity > 0.3:
                     if severity > 0.7:
@@ -1082,7 +1180,9 @@ class AuditLog:
 
                     html_parts.append(f"<div class='safety-check {css_class}'>")
                     html_parts.append(f"<span class='safety-icon'>{icon}</span>")
-                    html_parts.append(f"<div><strong>{html.escape(monitor)}</strong> - Severity: {severity:.2f}")
+                    html_parts.append(
+                        f"<div><strong>{html.escape(monitor)}</strong> - Severity: {severity:.2f}"
+                    )
                     if notes:
                         html_parts.append(f"<br><small>{html.escape(notes)}</small>")
                     html_parts.append("</div></div>")
@@ -1093,23 +1193,31 @@ class AuditLog:
             verdict = verdict_entries[0]
             html_parts.append("<div class='verdict' id='verdict'>")
             html_parts.append("<h2>Verdict</h2>")
-            html_parts.append(f"<div class='verdict-decision'>{html.escape(str(verdict.details.get('decision', 'N/A')))}</div>")
-            confidence = verdict.details.get('confidence', 0)
-            unanimous = verdict.details.get('unanimous', False)
-            html_parts.append(f"<div class='verdict-confidence'>Confidence: {confidence:.0%} | {'Unanimous' if unanimous else 'Not Unanimous'}</div>")
+            html_parts.append(
+                f"<div class='verdict-decision'>{html.escape(str(verdict.details.get('decision', 'N/A')))}</div>"
+            )
+            confidence = verdict.details.get("confidence", 0)
+            unanimous = verdict.details.get("unanimous", False)
+            html_parts.append(
+                f"<div class='verdict-confidence'>Confidence: {confidence:.0%} | {'Unanimous' if unanimous else 'Not Unanimous'}</div>"
+            )
 
-            reasoning = verdict.details.get('reasoning', '')
+            reasoning = verdict.details.get("reasoning", "")
             if reasoning:
-                html_parts.append(f"<div class='verdict-reasoning'><h4>Reasoning</h4><p>{html.escape(reasoning)}</p></div>")
+                html_parts.append(
+                    f"<div class='verdict-reasoning'><h4>Reasoning</h4><p>{html.escape(reasoning)}</p></div>"
+                )
 
-            scores = verdict.details.get('score_breakdown', {})
+            scores = verdict.details.get("score_breakdown", {})
             if scores:
                 html_parts.append("<h4>Final Scores</h4><div class='scores'>")
                 for agent, score in scores.items():
-                    html_parts.append(f"<div class='score-card'><div class='score-value'>{score:.2f}</div><div class='score-label'>{html.escape(agent)}</div></div>")
+                    html_parts.append(
+                        f"<div class='score-card'><div class='score-value'>{score:.2f}</div><div class='score-label'>{html.escape(agent)}</div></div>"
+                    )
                 html_parts.append("</div>")
 
-            dissenting = verdict.details.get('dissenting_count', 0)
+            dissenting = verdict.details.get("dissenting_count", 0)
             if dissenting > 0:
                 html_parts.append(f"<p><em>{dissenting} juror(s) dissented.</em></p>")
 
@@ -1123,38 +1231,44 @@ class AuditLog:
             if sub_debate_entries:
                 html_parts.append("<h3>Sub-Debates</h3>")
                 for i, sub in enumerate(sub_debate_entries, 1):
-                    aspect = sub.details.get('aspect', f'Sub-debate {i}')
-                    weight = sub.details.get('weight', 1.0)
-                    sub_verdict = sub.details.get('verdict', {})
+                    aspect = sub.details.get("aspect", f"Sub-debate {i}")
+                    weight = sub.details.get("weight", 1.0)
+                    sub_verdict = sub.details.get("verdict", {})
                     html_parts.append("<div class='sub-debate'>")
                     html_parts.append(f"<h4>{i}. {html.escape(str(aspect))}</h4>")
                     html_parts.append(f"<div class='sub-debate-meta'>Weight: {weight:.2f}</div>")
                     if sub_verdict:
-                        decision = sub_verdict.get('decision', 'N/A')
-                        confidence = sub_verdict.get('confidence', 0)
-                        reasoning = sub_verdict.get('reasoning', '')
-                        html_parts.append(f"<p><strong>Decision:</strong> {html.escape(str(decision))} ({confidence:.0%} confidence)</p>")
+                        decision = sub_verdict.get("decision", "N/A")
+                        confidence = sub_verdict.get("confidence", 0)
+                        reasoning = sub_verdict.get("reasoning", "")
+                        html_parts.append(
+                            f"<p><strong>Decision:</strong> {html.escape(str(decision))} ({confidence:.0%} confidence)</p>"
+                        )
                         if reasoning:
-                            html_parts.append(f"<p><em>{html.escape(str(reasoning)[:200])}...</em></p>")
+                            html_parts.append(
+                                f"<p><em>{html.escape(str(reasoning)[:200])}...</em></p>"
+                            )
                     html_parts.append("</div>")
 
             if compound_verdict_entries:
                 cv = compound_verdict_entries[0]
                 html_parts.append("<div class='compound-verdict'>")
                 html_parts.append("<h3>Compound Verdict (Aggregated)</h3>")
-                final_decision = cv.details.get('final_decision', 'N/A')
-                confidence = cv.details.get('confidence', 0)
-                method = cv.details.get('aggregation_method', 'N/A')
-                sub_count = cv.details.get('sub_verdicts_count', 0)
+                final_decision = cv.details.get("final_decision", "N/A")
+                confidence = cv.details.get("confidence", 0)
+                method = cv.details.get("aggregation_method", "N/A")
+                sub_count = cv.details.get("sub_verdicts_count", 0)
                 html_parts.append(f"<div class='decision'>{html.escape(str(final_decision))}</div>")
-                html_parts.append(f"<p>Confidence: {confidence:.0%} | Method: {html.escape(str(method))} | Sub-verdicts: {sub_count}</p>")
-                weights = cv.details.get('aggregation_weights', {})
+                html_parts.append(
+                    f"<p>Confidence: {confidence:.0%} | Method: {html.escape(str(method))} | Sub-verdicts: {sub_count}</p>"
+                )
+                weights = cv.details.get("aggregation_weights", {})
                 if weights:
                     html_parts.append("<p><strong>Aggregation Weights:</strong></p><ul>")
                     for aspect, w in weights.items():
                         html_parts.append(f"<li>{html.escape(str(aspect))}: {w:.2f}</li>")
                     html_parts.append("</ul>")
-                reasoning = cv.details.get('reasoning', '')
+                reasoning = cv.details.get("reasoning", "")
                 if reasoning:
                     html_parts.append(f"<p><em>{html.escape(str(reasoning))}</em></p>")
                 html_parts.append("</div>")
@@ -1166,41 +1280,51 @@ class AuditLog:
             html_parts.append("<div class='verification' id='verification'>")
             html_parts.append("<h2>Verification Results</h2>")
             for ver in verification_entries:
-                arg_id = ver.details.get('argument_id', 'Unknown')
-                passed = ver.details.get('overall_passed', False)
-                score = ver.details.get('overall_score', 0)
+                arg_id = ver.details.get("argument_id", "Unknown")
+                passed = ver.details.get("overall_passed", False)
+                score = ver.details.get("overall_score", 0)
                 status_class = "passed" if passed else "failed"
                 html_parts.append(f"<div class='verification-report {status_class}'>")
                 html_parts.append("<div class='verification-header'>")
                 html_parts.append(f"<h4>Argument <code>{html.escape(str(arg_id))}</code></h4>")
-                html_parts.append(f"<div class='verification-score {status_class}'>{score:.2f}</div>")
+                html_parts.append(
+                    f"<div class='verification-score {status_class}'>{score:.2f}</div>"
+                )
                 html_parts.append("</div>")
 
-                results = ver.details.get('results', [])
+                results = ver.details.get("results", [])
                 if results:
-                    html_parts.append("<table style='width:100%; margin-top:10px; border-collapse:collapse;'>")
-                    html_parts.append("<tr><th style='text-align:left; padding:5px; border-bottom:1px solid #ddd;'>Rule</th><th style='padding:5px; border-bottom:1px solid #ddd;'>Passed</th><th style='padding:5px; border-bottom:1px solid #ddd;'>Score</th></tr>")
+                    html_parts.append(
+                        "<table style='width:100%; margin-top:10px; border-collapse:collapse;'>"
+                    )
+                    html_parts.append(
+                        "<tr><th style='text-align:left; padding:5px; border-bottom:1px solid #ddd;'>Rule</th><th style='padding:5px; border-bottom:1px solid #ddd;'>Passed</th><th style='padding:5px; border-bottom:1px solid #ddd;'>Score</th></tr>"
+                    )
                     for r in results:
-                        rule_type = r.get('rule_type', 'unknown')
-                        r_passed = r.get('passed', False)
-                        r_score = r.get('score', 0)
+                        rule_type = r.get("rule_type", "unknown")
+                        r_passed = r.get("passed", False)
+                        r_score = r.get("score", 0)
                         passed_icon = "✅" if r_passed else "❌"
-                        html_parts.append(f"<tr><td style='padding:5px;'>{html.escape(str(rule_type))}</td><td style='text-align:center; padding:5px;'>{passed_icon}</td><td style='text-align:center; padding:5px;'>{r_score:.2f}</td></tr>")
+                        html_parts.append(
+                            f"<tr><td style='padding:5px;'>{html.escape(str(rule_type))}</td><td style='text-align:center; padding:5px;'>{passed_icon}</td><td style='text-align:center; padding:5px;'>{r_score:.2f}</td></tr>"
+                        )
                     html_parts.append("</table>")
 
                     # Show violations
                     all_violations = []
                     for r in results:
-                        for v in r.get('violations', []):
-                            all_violations.append((r.get('rule_type', 'unknown'), v))
+                        for v in r.get("violations", []):
+                            all_violations.append((r.get("rule_type", "unknown"), v))
 
                     if all_violations:
                         html_parts.append("<div class='violation-list'>")
                         html_parts.append("<h5>Violations</h5>")
                         for rule_type, v in all_violations:
-                            sev = v.get('severity', 0)
-                            desc = v.get('description', 'No description')
-                            html_parts.append(f"<div class='violation'><span class='violation-severity'>[{sev:.2f}]</span> <strong>{html.escape(str(rule_type))}:</strong> {html.escape(str(desc))}</div>")
+                            sev = v.get("severity", 0)
+                            desc = v.get("description", "No description")
+                            html_parts.append(
+                                f"<div class='violation'><span class='violation-severity'>[{sev:.2f}]</span> <strong>{html.escape(str(rule_type))}:</strong> {html.escape(str(desc))}</div>"
+                            )
                         html_parts.append("</div>")
 
                 html_parts.append("</div>")  # verification-report
@@ -1212,49 +1336,65 @@ class AuditLog:
 
         html_parts.append("<h2 id='safety'>Safety Analysis</h2>")
 
-        if not alert_entries and not any(e.details.get('severity', 0) > 0.3 for e in safety_checks):
-            html_parts.append("<p style='color: #388E3C;'>✅ No safety concerns detected during this debate.</p>")
+        if not alert_entries and not any(e.details.get("severity", 0) > 0.3 for e in safety_checks):
+            html_parts.append(
+                "<p style='color: #388E3C;'>✅ No safety concerns detected during this debate.</p>"
+            )
         else:
             if alert_entries:
                 html_parts.append("<h3>Critical Alerts</h3>")
                 for alert in alert_entries:
-                    severity = alert.details.get('severity', 0)
-                    severity_class = "high" if severity > 0.7 else "medium" if severity > 0.4 else "low"
-                    resolved = alert.details.get('resolved', False)
+                    severity = alert.details.get("severity", 0)
+                    severity_class = (
+                        "high" if severity > 0.7 else "medium" if severity > 0.4 else "low"
+                    )
+                    resolved = alert.details.get("resolved", False)
 
                     html_parts.append(f"<div class='alert {severity_class}'>")
                     html_parts.append("<div class='alert-header'>")
-                    html_parts.append(f"<span>{'🔴' if severity > 0.7 else '🟡' if severity > 0.4 else '🔵'}</span>")
-                    html_parts.append(f"<strong>{html.escape(str(alert.details.get('type', 'Unknown')))}</strong>")
+                    html_parts.append(
+                        f"<span>{'🔴' if severity > 0.7 else '🟡' if severity > 0.4 else '🔵'}</span>"
+                    )
+                    html_parts.append(
+                        f"<strong>{html.escape(str(alert.details.get('type', 'Unknown')))}</strong>"
+                    )
                     html_parts.append(f"<span> - {html.escape(str(alert.agent))}</span>")
                     html_parts.append("</div>")
 
                     html_parts.append("<div class='alert-details'>")
-                    html_parts.append(f"<p><strong>Monitor:</strong> {html.escape(str(alert.details.get('monitor', 'N/A')))}</p>")
+                    html_parts.append(
+                        f"<p><strong>Monitor:</strong> {html.escape(str(alert.details.get('monitor', 'N/A')))}</p>"
+                    )
                     html_parts.append(f"<p><strong>Severity:</strong> {severity:.2f}</p>")
-                    html_parts.append(f"<p><strong>Status:</strong> {'Resolved' if resolved else 'Unresolved'}</p>")
+                    html_parts.append(
+                        f"<p><strong>Status:</strong> {'Resolved' if resolved else 'Unresolved'}</p>"
+                    )
 
-                    indicators = alert.details.get('indicators', [])
+                    indicators = alert.details.get("indicators", [])
                     if indicators:
                         html_parts.append("<p><strong>Indicators:</strong></p><ul>")
                         for ind in indicators:
-                            html_parts.append(f"<li>{html.escape(str(ind.get('type', '')))}: {html.escape(str(ind.get('evidence', '')))}</li>")
+                            html_parts.append(
+                                f"<li>{html.escape(str(ind.get('type', '')))}: {html.escape(str(ind.get('evidence', '')))}</li>"
+                            )
                         html_parts.append("</ul>")
 
                     html_parts.append("</div></div>")
 
         # Close document
-        html_parts.extend([
-            "</div>",
-            "<script>",
-            "// Auto-expand details if there are safety issues",
-            "document.querySelectorAll('.evaluation details').forEach(d => {",
-            "  if(d.querySelector('.weaknesses li')) d.open = true;",
-            "});",
-            "</script>",
-            "</body>",
-            "</html>",
-        ])
+        html_parts.extend(
+            [
+                "</div>",
+                "<script>",
+                "// Auto-expand details if there are safety issues",
+                "document.querySelectorAll('.evaluation details').forEach(d => {",
+                "  if(d.querySelector('.weaknesses li')) d.open = true;",
+                "});",
+                "</script>",
+                "</body>",
+                "</html>",
+            ]
+        )
 
         html_str = "\n".join(html_parts)
 

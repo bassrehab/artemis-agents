@@ -73,9 +73,7 @@ class DebateAnalyzer:
             topic: Optional debate topic
         """
         self._transcript = transcript
-        self._agents = [
-            a.name if hasattr(a, "name") else str(a) for a in agents
-        ]
+        self._agents = [a.name if hasattr(a, "name") else str(a) for a in agents]
         self._debate_id = debate_id
         self._topic = topic
         self._cache: dict[str, Any] = {}
@@ -198,7 +196,9 @@ class DebateAnalyzer:
             for _i, turn in enumerate(self._transcript):
                 if turn.round != current_round:
                     current_round = turn.round
-                    round_label = "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    round_label = (
+                        "Opening Statements" if current_round == 0 else f"Round {current_round}"
+                    )
                     transcript_html.append(f"<h3>{round_label}</h3>")
 
                 agent_idx = self._agents.index(turn.agent) if turn.agent in self._agents else 0
@@ -207,33 +207,51 @@ class DebateAnalyzer:
                 transcript_html.append(f"<div class='turn' style='border-left-color: {color}'>")
                 transcript_html.append("<div class='turn-header'>")
                 transcript_html.append(f"<h4>{html_escape.escape(turn.agent)}</h4>")
-                transcript_html.append(f"<span class='turn-meta'>Level: {turn.argument.level.value} | ID: <code>{turn.id}</code></span>")
+                transcript_html.append(
+                    f"<span class='turn-meta'>Level: {turn.argument.level.value} | ID: <code>{turn.id}</code></span>"
+                )
                 transcript_html.append("</div>")
 
                 # Full argument content
                 content = turn.argument.content
-                transcript_html.append(f"<div class='turn-content'>{html_escape.escape(content)}</div>")
+                transcript_html.append(
+                    f"<div class='turn-content'>{html_escape.escape(content)}</div>"
+                )
 
                 # Evidence
                 if turn.argument.evidence:
-                    transcript_html.append(f"<div class='evidence'><h5>Evidence ({len(turn.argument.evidence)})</h5>")
+                    transcript_html.append(
+                        f"<div class='evidence'><h5>Evidence ({len(turn.argument.evidence)})</h5>"
+                    )
                     for ev in turn.argument.evidence:
-                        verified = " (Verified)" if getattr(ev, 'verified', False) else ""
+                        verified = " (Verified)" if getattr(ev, "verified", False) else ""
                         transcript_html.append("<div class='evidence-item'>")
-                        transcript_html.append(f"<div class='type'>{html_escape.escape(ev.type)}</div>")
-                        transcript_html.append(f"<div class='content'>{html_escape.escape(ev.content)}</div>")
-                        transcript_html.append(f"<div class='meta'>Source: {html_escape.escape(ev.source or 'N/A')} | Confidence: {ev.confidence:.2f}{verified}</div>")
+                        transcript_html.append(
+                            f"<div class='type'>{html_escape.escape(ev.type)}</div>"
+                        )
+                        transcript_html.append(
+                            f"<div class='content'>{html_escape.escape(ev.content)}</div>"
+                        )
+                        transcript_html.append(
+                            f"<div class='meta'>Source: {html_escape.escape(ev.source or 'N/A')} | Confidence: {ev.confidence:.2f}{verified}</div>"
+                        )
                         transcript_html.append("</div>")
                     transcript_html.append("</div>")
 
                 # Causal links
                 if turn.argument.causal_links:
-                    transcript_html.append(f"<div class='causal-links'><h5>Causal Links ({len(turn.argument.causal_links)})</h5>")
+                    transcript_html.append(
+                        f"<div class='causal-links'><h5>Causal Links ({len(turn.argument.causal_links)})</h5>"
+                    )
                     for link in turn.argument.causal_links:
                         transcript_html.append("<div class='causal-link'>")
-                        transcript_html.append(f"<span class='cause'>{html_escape.escape(link.cause)}</span>")
+                        transcript_html.append(
+                            f"<span class='cause'>{html_escape.escape(link.cause)}</span>"
+                        )
                         transcript_html.append("<span class='arrow'>→</span>")
-                        transcript_html.append(f"<span class='effect'>{html_escape.escape(link.effect)}</span>")
+                        transcript_html.append(
+                            f"<span class='effect'>{html_escape.escape(link.effect)}</span>"
+                        )
                         transcript_html.append("</div>")
                     transcript_html.append("</div>")
 
@@ -255,12 +273,16 @@ class DebateAnalyzer:
                 # Evaluation
                 if turn.evaluation:
                     transcript_html.append("<div class='evaluation'>")
-                    transcript_html.append(f"<details><summary>Evaluation Score: {turn.evaluation.total_score:.2f}</summary>")
+                    transcript_html.append(
+                        f"<details><summary>Evaluation Score: {turn.evaluation.total_score:.2f}</summary>"
+                    )
                     if turn.evaluation.scores:
                         transcript_html.append("<div class='evaluation-grid'>")
                         for criterion, score in turn.evaluation.scores.items():
                             weight = turn.evaluation.weights.get(criterion, 0)
-                            transcript_html.append(f"<div class='eval-metric'><div class='value'>{score:.2f}</div><div class='label'>{criterion} (w: {weight:.2f})</div></div>")
+                            transcript_html.append(
+                                f"<div class='eval-metric'><div class='value'>{score:.2f}</div><div class='label'>{criterion} (w: {weight:.2f})</div></div>"
+                            )
                         transcript_html.append("</div>")
                     transcript_html.append("</details></div>")
 
@@ -271,9 +293,13 @@ class DebateAnalyzer:
                         icon = "⛔" if safety.severity > 0.7 else "⚠️"
                         transcript_html.append(f"<div class='safety-check {css_class}'>")
                         transcript_html.append(f"<span class='safety-icon'>{icon}</span>")
-                        transcript_html.append(f"<div><strong>{html_escape.escape(safety.monitor)}</strong> - Severity: {safety.severity:.2f}")
+                        transcript_html.append(
+                            f"<div><strong>{html_escape.escape(safety.monitor)}</strong> - Severity: {safety.severity:.2f}"
+                        )
                         if safety.analysis_notes:
-                            transcript_html.append(f"<br><small>{html_escape.escape(safety.analysis_notes)}</small>")
+                            transcript_html.append(
+                                f"<br><small>{html_escape.escape(safety.analysis_notes)}</small>"
+                            )
                         transcript_html.append("</div></div>")
 
                 transcript_html.append("</div>")
@@ -286,7 +312,7 @@ class DebateAnalyzer:
             <div class='verdict'>
                 <h2>Verdict</h2>
                 <div class='verdict-decision'>{html_escape.escape(verdict.decision)}</div>
-                <div class='verdict-confidence'>Confidence: {verdict.confidence:.0%} | {'Unanimous' if verdict.unanimous else 'Not Unanimous'}</div>
+                <div class='verdict-confidence'>Confidence: {verdict.confidence:.0%} | {"Unanimous" if verdict.unanimous else "Not Unanimous"}</div>
                 <div class='verdict-reasoning'><h4>Reasoning</h4><p>{html_escape.escape(verdict.reasoning)}</p></div>
                 <div class='scores'>
                     {"".join(f"<div class='score-card'><div class='score-value'>{score:.2f}</div><div class='score-label'>{html_escape.escape(agent)}</div></div>" for agent, score in verdict.score_breakdown.items())}
@@ -367,7 +393,7 @@ class DebateAnalyzer:
 <body>
     <div class="container">
         <h1>Debate Analytics Report</h1>
-        <p><strong>Topic:</strong> {html_escape.escape(analytics.topic or 'N/A')}</p>
+        <p><strong>Topic:</strong> {html_escape.escape(analytics.topic or "N/A")}</p>
         <p><strong>Debate ID:</strong> <code>{analytics.debate_id}</code></p>
         <p><strong>Agents:</strong> {", ".join(analytics.agents)}</p>
         <p><strong>Rounds:</strong> {analytics.rounds}</p>

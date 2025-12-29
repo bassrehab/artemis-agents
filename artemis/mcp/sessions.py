@@ -203,7 +203,7 @@ class SessionStore:
                 sessions.append(snapshot.metadata)
 
         # Apply pagination
-        return sessions[offset:offset + limit]
+        return sessions[offset : offset + limit]
 
     async def cleanup(self, max_age_hours=24, status=None):
         """Clean up old sessions."""
@@ -268,7 +268,10 @@ class SessionManager:
             logger.info("Session cleanup task stopped")
 
     async def create_session(
-        self, topic, model, rounds=3,
+        self,
+        topic,
+        model,
+        rounds=3,
         pro_position="supports the proposition",
         con_position="opposes the proposition",
         tags=None,

@@ -18,12 +18,8 @@ class AgentConfig(BaseModel):
 
     name: str = Field(..., description="Unique name for the agent.")
     role: str = Field(..., description="Role description for the agent.")
-    position: str = Field(
-        default="", description="Position the agent will argue for."
-    )
-    model: str | None = Field(
-        default=None, description="Model override for this agent."
-    )
+    position: str = Field(default="", description="Position the agent will argue for.")
+    model: str | None = Field(default=None, description="Model override for this agent.")
 
 
 class DebateToolInput(BaseModel):
@@ -104,9 +100,7 @@ class ArtemisCrewTool:
 
     def run(self, topic, agents=None, pro_position=None, con_position=None, rounds=None):
         """Run a debate and return formatted result string."""
-        result = asyncio.run(
-            self._run_debate(topic, agents, pro_position, con_position, rounds)
-        )
+        result = asyncio.run(self._run_debate(topic, agents, pro_position, con_position, rounds))
         return self._format_result_string(result)
 
     async def arun(self, topic, agents=None, pro_position=None, con_position=None, rounds=None):
@@ -160,9 +154,7 @@ class ArtemisCrewTool:
         # From input agent configs
         if agent_configs:
             return {
-                cfg["name"]: cfg.get("position", "")
-                for cfg in agent_configs
-                if cfg.get("position")
+                cfg["name"]: cfg.get("position", "") for cfg in agent_configs if cfg.get("position")
             }
 
         # From simple pro/con positions
@@ -237,10 +229,7 @@ class ArtemisCrewTool:
                     scores[turn.agent] = []
                 scores[turn.agent].append(turn.evaluation.total_score)
 
-        return {
-            agent: (sum(s) / len(s) if s else 0.0)
-            for agent, s in scores.items()
-        }
+        return {agent: (sum(s) / len(s) if s else 0.0) for agent, s in scores.items()}
 
     def _extract_key_arguments(self, result: DebateResult) -> list[str]:
         """Extract key arguments from the debate."""
@@ -300,22 +289,26 @@ class ArtemisCrewTool:
         for agent, score in output.agent_scores.items():
             lines.append(f"  {agent}: {score:.2f}")
 
-        lines.extend([
-            "",
-            "KEY ARGUMENTS:",
-        ])
+        lines.extend(
+            [
+                "",
+                "KEY ARGUMENTS:",
+            ]
+        )
 
         for arg in output.key_arguments:
             lines.append(f"  - {arg}")
 
-        lines.extend([
-            "",
-            "REASONING:",
-            f"  {output.reasoning}",
-            "",
-            "RECOMMENDATION:",
-            f"  {output.recommendation}",
-        ])
+        lines.extend(
+            [
+                "",
+                "REASONING:",
+                f"  {output.reasoning}",
+                "",
+                "RECOMMENDATION:",
+                f"  {output.recommendation}",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -325,8 +318,7 @@ class ArtemisCrewTool:
             from crewai.tools import BaseTool
         except ImportError as e:
             raise ImportError(
-                "crewai is required for CrewAI integration. "
-                "Install with: pip install crewai"
+                "crewai is required for CrewAI integration. Install with: pip install crewai"
             ) from e
 
         tool_instance = self
@@ -354,9 +346,7 @@ class ArtemisCrewTool:
                 con_position: str | None = None,
                 rounds: int = 3,
             ) -> str:
-                return await tool_instance.arun(
-                    topic, agents, pro_position, con_position, rounds
-                )
+                return await tool_instance.arun(topic, agents, pro_position, con_position, rounds)
 
         return ArtemisDebateTool()
 
@@ -398,10 +388,7 @@ class ArtemisCrewTool:
         }
 
     def __repr__(self) -> str:
-        return (
-            f"ArtemisCrewTool(model={self.model!r}, "
-            f"default_rounds={self.default_rounds})"
-        )
+        return f"ArtemisCrewTool(model={self.model!r}, default_rounds={self.default_rounds})"
 
 
 class DebateAnalyzer:

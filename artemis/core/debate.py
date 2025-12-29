@@ -222,9 +222,7 @@ class Debate:
         context = self._build_context()
 
         for i, agent in enumerate(self.agents):
-            argument = await agent.generate_argument(
-                context, ArgumentLevel.STRATEGIC
-            )
+            argument = await agent.generate_argument(context, ArgumentLevel.STRATEGIC)
 
             turn = Turn(
                 round=0,
@@ -298,9 +296,7 @@ class Debate:
         closing_round = self.total_rounds + 1
 
         for i, agent in enumerate(self.agents):
-            argument = await agent.generate_argument(
-                context, ArgumentLevel.STRATEGIC
-            )
+            argument = await agent.generate_argument(context, ArgumentLevel.STRATEGIC)
 
             turn = Turn(
                 round=closing_round,
@@ -323,9 +319,7 @@ class Debate:
 
     async def _process_turn(self, turn: Turn, context: DebateContext):
         # evaluate, check safety, record
-        evaluation = await self._evaluator.evaluate_argument(
-            turn.argument, context
-        )
+        evaluation = await self._evaluator.evaluate_argument(turn.argument, context)
         turn = Turn(
             id=turn.id,
             round=turn.round,
@@ -428,9 +422,7 @@ class Debate:
                     agent=turn.agent,
                     monitor=result.monitor,
                 )
-                raise DebateHaltedError(
-                    f"Safety halt triggered by {result.monitor}", alert
-                )
+                raise DebateHaltedError(f"Safety halt triggered by {result.monitor}", alert)
 
     def _update_opponent_models(self, agent):
         for turn in self._transcript:
@@ -572,10 +564,7 @@ class Debate:
             if turn.evaluation:
                 scores[turn.agent].append(turn.evaluation.total_score)
 
-        return {
-            agent: (sum(s) / len(s) if s else 0.0)
-            for agent, s in scores.items()
-        }
+        return {agent: (sum(s) / len(s) if s else 0.0) for agent, s in scores.items()}
 
     def get_analytics(self, include_jury_pulse: bool = False):
         """Compute analytics for this debate.

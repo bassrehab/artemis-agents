@@ -48,15 +48,9 @@ class TopicAnalysis:
     controversy: float = 0.5
 
     # Class-level constants for keyword analysis
-    _SENSITIVITY_KEYWORDS: list[str] = field(
-        default_factory=list, init=False, repr=False
-    )
-    _COMPLEXITY_KEYWORDS: list[str] = field(
-        default_factory=list, init=False, repr=False
-    )
-    _CONTROVERSY_KEYWORDS: list[str] = field(
-        default_factory=list, init=False, repr=False
-    )
+    _SENSITIVITY_KEYWORDS: list[str] = field(default_factory=list, init=False, repr=False)
+    _COMPLEXITY_KEYWORDS: list[str] = field(default_factory=list, init=False, repr=False)
+    _CONTROVERSY_KEYWORDS: list[str] = field(default_factory=list, init=False, repr=False)
 
     @staticmethod
     def _get_sensitivity_keywords():
@@ -115,15 +109,11 @@ class TopicAnalysis:
         words = topic_lower.split()
 
         # Calculate sensitivity
-        sensitivity_count = sum(
-            1 for kw in cls._get_sensitivity_keywords() if kw in topic_lower
-        )
+        sensitivity_count = sum(1 for kw in cls._get_sensitivity_keywords() if kw in topic_lower)
         sensitivity = min(1.0, sensitivity_count * 0.15)
 
         # Calculate complexity
-        complexity_count = sum(
-            1 for kw in cls._get_complexity_keywords() if kw in topic_lower
-        )
+        complexity_count = sum(1 for kw in cls._get_complexity_keywords() if kw in topic_lower)
         complexity = min(1.0, complexity_count * 0.15)
 
         # Also consider topic length as complexity indicator
@@ -131,9 +121,7 @@ class TopicAnalysis:
             complexity = min(1.0, complexity + 0.2)
 
         # Calculate controversy
-        controversy_count = sum(
-            1 for kw in cls._get_controversy_keywords() if kw in topic_lower
-        )
+        controversy_count = sum(1 for kw in cls._get_controversy_keywords() if kw in topic_lower)
         controversy = min(1.0, controversy_count * 0.2)
 
         return cls(
@@ -432,9 +420,7 @@ class AdaptiveEvaluator:
         criterion_details: list[CriterionScore] = []
 
         # Logical coherence
-        scores["logical_coherence"] = (
-            self._criterion_evaluator.evaluate_logical_coherence(argument)
-        )
+        scores["logical_coherence"] = self._criterion_evaluator.evaluate_logical_coherence(argument)
         criterion_details.append(
             CriterionScore(
                 criterion="logical_coherence",
@@ -444,9 +430,7 @@ class AdaptiveEvaluator:
         )
 
         # Evidence quality
-        scores["evidence_quality"] = (
-            self._criterion_evaluator.evaluate_evidence_quality(argument)
-        )
+        scores["evidence_quality"] = self._criterion_evaluator.evaluate_evidence_quality(argument)
         criterion_details.append(
             CriterionScore(
                 criterion="evidence_quality",
@@ -456,10 +440,8 @@ class AdaptiveEvaluator:
         )
 
         # Causal reasoning
-        scores["causal_reasoning"] = (
-            self._criterion_evaluator.evaluate_causal_reasoning(
-                argument, self.causal_graph
-            )
+        scores["causal_reasoning"] = self._criterion_evaluator.evaluate_causal_reasoning(
+            argument, self.causal_graph
         )
         criterion_details.append(
             CriterionScore(
@@ -470,9 +452,7 @@ class AdaptiveEvaluator:
         )
 
         # Ethical alignment
-        scores["ethical_alignment"] = (
-            self._criterion_evaluator.evaluate_ethical_alignment(argument)
-        )
+        scores["ethical_alignment"] = self._criterion_evaluator.evaluate_ethical_alignment(argument)
         criterion_details.append(
             CriterionScore(
                 criterion="ethical_alignment",
@@ -482,9 +462,7 @@ class AdaptiveEvaluator:
         )
 
         # Persuasiveness
-        scores["persuasiveness"] = (
-            self._criterion_evaluator.evaluate_persuasiveness(argument)
-        )
+        scores["persuasiveness"] = self._criterion_evaluator.evaluate_persuasiveness(argument)
         criterion_details.append(
             CriterionScore(
                 criterion="persuasiveness",

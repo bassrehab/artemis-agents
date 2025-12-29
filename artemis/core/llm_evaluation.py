@@ -152,6 +152,7 @@ class LLMCriterionEvaluator:
         # Convert to ArgumentEvaluation
         # Get default weights from centralized prompts
         from artemis.prompts.v1.evaluation import DEFAULT_WEIGHTS
+
         weights = weights or DEFAULT_WEIGHTS
 
         # Normalize scores from 0-100 to 0-1

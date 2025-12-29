@@ -55,7 +55,9 @@ class GoogleModel(BaseModel):
         For AI Studio, provide api_key or set GOOGLE_API_KEY env var.
         """
         # Determine which backend to use
-        self.project = project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        self.project = (
+            project or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        )
         self.location = location or os.environ.get("GOOGLE_CLOUD_LOCATION", "us-central1")
 
         # Auto-detect: use Vertex AI if project is set, otherwise AI Studio
@@ -67,7 +69,9 @@ class GoogleModel(BaseModel):
         if use_vertex_ai:
             api_key = None  # Vertex AI uses ADC, not API key
         else:
-            api_key = api_key or os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+            api_key = (
+                api_key or os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+            )
 
         super().__init__(
             model=model,
@@ -127,12 +131,14 @@ class GoogleModel(BaseModel):
         """Get model instance."""
         if self.use_vertex_ai:
             from vertexai.generative_models import GenerativeModel
+
             return GenerativeModel(
                 model_name=self.model,
                 system_instruction=system_instruction,
             )
         else:
             import google.generativeai as genai
+
             return genai.GenerativeModel(
                 model_name=self.model,
                 system_instruction=system_instruction,
@@ -194,8 +200,12 @@ class GoogleModel(BaseModel):
             # Build usage info
             usage_metadata = getattr(response, "usage_metadata", None)
             usage = self._create_usage(
-                prompt_tokens=getattr(usage_metadata, "prompt_token_count", 0) if usage_metadata else 0,
-                completion_tokens=getattr(usage_metadata, "candidates_token_count", 0) if usage_metadata else 0,
+                prompt_tokens=getattr(usage_metadata, "prompt_token_count", 0)
+                if usage_metadata
+                else 0,
+                completion_tokens=getattr(usage_metadata, "candidates_token_count", 0)
+                if usage_metadata
+                else 0,
             )
 
             return ModelResponse(
@@ -274,8 +284,12 @@ class GoogleModel(BaseModel):
                 thinking_tokens = getattr(usage_metadata, "thoughts_token_count", 0)
 
             usage = self._create_usage(
-                prompt_tokens=getattr(usage_metadata, "prompt_token_count", 0) if usage_metadata else 0,
-                completion_tokens=getattr(usage_metadata, "candidates_token_count", 0) if usage_metadata else 0,
+                prompt_tokens=getattr(usage_metadata, "prompt_token_count", 0)
+                if usage_metadata
+                else 0,
+                completion_tokens=getattr(usage_metadata, "candidates_token_count", 0)
+                if usage_metadata
+                else 0,
                 reasoning_tokens=thinking_tokens,
             )
 
@@ -356,9 +370,11 @@ class GoogleModel(BaseModel):
         """Build generation config for either backend."""
         if self.use_vertex_ai:
             from vertexai.generative_models import GenerationConfig
+
             config_cls = GenerationConfig
         else:
             import google.generativeai as genai
+
             config_cls = genai.GenerationConfig
 
         config_kwargs = {

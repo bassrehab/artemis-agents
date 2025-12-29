@@ -63,7 +63,9 @@ class DebateMetricsCalculator:
                 continue
 
             avg_all = sum(all_scores) / len(all_scores)
-            avg_rebuttal = sum(rebuttal_scores) / len(rebuttal_scores) if rebuttal_scores else avg_all
+            avg_rebuttal = (
+                sum(rebuttal_scores) / len(rebuttal_scores) if rebuttal_scores else avg_all
+            )
 
             # Effectiveness is ratio of rebuttal performance to baseline
             if avg_all > 0:
@@ -120,7 +122,11 @@ class DebateMetricsCalculator:
             if not turn.argument:
                 continue
 
-            level = turn.argument.level.value if hasattr(turn.argument.level, "value") else str(turn.argument.level)
+            level = (
+                turn.argument.level.value
+                if hasattr(turn.argument.level, "value")
+                else str(turn.argument.level)
+            )
             agent = turn.agent
 
             if agent not in agent_levels:
@@ -317,7 +323,11 @@ class DebateMetricsCalculator:
 
             for turn in agent_turns:
                 if turn.argument:
-                    level = turn.argument.level.value if hasattr(turn.argument.level, "value") else str(turn.argument.level)
+                    level = (
+                        turn.argument.level.value
+                        if hasattr(turn.argument.level, "value")
+                        else str(turn.argument.level)
+                    )
                     result[agent][level] = result[agent].get(level, 0) + 1
 
         return result
@@ -347,14 +357,20 @@ class RebuttalAnalyzer:
                 for rebutted_id in turn.argument.rebuts:
                     original = arg_index.get(rebutted_id)
 
-                    chains.append({
-                        "argument_id": rebutted_id,
-                        "rebutted_by": turn.id,
-                        "rebutter_agent": turn.agent,
-                        "rebutter_score": turn.evaluation.total_score if turn.evaluation else 0.0,
-                        "original_agent": original.agent if original else "unknown",
-                        "original_score": original.evaluation.total_score if original and original.evaluation else 0.0,
-                    })
+                    chains.append(
+                        {
+                            "argument_id": rebutted_id,
+                            "rebutted_by": turn.id,
+                            "rebutter_agent": turn.agent,
+                            "rebutter_score": turn.evaluation.total_score
+                            if turn.evaluation
+                            else 0.0,
+                            "original_agent": original.agent if original else "unknown",
+                            "original_score": original.evaluation.total_score
+                            if original and original.evaluation
+                            else 0.0,
+                        }
+                    )
 
         return chains
 
@@ -366,10 +382,7 @@ class RebuttalAnalyzer:
         if not agent_rebuttals:
             return 0.0
 
-        successful = sum(
-            1 for c in agent_rebuttals
-            if c["rebutter_score"] > c["original_score"]
-        )
+        successful = sum(1 for c in agent_rebuttals if c["rebutter_score"] > c["original_score"])
 
         return successful / len(agent_rebuttals)
 

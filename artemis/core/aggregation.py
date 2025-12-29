@@ -181,14 +181,10 @@ class MajorityVoteAggregator(VerdictAggregator):
             avg_confidences = {}
             for decision in tied_decisions:
                 matching = [v for v in verdicts if v.decision.lower() == decision]
-                avg_confidences[decision] = (
-                    sum(v.confidence for v in matching) / len(matching)
-                )
+                avg_confidences[decision] = sum(v.confidence for v in matching) / len(matching)
             winner = max(avg_confidences, key=avg_confidences.get)
 
-        reasoning_parts = [
-            f"Aggregated {len(verdicts)} sub-debate verdicts using majority vote."
-        ]
+        reasoning_parts = [f"Aggregated {len(verdicts)} sub-debate verdicts using majority vote."]
         for decision, count in vote_counts.most_common():
             reasoning_parts.append(f"- {decision}: {count} votes")
 
@@ -254,9 +250,7 @@ class ConfidenceWeightedAggregator(VerdictAggregator):
         reasoning_parts = [
             f"Aggregated {len(verdicts)} sub-debate verdicts weighted by confidence."
         ]
-        for decision, conf in sorted(
-            decision_confidence.items(), key=lambda x: x[1], reverse=True
-        ):
+        for decision, conf in sorted(decision_confidence.items(), key=lambda x: x[1], reverse=True):
             reasoning_parts.append(f"- {decision}: {conf:.2%} weighted support")
 
         return CompoundVerdict(
@@ -314,8 +308,7 @@ class UnanimousAggregator(VerdictAggregator):
             winner = "no_consensus"
             avg_confidence = 0.0
             reasoning = (
-                f"Sub-debates did not reach unanimous agreement. "
-                f"Decisions: {', '.join(decisions)}"
+                f"Sub-debates did not reach unanimous agreement. Decisions: {', '.join(decisions)}"
             )
 
         return CompoundVerdict(
@@ -386,9 +379,7 @@ class WeightedMajorityAggregator(VerdictAggregator):
         reasoning_parts = [
             f"Aggregated {len(verdicts)} sub-debate verdicts using weighted majority."
         ]
-        for decision, weight in sorted(
-            weighted_votes.items(), key=lambda x: x[1], reverse=True
-        ):
+        for decision, weight in sorted(weighted_votes.items(), key=lambda x: x[1], reverse=True):
             reasoning_parts.append(f"- {decision}: {weight:.2%} weighted votes")
 
         return CompoundVerdict(

@@ -131,7 +131,7 @@ class SteeringVector:
         for dim in self._dimensions():
             diff = getattr(self, dim) - getattr(other, dim)
             total += diff * diff
-        return total ** 0.5
+        return total**0.5
 
     def magnitude(self) -> float:
         """Calculate the magnitude (distance from neutral).
@@ -186,9 +186,7 @@ class SteeringConfig:
     def __post_init__(self) -> None:
         """Validate configuration."""
         if not 0.0 <= self.strength <= 1.0:
-            raise ValueError(
-                f"Strength must be between 0.0 and 1.0, got {self.strength}"
-            )
+            raise ValueError(f"Strength must be between 0.0 and 1.0, got {self.strength}")
         if not 0.0 <= self.adaptation_rate <= 1.0:
             raise ValueError(
                 f"Adaptation rate must be between 0.0 and 1.0, got {self.adaptation_rate}"

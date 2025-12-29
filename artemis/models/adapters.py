@@ -65,19 +65,23 @@ class OpenAIContentAdapter(ContentAdapter):
 
             elif part.type == ContentType.IMAGE:
                 if part.url:
-                    formatted.append({
-                        "type": "image_url",
-                        "image_url": {"url": part.url},
-                    })
+                    formatted.append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": part.url},
+                        }
+                    )
                 elif part.data:
                     # Base64 encoded data
                     b64_data = base64.b64encode(part.data).decode("utf-8")
                     media_type = part.media_type or "image/png"
                     data_url = f"data:{media_type};base64,{b64_data}"
-                    formatted.append({
-                        "type": "image_url",
-                        "image_url": {"url": data_url},
-                    })
+                    formatted.append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": data_url},
+                        }
+                    )
 
             elif part.type == ContentType.DOCUMENT:
                 # OpenAI doesn't natively support documents
@@ -114,36 +118,42 @@ class AnthropicContentAdapter(ContentAdapter):
             elif part.type == ContentType.IMAGE:
                 if part.data:
                     b64_data = base64.b64encode(part.data).decode("utf-8")
-                    formatted.append({
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": part.media_type or "image/png",
-                            "data": b64_data,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": part.media_type or "image/png",
+                                "data": b64_data,
+                            },
+                        }
+                    )
                 elif part.url:
                     # Anthropic prefers base64, but URLs can work
-                    formatted.append({
-                        "type": "image",
-                        "source": {
-                            "type": "url",
-                            "url": part.url,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "url",
+                                "url": part.url,
+                            },
+                        }
+                    )
 
             elif part.type == ContentType.DOCUMENT:
                 if part.data and part.media_type == "application/pdf":
                     # Claude 3 supports PDF natively
                     b64_data = base64.b64encode(part.data).decode("utf-8")
-                    formatted.append({
-                        "type": "document",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "application/pdf",
-                            "data": b64_data,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "type": "document",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "application/pdf",
+                                "data": b64_data,
+                            },
+                        }
+                    )
                 else:
                     # Non-PDF documents - convert to text description
                     desc = f"[Document: {part.filename or 'unnamed'}]"
@@ -172,37 +182,45 @@ class GoogleContentAdapter(ContentAdapter):
             elif part.type == ContentType.IMAGE:
                 if part.data:
                     b64_data = base64.b64encode(part.data).decode("utf-8")
-                    formatted.append({
-                        "inline_data": {
-                            "mime_type": part.media_type or "image/png",
-                            "data": b64_data,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "inline_data": {
+                                "mime_type": part.media_type or "image/png",
+                                "data": b64_data,
+                            },
+                        }
+                    )
                 elif part.url:
                     # Gemini supports file URIs
-                    formatted.append({
-                        "file_data": {
-                            "mime_type": part.media_type or "image/png",
-                            "file_uri": part.url,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "file_data": {
+                                "mime_type": part.media_type or "image/png",
+                                "file_uri": part.url,
+                            },
+                        }
+                    )
 
             elif part.type == ContentType.DOCUMENT:
                 if part.data:
                     b64_data = base64.b64encode(part.data).decode("utf-8")
-                    formatted.append({
-                        "inline_data": {
-                            "mime_type": part.media_type or "application/pdf",
-                            "data": b64_data,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "inline_data": {
+                                "mime_type": part.media_type or "application/pdf",
+                                "data": b64_data,
+                            },
+                        }
+                    )
                 elif part.url:
-                    formatted.append({
-                        "file_data": {
-                            "mime_type": part.media_type or "application/pdf",
-                            "file_uri": part.url,
-                        },
-                    })
+                    formatted.append(
+                        {
+                            "file_data": {
+                                "mime_type": part.media_type or "application/pdf",
+                                "file_uri": part.url,
+                            },
+                        }
+                    )
 
         return formatted
 

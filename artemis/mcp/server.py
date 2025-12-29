@@ -183,10 +183,12 @@ class ArtemisMCPServer:
             config=self.config,
         )
 
-        debate.assign_positions({
-            "pro_agent": pro_position,
-            "con_agent": con_position,
-        })
+        debate.assign_positions(
+            {
+                "pro_agent": pro_position,
+                "con_agent": con_position,
+            }
+        )
 
         session = DebateSession(
             debate_id=debate_id,
@@ -275,10 +277,7 @@ class ArtemisMCPServer:
                     scores[turn.agent] = []
                 scores[turn.agent].append(turn.evaluation.total_score)
 
-        final_scores = {
-            agent: sum(s) / len(s) if s else 0.0
-            for agent, s in scores.items()
-        }
+        final_scores = {agent: sum(s) / len(s) if s else 0.0 for agent, s in scores.items()}
 
         return GetVerdictOutput(
             debate_id=debate_id,
@@ -311,13 +310,15 @@ class ArtemisMCPServer:
             if include_evaluations and turn.evaluation:
                 score = turn.evaluation.total_score
 
-            turns.append(TranscriptTurn(
-                round=turn.round,
-                agent=turn.agent,
-                position=session.debate.get_position(turn.agent),
-                argument=turn.argument.content,
-                score=score,
-            ))
+            turns.append(
+                TranscriptTurn(
+                    round=turn.round,
+                    agent=turn.agent,
+                    position=session.debate.get_position(turn.agent),
+                    argument=turn.argument.content,
+                    score=score,
+                )
+            )
 
         return GetTranscriptOutput(
             debate_id=debate_id,
@@ -333,13 +334,15 @@ class ArtemisMCPServer:
         """List all active debates."""
         debates = []
         for session_id, session in self.state.sessions.items():
-            debates.append({
-                "debate_id": session_id,
-                "topic": session.topic[:100],
-                "status": session.status,
-                "current_round": session.current_round,
-                "created_at": session.created_at.isoformat(),
-            })
+            debates.append(
+                {
+                    "debate_id": session_id,
+                    "topic": session.topic[:100],
+                    "status": session.status,
+                    "current_round": session.current_round,
+                    "created_at": session.created_at.isoformat(),
+                }
+            )
 
         return ListDebatesOutput(debates=debates)
 
@@ -472,11 +475,7 @@ Respond in JSON format:
                 tool_name = params.get("name", "")
                 tool_args = params.get("arguments", {})
                 content = await self.handle_tool_call(tool_name, tool_args)
-                result = {
-                    "content": [
-                        {"type": "text", "text": json.dumps(content, indent=2)}
-                    ]
-                }
+                result = {"content": [{"type": "text", "text": json.dumps(content, indent=2)}]}
             else:
                 raise ValueError(f"Unknown method: {method}")
 
@@ -525,8 +524,7 @@ Respond in JSON format:
             from aiohttp import web
         except ImportError as e:
             raise ImportError(
-                "aiohttp is required for HTTP server mode. "
-                "Install with: pip install aiohttp"
+                "aiohttp is required for HTTP server mode. Install with: pip install aiohttp"
             ) from e
 
         app = web.Application()
@@ -561,10 +559,12 @@ Respond in JSON format:
         """Health check endpoint."""
         from aiohttp import web
 
-        return web.json_response({
-            "status": "healthy",
-            "sessions": len(self.state.sessions),
-        })
+        return web.json_response(
+            {
+                "status": "healthy",
+                "sessions": len(self.state.sessions),
+            }
+        )
 
 
 async def create_mcp_server(

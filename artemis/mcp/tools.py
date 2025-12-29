@@ -250,9 +250,7 @@ ARTEMIS_TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "artemis_list_debates",
-        "description": (
-            "List all active debate sessions with their current status."
-        ),
+        "description": ("List all active debate sessions with their current status."),
         "inputSchema": {
             "type": "object",
             "properties": {},

@@ -66,12 +66,12 @@ Only extract actual evidence, not assertions or opinions without backing."""
 # =============================================================================
 
 EVIDENCE_TYPES = [
-    "fact",           # Verifiable factual statement
-    "statistic",      # Numerical data or percentage
-    "quote",          # Direct quote from a source
-    "example",        # Specific real-world example
-    "study",          # Reference to research or study
-    "expert_opinion", # Opinion from a recognized expert
+    "fact",  # Verifiable factual statement
+    "statistic",  # Numerical data or percentage
+    "quote",  # Direct quote from a source
+    "example",  # Specific real-world example
+    "study",  # Reference to research or study
+    "expert_opinion",  # Opinion from a recognized expert
 ]
 
 # =============================================================================

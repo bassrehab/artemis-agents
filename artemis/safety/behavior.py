@@ -184,9 +184,7 @@ class BehaviorTracker(SafetyMonitor):
 
             for signal, score, evidence in signals:
                 if score >= 0.3:
-                    indicators.append(
-                        self._create_signal_indicator(signal, score, evidence)
-                    )
+                    indicators.append(self._create_signal_indicator(signal, score, evidence))
                     profile.drift_events.append((turn.round, signal.value, score))
 
             signal_names = [s.value for s, _, _ in signals]
@@ -217,13 +215,32 @@ class BehaviorTracker(SafetyMonitor):
 
         # Formality indicators
         formal_markers = [
-            "therefore", "consequently", "furthermore", "moreover",
-            "nevertheless", "accordingly", "hence", "thus",
-            "regarding", "concerning", "hereby", "whereas",
+            "therefore",
+            "consequently",
+            "furthermore",
+            "moreover",
+            "nevertheless",
+            "accordingly",
+            "hence",
+            "thus",
+            "regarding",
+            "concerning",
+            "hereby",
+            "whereas",
         ]
         informal_markers = [
-            "gonna", "wanna", "kinda", "gotta", "yeah", "nope",
-            "ok", "okay", "hey", "wow", "oops", "ugh",
+            "gonna",
+            "wanna",
+            "kinda",
+            "gotta",
+            "yeah",
+            "nope",
+            "ok",
+            "okay",
+            "hey",
+            "wow",
+            "oops",
+            "ugh",
         ]
         formal_count = sum(1 for m in formal_markers if m in content_lower)
         informal_count = sum(1 for m in informal_markers if m in content_lower)
@@ -232,22 +249,46 @@ class BehaviorTracker(SafetyMonitor):
 
         # Aggression indicators
         aggressive_markers = [
-            "wrong", "stupid", "ridiculous", "absurd", "nonsense",
-            "ignorant", "foolish", "idiotic", "pathetic", "terrible",
-            "completely wrong", "utterly", "totally wrong",
+            "wrong",
+            "stupid",
+            "ridiculous",
+            "absurd",
+            "nonsense",
+            "ignorant",
+            "foolish",
+            "idiotic",
+            "pathetic",
+            "terrible",
+            "completely wrong",
+            "utterly",
+            "totally wrong",
         ]
         aggression = sum(0.15 for m in aggressive_markers if m in content_lower)
         aggression = min(1.0, aggression)
 
         # Cooperation indicators
         cooperative_markers = [
-            "agree", "valid point", "good point", "you're right",
-            "fair enough", "i see", "understand", "appreciate",
-            "however", "on the other hand", "consider",
+            "agree",
+            "valid point",
+            "good point",
+            "you're right",
+            "fair enough",
+            "i see",
+            "understand",
+            "appreciate",
+            "however",
+            "on the other hand",
+            "consider",
         ]
         competitive_markers = [
-            "wrong", "incorrect", "mistaken", "fail", "you don't",
-            "you can't", "impossible", "never",
+            "wrong",
+            "incorrect",
+            "mistaken",
+            "fail",
+            "you don't",
+            "you can't",
+            "impossible",
+            "never",
         ]
         coop_count = sum(1 for m in cooperative_markers if m in content_lower)
         comp_count = sum(1 for m in competitive_markers if m in content_lower)
@@ -259,12 +300,26 @@ class BehaviorTracker(SafetyMonitor):
 
         # Certainty
         certain_markers = [
-            "definitely", "certainly", "absolutely", "clearly",
-            "obviously", "undoubtedly", "surely", "always", "never",
+            "definitely",
+            "certainly",
+            "absolutely",
+            "clearly",
+            "obviously",
+            "undoubtedly",
+            "surely",
+            "always",
+            "never",
         ]
         uncertain_markers = [
-            "maybe", "perhaps", "possibly", "might", "could",
-            "sometimes", "often", "usually", "probably",
+            "maybe",
+            "perhaps",
+            "possibly",
+            "might",
+            "could",
+            "sometimes",
+            "often",
+            "usually",
+            "probably",
         ]
         certain_count = sum(1 for m in certain_markers if m in content_lower)
         uncertain_count = sum(1 for m in uncertain_markers if m in content_lower)
@@ -299,12 +354,24 @@ class BehaviorTracker(SafetyMonitor):
         content_lower = content.lower()
 
         strong_markers = [
-            "must", "definitely", "certainly", "absolutely",
-            "clearly", "obviously", "undeniably", "without doubt",
+            "must",
+            "definitely",
+            "certainly",
+            "absolutely",
+            "clearly",
+            "obviously",
+            "undeniably",
+            "without doubt",
         ]
         weak_markers = [
-            "might", "maybe", "perhaps", "possibly", "could",
-            "not sure", "uncertain", "debatable",
+            "might",
+            "maybe",
+            "perhaps",
+            "possibly",
+            "could",
+            "not sure",
+            "uncertain",
+            "debatable",
         ]
 
         strong_count = sum(1 for m in strong_markers if m in content_lower)
@@ -343,18 +410,14 @@ class BehaviorTracker(SafetyMonitor):
 
         # Update averages with exponential smoothing
         alpha = 0.3  # Smoothing factor
-        profile.avg_formality = (
-            alpha * style.formality_score + (1 - alpha) * profile.avg_formality
-        )
+        profile.avg_formality = alpha * style.formality_score + (1 - alpha) * profile.avg_formality
         profile.avg_aggression = (
             alpha * style.aggression_score + (1 - alpha) * profile.avg_aggression
         )
         profile.avg_cooperation = (
             alpha * style.cooperation_score + (1 - alpha) * profile.avg_cooperation
         )
-        profile.avg_verbosity = (
-            alpha * style.verbosity + (1 - alpha) * profile.avg_verbosity
-        )
+        profile.avg_verbosity = alpha * style.verbosity + (1 - alpha) * profile.avg_verbosity
 
         # Update variance estimates
         if n >= 3:

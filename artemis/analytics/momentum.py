@@ -130,7 +130,7 @@ class MomentumTracker:
         recent_deltas = deltas[-window:] if len(deltas) >= window else deltas
 
         # Exponential weights (more recent = higher weight)
-        weights = [2 ** i for i in range(len(recent_deltas))]
+        weights = [2**i for i in range(len(recent_deltas))]
         total_weight = sum(weights)
 
         if total_weight == 0:
@@ -160,15 +160,25 @@ class MomentumTracker:
             curr_round = sorted_rounds[i]
 
             prev_momentum = {
-                agent: rounds_data[prev_round].get(agent, MomentumPoint(
-                    round=prev_round, agent=agent, score=0, momentum=0, cumulative_advantage=0
-                )).momentum
+                agent: rounds_data[prev_round]
+                .get(
+                    agent,
+                    MomentumPoint(
+                        round=prev_round, agent=agent, score=0, momentum=0, cumulative_advantage=0
+                    ),
+                )
+                .momentum
                 for agent in agents
             }
             curr_momentum = {
-                agent: rounds_data[curr_round].get(agent, MomentumPoint(
-                    round=curr_round, agent=agent, score=0, momentum=0, cumulative_advantage=0
-                )).momentum
+                agent: rounds_data[curr_round]
+                .get(
+                    agent,
+                    MomentumPoint(
+                        round=curr_round, agent=agent, score=0, momentum=0, cumulative_advantage=0
+                    ),
+                )
+                .momentum
                 for agent in agents
             }
 
@@ -400,7 +410,9 @@ class JuryPulseTracker:
         breakdown: dict[str, dict[str, float]] = {}
 
         for e in evaluations:
-            perspective_name = e.perspective.value if hasattr(e.perspective, "value") else str(e.perspective)
+            perspective_name = (
+                e.perspective.value if hasattr(e.perspective, "value") else str(e.perspective)
+            )
             breakdown[perspective_name] = e.agent_scores.copy()
 
         return breakdown

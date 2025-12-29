@@ -93,9 +93,7 @@ class CausalStrategy:
         self.own_graph = own_graph
         self.opponent_graph = opponent_graph
         self._own_analyzer = CausalAnalyzer(own_graph)
-        self._opponent_analyzer = (
-            CausalAnalyzer(opponent_graph) if opponent_graph else None
-        )
+        self._opponent_analyzer = CausalAnalyzer(opponent_graph) if opponent_graph else None
 
     def map_attack_surface(self) -> list[AttackTarget]:
         """Find vulnerable points in opponent's causal graph."""
@@ -137,13 +135,9 @@ class CausalStrategy:
                 )
             )
 
-        return sorted(
-            targets, key=lambda x: (x.priority, -x.vulnerability_score)
-        )
+        return sorted(targets, key=lambda x: (x.priority, -x.vulnerability_score))
 
-    def _generate_attack_strategies(
-        self, weak: WeakLinkResult
-    ) -> list[str]:
+    def _generate_attack_strategies(self, weak: WeakLinkResult) -> list[str]:
         strategies: list[str] = []
 
         source_label = ""
@@ -158,8 +152,7 @@ class CausalStrategy:
 
         if weak.weakness_score > 0.7:
             strategies.append(
-                f"Directly challenge the claim that '{source_label}' "
-                f"causes '{target_label}'"
+                f"Directly challenge the claim that '{source_label}' causes '{target_label}'"
             )
             strategies.append("Request evidence supporting this causal link")
         else:
@@ -171,9 +164,7 @@ class CausalStrategy:
         strategies.append(f"Propose alternative explanations for '{target_label}'")
 
         if len(weak.argument_ids) < 2:
-            strategies.append(
-                "Note that this claim lacks corroborating evidence"
-            )
+            strategies.append("Note that this claim lacks corroborating evidence")
 
         return strategies
 
@@ -202,9 +193,7 @@ class CausalStrategy:
         cascade_factor = len(downstream) / total_nodes
         return min(1.0, weak.weakness_score * 0.5 + cascade_factor * 0.5)
 
-    def suggest_rebuttals(
-        self, opponent_argument: Argument
-    ) -> list[RebuttalSuggestion]:
+    def suggest_rebuttals(self, opponent_argument: Argument) -> list[RebuttalSuggestion]:
         """Suggest rebuttals for an opponent's argument."""
         suggestions: list[RebuttalSuggestion] = []
 
@@ -248,17 +237,14 @@ class CausalStrategy:
                     target_claim="overall argument",
                     strategy="insufficient_evidence",
                     suggested_content=(
-                        "This argument lacks sufficient evidence to "
-                        "support its claims."
+                        "This argument lacks sufficient evidence to support its claims."
                     ),
                     expected_impact=0.4,
                     evidence_needed=[],
                 )
             )
 
-        return sorted(
-            suggestions, key=lambda x: x.expected_impact, reverse=True
-        )
+        return sorted(suggestions, key=lambda x: x.expected_impact, reverse=True)
 
     def find_vulnerable_claims(self) -> list[VulnerableClaim]:
         """Find claims in own graph that are vulnerable to attack."""
@@ -286,9 +272,7 @@ class CausalStrategy:
                 )
             )
 
-        return sorted(
-            vulnerable, key=lambda x: x.vulnerability_score, reverse=True
-        )
+        return sorted(vulnerable, key=lambda x: x.vulnerability_score, reverse=True)
 
     def suggest_reinforcements(self) -> list[ReinforcementSuggestion]:
         """Suggest reinforcements for weak links in own arguments."""
@@ -304,15 +288,11 @@ class CausalStrategy:
 
             edge = self.own_graph._edges.get((weak.source, weak.target))
             evidence_types = self._suggest_evidence_types(edge)
-            mechanisms = self._suggest_mechanisms(
-                source_node.label, target_node.label
-            )
+            mechanisms = self._suggest_mechanisms(source_node.label, target_node.label)
 
             priority = weak.weakness_score
             if self.opponent_graph:
-                opponent_strength = self._check_opponent_coverage(
-                    weak.source, weak.target
-                )
+                opponent_strength = self._check_opponent_coverage(weak.source, weak.target)
                 if opponent_strength > 0.5:
                     priority = min(1.0, priority + 0.2)
 
@@ -375,17 +355,12 @@ class CausalStrategy:
             if not node:
                 continue
 
-            critical = next(
-                (n for n in critical_nodes if n.node_id == node_id), None
-            )
-            vulnerable = next(
-                (v for v in vulnerable_claims if v.node_id == node_id), None
-            )
+            critical = next((n for n in critical_nodes if n.node_id == node_id), None)
+            vulnerable = next((v for v in vulnerable_claims if v.node_id == node_id), None)
 
             if critical and vulnerable:
                 priority_score = (
-                    critical.centrality_score * 0.5
-                    + vulnerable.vulnerability_score * 0.5
+                    critical.centrality_score * 0.5 + vulnerable.vulnerability_score * 0.5
                 )
                 threat_level = critical.impact_if_challenged
 
@@ -435,11 +410,7 @@ class CausalStrategy:
             if crit_score > 0.5:
                 reasons.append("high impact if challenged")
 
-            reasoning = (
-                f"Target due to {', '.join(reasons)}"
-                if reasons
-                else "Moderate target"
-            )
+            reasoning = f"Target due to {', '.join(reasons)}" if reasons else "Moderate target"
 
             predictions.append(
                 PredictedTarget(
@@ -459,20 +430,13 @@ class CausalStrategy:
 
         focus_areas: dict[str, int] = {}
         for node in self.opponent_graph.nodes:
-            focus_areas[node.label] = (
-                len(self.opponent_graph._incoming.get(node.id, set()))
-                + len(self.opponent_graph._outgoing.get(node.id, set()))
+            focus_areas[node.label] = len(self.opponent_graph._incoming.get(node.id, set())) + len(
+                self.opponent_graph._outgoing.get(node.id, set())
             )
 
-        primary_focus = (
-            max(focus_areas, key=focus_areas.get)
-            if focus_areas
-            else "unknown"
-        )
+        primary_focus = max(focus_areas, key=focus_areas.get) if focus_areas else "unknown"
 
-        total_evidence = sum(
-            e.evidence_count for e in self.opponent_graph.edges
-        )
+        total_evidence = sum(e.evidence_count for e in self.opponent_graph.edges)
         total_edges = len(self.opponent_graph.edges)
         avg_evidence = total_evidence / max(1, total_edges)
 
@@ -484,18 +448,10 @@ class CausalStrategy:
             style = "mixed"
 
         weak_links = self._opponent_analyzer.find_weak_links()
-        weak_points = [
-            f"{w.source} -> {w.target}"
-            for w in weak_links[:3]
-        ]
+        weak_points = [f"{w.source} -> {w.target}" for w in weak_links[:3]]
 
-        strong_edges = [
-            e for e in self.opponent_graph.edges if e.strength > 0.7
-        ]
-        strong_points = [
-            f"{e.source_id} -> {e.target_id}"
-            for e in strong_edges[:3]
-        ]
+        strong_edges = [e for e in self.opponent_graph.edges if e.strength > 0.7]
+        strong_points = [f"{e.source_id} -> {e.target_id}" for e in strong_edges[:3]]
 
         predicted_moves = []
         if weak_links:

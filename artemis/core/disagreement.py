@@ -128,15 +128,9 @@ class DisagreementAnalyzer:
         for turn in recent_turns:
             content = turn.argument.content.lower()
 
-            strategic_count += sum(
-                1 for ind in self.STRATEGIC_INDICATORS if ind in content
-            )
-            tactical_count += sum(
-                1 for ind in self.TACTICAL_INDICATORS if ind in content
-            )
-            operational_count += sum(
-                1 for ind in self.OPERATIONAL_INDICATORS if ind in content
-            )
+            strategic_count += sum(1 for ind in self.STRATEGIC_INDICATORS if ind in content)
+            tactical_count += sum(1 for ind in self.TACTICAL_INDICATORS if ind in content)
+            operational_count += sum(1 for ind in self.OPERATIONAL_INDICATORS if ind in content)
 
         total_indicators = strategic_count + tactical_count + operational_count
 

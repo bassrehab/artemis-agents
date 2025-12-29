@@ -64,7 +64,8 @@ Examples:
         help="Maximum concurrent debate sessions (default: 100)",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Enable verbose logging",
     )

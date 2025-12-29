@@ -133,7 +133,7 @@ class SafetyMonitor(ABC):
         self._state.severity_history.append(result.severity)
         if len(self._state.severity_history) > self.config.window_size * 2:
             self._state.severity_history = self._state.severity_history[
-                -self.config.window_size * 2:
+                -self.config.window_size * 2 :
             ]
 
         # Update indicator history
@@ -159,10 +159,7 @@ class SafetyMonitor(ABC):
 
     def _apply_thresholds(self, result):
         should_alert = result.severity >= self.config.alert_threshold
-        should_halt = (
-            result.severity >= self.config.halt_threshold
-            and self.is_active
-        )
+        should_halt = result.severity >= self.config.halt_threshold and self.is_active
 
         # Check cooldown
         turns_since_alert = self._state.turn_count - self._state.last_alert_turn
@@ -218,7 +215,7 @@ class SafetyMonitor(ABC):
         if not self._state.severity_history:
             return 0.0
 
-        recent = self._state.severity_history[-self.config.window_size:]
+        recent = self._state.severity_history[-self.config.window_size :]
         return sum(recent) / len(recent)
 
     def get_severity_trend(self):
@@ -226,9 +223,9 @@ class SafetyMonitor(ABC):
         if len(self._state.severity_history) < 4:
             return "stable"
 
-        recent = self._state.severity_history[-self.config.window_size:]
+        recent = self._state.severity_history[-self.config.window_size :]
         older = self._state.severity_history[
-            -self.config.window_size * 2:-self.config.window_size
+            -self.config.window_size * 2 : -self.config.window_size
         ]
 
         if not older:
@@ -257,11 +254,7 @@ class SafetyMonitor(ABC):
         )
 
     def __repr__(self) -> str:
-        return (
-            f"{self.__class__.__name__}("
-            f"name={self.name!r}, "
-            f"mode={self.config.mode.value!r})"
-        )
+        return f"{self.__class__.__name__}(name={self.name!r}, mode={self.config.mode.value!r})"
 
 
 class CompositeMonitor(SafetyMonitor):
@@ -357,16 +350,10 @@ class MonitorRegistry:
         return list(self._monitors.values())
 
     def get_by_type(self, monitor_type: str):
-        return [
-            m for m in self._monitors.values()
-            if m.monitor_type == monitor_type
-        ]
+        return [m for m in self._monitors.values() if m.monitor_type == monitor_type]
 
     def get_by_priority(self, priority):
-        return [
-            m for m in self._monitors.values()
-            if m.config.priority == priority
-        ]
+        return [m for m in self._monitors.values() if m.config.priority == priority]
 
     def get_active(self):
         return [m for m in self._monitors.values() if m.is_active]
@@ -478,7 +465,4 @@ class SafetyManager:
         return len(self._registry)
 
     def __repr__(self) -> str:
-        return (
-            f"SafetyManager(monitors={len(self._registry)}, "
-            f"mode={self.default_mode.value})"
-        )
+        return f"SafetyManager(monitors={len(self._registry)}, mode={self.default_mode.value})"

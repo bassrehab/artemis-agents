@@ -18,12 +18,8 @@ class AgentConfig(BaseModel):
 
     name: str = Field(..., description="Unique name for the agent.")
     role: str = Field(..., description="Role description for the agent.")
-    position: str = Field(
-        default="", description="Position the agent will argue for."
-    )
-    model: str | None = Field(
-        default=None, description="Model override for this agent."
-    )
+    position: str = Field(default="", description="Position the agent will argue for.")
+    model: str | None = Field(default=None, description="Model override for this agent.")
 
 
 class DebateInput(BaseModel):
@@ -176,9 +172,7 @@ class ArtemisDebateTool:
             ),
         ]
 
-    def _get_positions(
-        self, input_data: DebateInput, agents: list[Agent]
-    ) -> dict[str, str]:
+    def _get_positions(self, input_data: DebateInput, agents: list[Agent]) -> dict[str, str]:
         """Get positions mapping for agents."""
         # From input agent configs
         if input_data.agents:
@@ -223,10 +217,7 @@ class ArtemisDebateTool:
                     scores[turn.agent] = []
                 scores[turn.agent].append(turn.evaluation.total_score)
 
-        return {
-            agent: (sum(s) / len(s) if s else 0.0)
-            for agent, s in scores.items()
-        }
+        return {agent: (sum(s) / len(s) if s else 0.0) for agent, s in scores.items()}
 
     def _generate_summary(self, result: DebateResult) -> str:
         """Generate a brief debate summary."""
@@ -307,10 +298,7 @@ class ArtemisDebateTool:
         }
 
     def __repr__(self) -> str:
-        return (
-            f"ArtemisDebateTool(model={self.model!r}, "
-            f"default_rounds={self.default_rounds})"
-        )
+        return f"ArtemisDebateTool(model={self.model!r}, default_rounds={self.default_rounds})"
 
 
 class QuickDebate:

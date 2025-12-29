@@ -61,7 +61,7 @@ class CausalVisualizer:
             lines.append(
                 f'    "{node_id}" [label="{label}", '
                 f'fillcolor="{color}", style="filled,rounded", '
-                f'shape={shape}];'
+                f"shape={shape}];"
             )
 
         for edge in self.graph.edges:
@@ -85,7 +85,7 @@ class CausalVisualizer:
             lines.append(
                 f'    "{source}" -> "{target}" '
                 f'[label="{label}", color="{color}", '
-                f'penwidth={penwidth}, style={style}];'
+                f"penwidth={penwidth}, style={style}];"
             )
 
         lines.append("}")
@@ -135,9 +135,7 @@ class CausalVisualizer:
 
             if highlight_weak and edge.strength < weak_threshold:
                 lines.append(f"    {source} {arrow} {label} {target}")
-                lines.append(
-                    f"    linkStyle {len(lines) - 2} stroke:#dc2626,stroke-width:2px"
-                )
+                lines.append(f"    linkStyle {len(lines) - 2} stroke:#dc2626,stroke-width:2px")
             else:
                 lines.append(f"    {source} {arrow} {label} {target}")
 
@@ -153,24 +151,28 @@ class CausalVisualizer:
 
         nodes = []
         for node in self.graph.nodes:
-            nodes.append({
-                "id": node.id,
-                "label": node.label,
-                "argument_ids": node.argument_ids,
-                "in_degree": len(self.graph._incoming.get(node.id, set())),
-                "out_degree": len(self.graph._outgoing.get(node.id, set())),
-            })
+            nodes.append(
+                {
+                    "id": node.id,
+                    "label": node.label,
+                    "argument_ids": node.argument_ids,
+                    "in_degree": len(self.graph._incoming.get(node.id, set())),
+                    "out_degree": len(self.graph._outgoing.get(node.id, set())),
+                }
+            )
 
         edges = []
         for edge in self.graph.edges:
-            edges.append({
-                "source": edge.source_id,
-                "target": edge.target_id,
-                "link_type": edge.link_type.value,
-                "strength": edge.strength,
-                "evidence_count": edge.evidence_count,
-                "argument_ids": edge.argument_ids,
-            })
+            edges.append(
+                {
+                    "source": edge.source_id,
+                    "target": edge.target_id,
+                    "link_type": edge.link_type.value,
+                    "strength": edge.strength,
+                    "evidence_count": edge.evidence_count,
+                    "argument_ids": edge.argument_ids,
+                }
+            )
 
         result = {
             "nodes": nodes,
@@ -195,9 +197,7 @@ class CausalVisualizer:
 
         return result
 
-    def generate_timeline(
-        self, snapshots: list[GraphSnapshot]
-    ) -> str:
+    def generate_timeline(self, snapshots: list[GraphSnapshot]) -> str:
         """Generate a timeline visualization showing graph evolution."""
         if not snapshots:
             return "gantt\n    title Graph Evolution\n    (no data)"
@@ -222,9 +222,7 @@ class CausalVisualizer:
             edge_delta = snap.edge_count - prev_edges
 
             if node_delta > 0 or edge_delta > 0:
-                lines.append(
-                    f"    +{node_delta}N +{edge_delta}E :g{i}, {i}, {i + 1}"
-                )
+                lines.append(f"    +{node_delta}N +{edge_delta}E :g{i}, {i}, {i + 1}")
 
             prev_nodes = snap.node_count
             prev_edges = snap.edge_count
@@ -348,12 +346,12 @@ class CausalVisualizer:
             <div class="metric-value">{len(self.graph.edges)}</div>
             <div class="metric-label">Edges</div>
         </div>
-        <div class="metric {'success' if analysis.overall_coherence > 0.7 else 'warning' if analysis.overall_coherence > 0.4 else 'danger'}">
+        <div class="metric {"success" if analysis.overall_coherence > 0.7 else "warning" if analysis.overall_coherence > 0.4 else "danger"}">
             <div class="metric-value">{analysis.overall_coherence:.0%}</div>
             <div class="metric-label">Coherence</div>
         </div>
-        <div class="metric {'danger' if analysis.has_circular_reasoning else 'success'}">
-            <div class="metric-value">{'Yes' if analysis.has_circular_reasoning else 'No'}</div>
+        <div class="metric {"danger" if analysis.has_circular_reasoning else "success"}">
+            <div class="metric-value">{"Yes" if analysis.has_circular_reasoning else "No"}</div>
             <div class="metric-label">Circular Reasoning</div>
         </div>
     </div>
@@ -396,7 +394,7 @@ class CausalVisualizer:
                 <td>{html.escape(weak.source)}</td>
                 <td>{html.escape(weak.target)}</td>
                 <td class="{severity_class}">{weak.strength:.2f}</td>
-                <td>{', '.join(weak.attack_suggestions[:2]) if weak.attack_suggestions else '-'}</td>
+                <td>{", ".join(weak.attack_suggestions[:2]) if weak.attack_suggestions else "-"}</td>
             </tr>
             """
 

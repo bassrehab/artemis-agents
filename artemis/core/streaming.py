@@ -314,9 +314,7 @@ class StreamingDebate:
                 event_type=StreamEventType.DEBATE_END,
                 verdict=verdict,
                 metadata={
-                    "duration_seconds": (
-                        self._ended_at - self._started_at
-                    ).total_seconds(),
+                    "duration_seconds": (self._ended_at - self._started_at).total_seconds(),
                     "total_turns": len(self._transcript),
                 },
             )
@@ -407,9 +405,7 @@ class StreamingDebate:
             self._update_opponent_models(agent)
 
             # Generate argument with streaming
-            argument = await self._stream_argument_generation(
-                agent, context, level, round_num, i
-            )
+            argument = await self._stream_argument_generation(agent, context, level, round_num, i)
 
             turn = Turn(
                 round=round_num,
@@ -541,9 +537,7 @@ class StreamingDebate:
 
         return argument
 
-    async def _process_turn(
-        self, turn: Turn, context: DebateContext
-    ) -> None:
+    async def _process_turn(self, turn: Turn, context: DebateContext) -> None:
         """Process a turn: evaluate and check safety."""
         # Emit evaluation start
         await self._emit_event(
@@ -555,9 +549,7 @@ class StreamingDebate:
         )
 
         # Evaluate argument
-        evaluation = await self._evaluator.evaluate_argument(
-            turn.argument, context
-        )
+        evaluation = await self._evaluator.evaluate_argument(turn.argument, context)
 
         turn = Turn(
             id=turn.id,
@@ -609,9 +601,7 @@ class StreamingDebate:
             )
         )
 
-    async def _run_safety_monitors(
-        self, turn: Turn, context: DebateContext
-    ) -> list[SafetyResult]:
+    async def _run_safety_monitors(self, turn: Turn, context: DebateContext) -> list[SafetyResult]:
         """Run all safety monitors."""
         if not self._safety_monitors:
             return []
@@ -683,9 +673,7 @@ class StreamingDebate:
                     turn_id=turn.id,
                 )
                 self._safety_alerts.append(alert)
-                raise RuntimeError(
-                    f"Safety halt triggered by {result.monitor}"
-                )
+                raise RuntimeError(f"Safety halt triggered by {result.monitor}")
 
     def _update_opponent_models(self, agent: Agent) -> None:
         """Update agent's model of opponents."""
@@ -729,9 +717,7 @@ class StreamingDebate:
             topic=self.topic,
             current_round=self._current_round,
             total_rounds=self.total_rounds,
-            turn_in_round=len(
-                [t for t in self._transcript if t.round == self._current_round]
-            ),
+            turn_in_round=len([t for t in self._transcript if t.round == self._current_round]),
             transcript=self._transcript.copy(),
             agent_positions=self._agent_positions.copy(),
             agent_feedback=self._agent_feedback.copy(),
@@ -749,9 +735,7 @@ class StreamingDebate:
 
         for agent in self.agents:
             own_turns = [t for t in self._transcript if t.agent == agent.name]
-            opponent_turns = [
-                t for t in self._transcript if t.agent != agent.name
-            ]
+            opponent_turns = [t for t in self._transcript if t.agent != agent.name]
 
             feedback = self._feedback_synthesizer.synthesize(
                 agent_name=agent.name,
@@ -759,9 +743,9 @@ class StreamingDebate:
                 opponent_turns=opponent_turns,
             )
 
-            self._agent_feedback[
-                agent.name
-            ] = self._feedback_synthesizer.format_for_prompt(feedback)
+            self._agent_feedback[agent.name] = self._feedback_synthesizer.format_for_prompt(
+                feedback
+            )
 
     def _build_result(self, verdict: Verdict) -> DebateResult:
         """Build the final debate result."""

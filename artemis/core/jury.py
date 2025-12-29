@@ -155,14 +155,10 @@ class JuryMember:
         agents = list({turn.agent for turn in transcript})
 
         # Evaluate each argument using internal evaluator
-        argument_evaluations: dict[str, list[ArgumentEvaluation]] = {
-            agent: [] for agent in agents
-        }
+        argument_evaluations: dict[str, list[ArgumentEvaluation]] = {agent: [] for agent in agents}
 
         for turn in transcript:
-            evaluation = await self._evaluator.evaluate_argument(
-                turn.argument, context
-            )
+            evaluation = await self._evaluator.evaluate_argument(turn.argument, context)
             argument_evaluations[turn.agent].append(evaluation)
 
         # Compute criterion-level scores per agent
@@ -188,9 +184,7 @@ class JuryMember:
         score_spread = max(weighted_scores.values()) - min(weighted_scores.values())
 
         # Generate reasoning using LLM
-        reasoning = await self._generate_reasoning(
-            transcript, context, weighted_scores, winner
-        )
+        reasoning = await self._generate_reasoning(transcript, context, weighted_scores, winner)
 
         # Calculate confidence based on score spread
         confidence = min(1.0, 0.5 + score_spread)
@@ -235,8 +229,7 @@ class JuryMember:
                     criterion_totals[criterion] += score
 
             result[agent] = {
-                criterion: total / len(evals)
-                for criterion, total in criterion_totals.items()
+                criterion: total / len(evals) for criterion, total in criterion_totals.items()
             }
 
         return result
@@ -293,8 +286,7 @@ class JuryMember:
         summary_parts = []
         for turn in transcript[-6:]:  # Last 6 turns
             summary_parts.append(
-                f"{turn.agent} ({turn.argument.level.value}): "
-                f"{turn.argument.content[:200]}..."
+                f"{turn.agent} ({turn.argument.level.value}): {turn.argument.content[:200]}..."
             )
         argument_summary = "\n".join(summary_parts)
 
@@ -318,16 +310,11 @@ class JuryMember:
             response = await self._model.generate(messages=messages, max_tokens=200)
             return response.content
         except Exception as e:
-            logger.warning(
-                "Failed to generate reasoning", juror_id=self.juror_id, error=str(e)
-            )
+            logger.warning("Failed to generate reasoning", juror_id=self.juror_id, error=str(e))
             return f"{winner} demonstrated stronger arguments overall."
 
     def __repr__(self) -> str:
-        return (
-            f"JuryMember(id={self.juror_id!r}, "
-            f"perspective={self.perspective.value!r})"
-        )
+        return f"JuryMember(id={self.juror_id!r}, perspective={self.perspective.value!r})"
 
 
 class JuryPanel:
@@ -429,9 +416,7 @@ class JuryPanel:
         score_breakdown = self._aggregate_scores(evaluations)
 
         # Generate final reasoning
-        reasoning = self._generate_verdict_reasoning(
-            evaluations, consensus, score_breakdown
-        )
+        reasoning = self._generate_verdict_reasoning(evaluations, consensus, score_breakdown)
 
         verdict = Verdict(
             decision=consensus.decision,
@@ -475,9 +460,7 @@ class JuryPanel:
         total_confidence = sum(e.confidence for e in evaluations)
 
         # Calculate agreement score
-        agreement_score = (
-            vote_scores[decision] / total_confidence if total_confidence > 0 else 0.0
-        )
+        agreement_score = vote_scores[decision] / total_confidence if total_confidence > 0 else 0.0
 
         # Identify supporting and dissenting jurors
         supporting = [e.juror_id for e in evaluations if e.winner == decision]
@@ -536,18 +519,11 @@ class JuryPanel:
         for evaluation in evaluations:
             if evaluation.winner != consensus.decision:
                 # Calculate score deviation
-                consensus_scores = [
-                    e.agent_scores.get(consensus.decision, 0)
-                    for e in evaluations
-                ]
+                consensus_scores = [e.agent_scores.get(consensus.decision, 0) for e in evaluations]
                 avg_consensus_score = (
-                    sum(consensus_scores) / len(consensus_scores)
-                    if consensus_scores
-                    else 0
+                    sum(consensus_scores) / len(consensus_scores) if consensus_scores else 0
                 )
-                juror_consensus_score = evaluation.agent_scores.get(
-                    consensus.decision, 0
-                )
+                juror_consensus_score = evaluation.agent_scores.get(consensus.decision, 0)
                 deviation = avg_consensus_score - juror_consensus_score
 
                 dissents.append(
@@ -574,11 +550,7 @@ class JuryPanel:
         # Average scores across jurors
         aggregated: dict[str, float] = {}
         for agent in all_agents:
-            scores = [
-                e.agent_scores.get(agent, 0)
-                for e in evaluations
-                if agent in e.agent_scores
-            ]
+            scores = [e.agent_scores.get(agent, 0) for e in evaluations if agent in e.agent_scores]
             if scores:
                 aggregated[agent] = sum(scores) / len(scores)
 
@@ -617,9 +589,7 @@ class JuryPanel:
                 )
 
         if perspective_summary:
-            parts.append(
-                f"Supporting perspectives: {', '.join(perspective_summary[:2])}."
-            )
+            parts.append(f"Supporting perspectives: {', '.join(perspective_summary[:2])}.")
 
         return " ".join(parts)
 
@@ -636,10 +606,7 @@ class JuryPanel:
         return len(self.jurors)
 
     def __repr__(self) -> str:
-        return (
-            f"JuryPanel(jurors={len(self.jurors)}, "
-            f"threshold={self.consensus_threshold})"
-        )
+        return f"JuryPanel(jurors={len(self.jurors)}, threshold={self.consensus_threshold})"
 
 
 @dataclass

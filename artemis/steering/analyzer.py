@@ -162,12 +162,8 @@ class SteeringEffectivenessAnalyzer:
 
         # Analyze aggression
         aggressive_count = self._count_patterns(text_lower, self.AGGRESSIVE_INDICATORS)
-        cooperative_count = self._count_patterns(
-            text_lower, self.COOPERATIVE_INDICATORS
-        )
-        aggression = self._calculate_ratio(
-            aggressive_count, cooperative_count, base=0.3
-        )
+        cooperative_count = self._count_patterns(text_lower, self.COOPERATIVE_INDICATORS)
+        aggression = self._calculate_ratio(aggressive_count, cooperative_count, base=0.3)
 
         # Analyze evidence emphasis
         evidence_count = self._count_patterns(text_lower, self.EVIDENCE_INDICATORS)
@@ -206,9 +202,7 @@ class SteeringEffectivenessAnalyzer:
             total += len(re.findall(pattern, text, re.IGNORECASE))
         return total
 
-    def _calculate_ratio(
-        self, positive: int, negative: int, base: float = 0.5
-    ) -> float:
+    def _calculate_ratio(self, positive: int, negative: int, base: float = 0.5) -> float:
         total = positive + negative
         if total == 0:
             return base
@@ -227,15 +221,13 @@ class SteeringEffectivenessAnalyzer:
         total_words = sum(len(s.split()) for s in sentences)
         return total_words / len(sentences)
 
-    def calculate_effectiveness(
-        self, metrics: StyleMetrics, target: SteeringVector
-    ) -> float:
+    def calculate_effectiveness(self, metrics: StyleMetrics, target: SteeringVector) -> float:
         """Calculate how well metrics match target vector."""
         measured = metrics.to_vector()
         distance = measured.distance(target)
 
         # Max possible distance is sqrt(7) ≈ 2.65 (7 dimensions, max diff 1.0 each)
-        max_distance = 7 ** 0.5
+        max_distance = 7**0.5
 
         # Convert distance to effectiveness (inverse)
         effectiveness = 1.0 - (distance / max_distance)

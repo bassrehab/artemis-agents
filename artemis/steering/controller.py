@@ -162,11 +162,7 @@ class SteeringController:
                 eff = analyzer.calculate_effectiveness(app.metrics, app.vector)
                 effectivenesses.append(eff)
 
-        avg_effectiveness = (
-            sum(effectivenesses) / len(effectivenesses)
-            if effectivenesses
-            else None
-        )
+        avg_effectiveness = sum(effectivenesses) / len(effectivenesses) if effectivenesses else None
 
         return {
             "applications": len(self._history),

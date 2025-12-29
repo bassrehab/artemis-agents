@@ -109,13 +109,15 @@ class ArgumentVerifier:
                     error=str(e),
                 )
                 # Add a failed result
-                results.append(VerificationResult(
-                    rule_type=rule_config.rule_type,
-                    passed=False,
-                    score=0.0,
-                    violations=[],
-                    details={"error": str(e)},
-                ))
+                results.append(
+                    VerificationResult(
+                        rule_type=rule_config.rule_type,
+                        passed=False,
+                        score=0.0,
+                        violations=[],
+                        details={"error": str(e)},
+                    )
+                )
                 total_weight += rule_config.severity
 
         # Calculate overall score
@@ -178,18 +180,12 @@ class ArgumentVerifier:
             VerificationRuleType.CAUSAL_CHAIN: (
                 "Verifies causal reasoning chains are valid and connected"
             ),
-            VerificationRuleType.CITATION: (
-                "Checks for proper citations and evidence attribution"
-            ),
+            VerificationRuleType.CITATION: ("Checks for proper citations and evidence attribution"),
             VerificationRuleType.LOGICAL_CONSISTENCY: (
                 "Detects logical contradictions and inconsistencies"
             ),
-            VerificationRuleType.EVIDENCE_SUPPORT: (
-                "Ensures claims are supported by evidence"
-            ),
-            VerificationRuleType.FALLACY_FREE: (
-                "Identifies logical fallacies in arguments"
-            ),
+            VerificationRuleType.EVIDENCE_SUPPORT: ("Ensures claims are supported by evidence"),
+            VerificationRuleType.FALLACY_FREE: ("Identifies logical fallacies in arguments"),
         }
 
         return {

@@ -133,9 +133,7 @@ class CausalAnalyzer:
 
         return suggestions
 
-    def get_weakest_path(
-        self, start: str, end: str
-    ) -> tuple[list[str], float]:
+    def get_weakest_path(self, start: str, end: str) -> tuple[list[str], float]:
         """Find the weakest link in the strongest path between two nodes."""
         path, _ = self.graph.get_strongest_path(start, end)
         if not path:
@@ -168,9 +166,7 @@ class CausalAnalyzer:
                                 claim_b_source=e2.source_id,
                                 claim_b_target=e2.target_id,
                                 claim_b_type=e2.link_type.value,
-                                agents=list(
-                                    set(e1.argument_ids) | set(e2.argument_ids)
-                                ),
+                                agents=list(set(e1.argument_ids) | set(e2.argument_ids)),
                                 severity=max(e1.strength, e2.strength),
                                 explanation=(
                                     f"Conflicting claims: '{e1.link_type.value}' vs "
@@ -216,13 +212,9 @@ class CausalAnalyzer:
         }
         return (t1, t2) in contradictions or (t2, t1) in contradictions
 
-    def compute_argument_strength(
-        self, argument_id: str
-    ) -> ArgumentStrengthScore:
+    def compute_argument_strength(self, argument_id: str) -> ArgumentStrengthScore:
         """Compute strength score for an argument based on its causal support."""
-        nodes_for_argument = [
-            n for n in self.graph.nodes if argument_id in n.argument_ids
-        ]
+        nodes_for_argument = [n for n in self.graph.nodes if argument_id in n.argument_ids]
 
         if not nodes_for_argument:
             return ArgumentStrengthScore(
@@ -234,17 +226,13 @@ class CausalAnalyzer:
                 critical_dependencies=[],
             )
 
-        edges_for_argument = [
-            e for e in self.graph.edges if argument_id in e.argument_ids
-        ]
+        edges_for_argument = [e for e in self.graph.edges if argument_id in e.argument_ids]
 
         if not edges_for_argument:
             causal_support = 0.2
             evidence_backing = 0.0
         else:
-            avg_strength = sum(e.strength for e in edges_for_argument) / len(
-                edges_for_argument
-            )
+            avg_strength = sum(e.strength for e in edges_for_argument) / len(edges_for_argument)
             causal_support = avg_strength
             total_evidence = sum(e.evidence_count for e in edges_for_argument)
             evidence_backing = min(1.0, total_evidence / (len(edges_for_argument) * 3))
@@ -254,7 +242,7 @@ class CausalAnalyzer:
 
         critical_deps = self._find_critical_dependencies(argument_id)
 
-        overall = (causal_support * 0.4 + evidence_backing * 0.3 + (1 - vulnerability) * 0.3)
+        overall = causal_support * 0.4 + evidence_backing * 0.3 + (1 - vulnerability) * 0.3
 
         return ArgumentStrengthScore(
             argument_id=argument_id,
@@ -483,9 +471,7 @@ class CausalFallacyDetector:
 
     def __init__(self) -> None:
         # XXX: compiling regexes upfront - might be overkill for small inputs
-        self._post_hoc_compiled = [
-            re.compile(p, re.IGNORECASE) for p in self.POST_HOC_PATTERNS
-        ]
+        self._post_hoc_compiled = [re.compile(p, re.IGNORECASE) for p in self.POST_HOC_PATTERNS]
         self._correlation_compiled = [
             re.compile(p, re.IGNORECASE) for p in self.CORRELATION_PATTERNS
         ]
@@ -555,8 +541,7 @@ class CausalFallacyDetector:
                             "may indicate false cause assumption."
                         ),
                         evidence=[
-                            f"Link: {link.cause} -> {link.effect} "
-                            f"(strength: {link.strength})"
+                            f"Link: {link.cause} -> {link.effect} (strength: {link.strength})"
                         ],
                         severity=0.4,
                         affected_links=[link.id],
@@ -645,9 +630,7 @@ class CausalFallacyDetector:
         if link.strength < 0.3 and not link.mechanism:
             return FallacyResult(
                 fallacy_type=FallacyType.POST_HOC,
-                description=(
-                    "Weak temporal link without mechanism may be post hoc."
-                ),
+                description=("Weak temporal link without mechanism may be post hoc."),
                 evidence=[f"Link: {link.cause} -> {link.effect}"],
                 severity=0.4,
                 affected_links=[link.id],
@@ -686,9 +669,7 @@ class CausalFallacyDetector:
         if strength < 0.2:
             return FallacyResult(
                 fallacy_type=FallacyType.SLIPPERY_SLOPE,
-                description=(
-                    "Long causal chain with very weak cumulative strength."
-                ),
+                description=("Long causal chain with very weak cumulative strength."),
                 evidence=[f"Path strength: {strength:.2f}"],
                 severity=0.7,
             )

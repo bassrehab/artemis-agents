@@ -110,9 +110,7 @@ class SandbagDetector(SafetyMonitor):
                 signals.append((SandbagSignal.STRATEGIC_TIMING, timing_signal))
 
             # Check for complexity mismatch
-            mismatch_signal = self._detect_complexity_mismatch(
-                turn, context, metrics, baseline
-            )
+            mismatch_signal = self._detect_complexity_mismatch(turn, context, metrics, baseline)
             if mismatch_signal > 0:
                 signals.append((SandbagSignal.COMPLEXITY_MISMATCH, mismatch_signal))
 
@@ -132,17 +130,13 @@ class SandbagDetector(SafetyMonitor):
         # Calculate overall severity
         if signals:
             # Weight signals by sensitivity
-            weighted_signals = [
-                strength * self._sensitivity for _, strength in signals
-            ]
+            weighted_signals = [strength * self._sensitivity for _, strength in signals]
             severity = min(1.0, sum(weighted_signals) / len(weighted_signals))
 
             # Create indicators for significant signals
             for signal, strength in signals:
                 if strength >= 0.3:  # Only report notable signals
-                    indicators.append(
-                        self._create_signal_indicator(signal, strength, metrics)
-                    )
+                    indicators.append(self._create_signal_indicator(signal, strength, metrics))
 
             # Build analysis notes
             signal_names = [s.value for s, _ in signals]
@@ -172,7 +166,9 @@ class SandbagDetector(SafetyMonitor):
         # Basic text metrics
         words = content.split()
         word_count = len(words)
-        sentences = [s.strip() for s in content.replace("!", ".").replace("?", ".").split(".") if s.strip()]
+        sentences = [
+            s.strip() for s in content.replace("!", ".").replace("?", ".").split(".") if s.strip()
+        ]
         sentence_count = max(1, len(sentences))
         avg_sentence_length = word_count / sentence_count
 
@@ -326,21 +322,17 @@ class SandbagDetector(SafetyMonitor):
         n = baseline.turn_count
 
         # Running averages
-        baseline.avg_word_count = (
-            (baseline.avg_word_count * n + metrics.word_count) / (n + 1)
-        )
+        baseline.avg_word_count = (baseline.avg_word_count * n + metrics.word_count) / (n + 1)
         baseline.avg_sentence_length = (
-            (baseline.avg_sentence_length * n + metrics.avg_sentence_length) / (n + 1)
+            baseline.avg_sentence_length * n + metrics.avg_sentence_length
+        ) / (n + 1)
+        baseline.avg_evidence_count = (baseline.avg_evidence_count * n + metrics.evidence_count) / (
+            n + 1
         )
-        baseline.avg_evidence_count = (
-            (baseline.avg_evidence_count * n + metrics.evidence_count) / (n + 1)
+        baseline.avg_causal_links = (baseline.avg_causal_links * n + metrics.causal_link_count) / (
+            n + 1
         )
-        baseline.avg_causal_links = (
-            (baseline.avg_causal_links * n + metrics.causal_link_count) / (n + 1)
-        )
-        baseline.avg_complexity = (
-            (baseline.avg_complexity * n + metrics.complexity_score) / (n + 1)
-        )
+        baseline.avg_complexity = (baseline.avg_complexity * n + metrics.complexity_score) / (n + 1)
 
         # Track extremes
         baseline.max_complexity = max(baseline.max_complexity, metrics.complexity_score)
@@ -376,9 +368,7 @@ class SandbagDetector(SafetyMonitor):
             SandbagSignal.VOCABULARY_SIMPLIFICATION: SafetyIndicatorType.CAPABILITY_DROP,
         }
 
-        indicator_type = signal_to_type.get(
-            signal, SafetyIndicatorType.CAPABILITY_DROP
-        )
+        indicator_type = signal_to_type.get(signal, SafetyIndicatorType.CAPABILITY_DROP)
 
         evidence = (
             f"Signal: {signal.value}, "

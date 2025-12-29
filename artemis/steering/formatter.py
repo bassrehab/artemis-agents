@@ -54,9 +54,7 @@ class SteeringFormatter:
         """Initialize the formatter."""
         self.include_header = include_header
 
-    def format_instructions(
-        self, vector: SteeringVector, strength: float = 1.0
-    ) -> str:
+    def format_instructions(self, vector: SteeringVector, strength: float = 1.0) -> str:
         """Format steering vector into prompt instructions."""
         instructions: list[str] = []
 
@@ -75,9 +73,7 @@ class SteeringFormatter:
 
         return result
 
-    def _format_dimension(
-        self, dimension: str, value: float, strength: float
-    ) -> str:
+    def _format_dimension(self, dimension: str, value: float, strength: float) -> str:
         # Skip dimensions that are near neutral (0.5)
         if 0.4 <= value <= 0.6:
             return ""
@@ -109,9 +105,7 @@ class SteeringFormatter:
 
         return desc
 
-    def format_system_prompt_addon(
-        self, vector: SteeringVector, strength: float = 1.0
-    ) -> str:
+    def format_system_prompt_addon(self, vector: SteeringVector, strength: float = 1.0) -> str:
         """Format as an addon for system prompts."""
         instructions = self.format_instructions(vector, strength)
         if not instructions:
@@ -119,9 +113,7 @@ class SteeringFormatter:
 
         return f"\n\n## Communication Style\n{instructions}"
 
-    def format_user_prompt_addon(
-        self, vector: SteeringVector, strength: float = 1.0
-    ) -> str:
+    def format_user_prompt_addon(self, vector: SteeringVector, strength: float = 1.0) -> str:
         """Format as an addon for user prompts."""
         instructions = self.format_instructions(vector, strength)
         if not instructions:

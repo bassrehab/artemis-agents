@@ -209,6 +209,7 @@ class DeepSeekModel(BaseModel):
                         break
 
                     import json
+
                     chunk = json.loads(data)
                     if chunk.get("choices"):
                         delta = chunk["choices"][0].get("delta", {})
@@ -251,9 +252,7 @@ class DeepSeekModel(BaseModel):
 
         # Add thinking configuration for R1 models
         if thinking_budget and self.supports_reasoning:
-            request["reasoning_effort"] = self._thinking_budget_to_effort(
-                thinking_budget
-            )
+            request["reasoning_effort"] = self._thinking_budget_to_effort(thinking_budget)
 
         # Add any extra parameters
         request.update(kwargs)
@@ -292,7 +291,8 @@ class DeepSeekModel(BaseModel):
             except DeepSeekRateLimitError:
                 # Exponential backoff for rate limits
                 import asyncio
-                wait_time = 2 ** attempt
+
+                wait_time = 2**attempt
                 logger.warning(
                     "Rate limit hit, waiting",
                     wait_time=wait_time,

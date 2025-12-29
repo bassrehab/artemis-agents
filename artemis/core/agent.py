@@ -128,6 +128,7 @@ class Agent:
                 LLMCausalExtractor,
                 LLMEvidenceExtractor,
             )
+
             self._llm_causal_extractor = LLMCausalExtractor(model_name=extraction_model)
             self._llm_evidence_extractor = LLMEvidenceExtractor(model_name=extraction_model)
 
@@ -400,6 +401,7 @@ class Agent:
 
             # Run LLM extractions in parallel if both are needed
             import asyncio
+
             extraction_tasks = []
             need_evidence = self._llm_evidence_extractor and not evidence
             need_causal = self._llm_causal_extractor and not causal_links
@@ -419,9 +421,11 @@ class Agent:
                     causal_links = results[idx]
 
             # Rebuild argument with enhanced extraction and optional thinking trace
-            if (evidence != argument.evidence or
-                causal_links != argument.causal_links or
-                (thinking_trace and self.reasoning.include_trace_in_output)):
+            if (
+                evidence != argument.evidence
+                or causal_links != argument.causal_links
+                or (thinking_trace and self.reasoning.include_trace_in_output)
+            ):
                 argument = Argument(
                     id=argument.id,
                     agent=argument.agent,
@@ -432,7 +436,9 @@ class Agent:
                     rebuts=argument.rebuts,
                     supports=argument.supports,
                     ethical_score=argument.ethical_score,
-                    thinking_trace=thinking_trace if self.reasoning.include_trace_in_output else None,
+                    thinking_trace=thinking_trace
+                    if self.reasoning.include_trace_in_output
+                    else None,
                     timestamp=argument.timestamp,
                 )
 

@@ -73,9 +73,7 @@ class FeedbackSynthesizer:
                 opponent_vulnerabilities = self._find_vulnerabilities(opponent_evals)
 
         # Generate overall guidance
-        overall_guidance = self._generate_guidance(
-            strengths, weaknesses, opponent_vulnerabilities
-        )
+        overall_guidance = self._generate_guidance(strengths, weaknesses, opponent_vulnerabilities)
 
         return FeedbackSummary(
             agent=agent_name,
@@ -127,21 +125,13 @@ class FeedbackSynthesizer:
 
         for weakness in weaknesses:
             if "logical" in weakness.lower():
-                suggestions.append(
-                    "Strengthen logical flow with explicit premises and conclusions"
-                )
+                suggestions.append("Strengthen logical flow with explicit premises and conclusions")
             elif "evidence" in weakness.lower():
-                suggestions.append(
-                    "Add more specific evidence, statistics, or expert citations"
-                )
+                suggestions.append("Add more specific evidence, statistics, or expert citations")
             elif "causal" in weakness.lower():
-                suggestions.append(
-                    "Clarify cause-effect relationships with explicit mechanisms"
-                )
+                suggestions.append("Clarify cause-effect relationships with explicit mechanisms")
             elif "ethical" in weakness.lower():
-                suggestions.append(
-                    "Address ethical implications and stakeholder impacts"
-                )
+                suggestions.append("Address ethical implications and stakeholder impacts")
             elif "persuasive" in weakness.lower():
                 suggestions.append(
                     "Use more compelling rhetorical techniques and address counterarguments"
@@ -149,9 +139,7 @@ class FeedbackSynthesizer:
 
         return suggestions
 
-    def _find_vulnerabilities(
-        self, opponent_evals: list[ArgumentEvaluation]
-    ) -> list[str]:
+    def _find_vulnerabilities(self, opponent_evals: list[ArgumentEvaluation]) -> list[str]:
         """Identify weaknesses in opponent's arguments to exploit."""
         vulnerabilities = []
 
@@ -172,17 +160,13 @@ class FeedbackSynthesizer:
                         "Opponent's arguments have logical gaps - challenge their reasoning"
                     )
                 elif criterion == "evidence_quality":
-                    vulnerabilities.append(
-                        "Opponent lacks strong evidence - demand citations"
-                    )
+                    vulnerabilities.append("Opponent lacks strong evidence - demand citations")
                 elif criterion == "causal_reasoning":
                     vulnerabilities.append(
                         "Opponent's causal claims are weak - question mechanisms"
                     )
                 elif criterion == "ethical_alignment":
-                    vulnerabilities.append(
-                        "Opponent overlooks ethical concerns - highlight them"
-                    )
+                    vulnerabilities.append("Opponent overlooks ethical concerns - highlight them")
 
         return vulnerabilities
 
@@ -199,9 +183,7 @@ class FeedbackSynthesizer:
             parts.append(f"Build on your strengths: {strengths[0].split('(')[0].strip()}")
 
         if weaknesses:
-            parts.append(
-                f"Focus on improving: {weaknesses[0].split('(')[0].strip()}"
-            )
+            parts.append(f"Focus on improving: {weaknesses[0].split('(')[0].strip()}")
 
         if opponent_vulnerabilities:
             parts.append(opponent_vulnerabilities[0])

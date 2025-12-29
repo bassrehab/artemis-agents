@@ -27,6 +27,7 @@ def _get_perspective_prompt(perspective: JuryPerspective) -> str:
 # Prompt Builders
 # =============================================================================
 
+
 def build_reasoning_system_prompt(
     perspective: JuryPerspective,
     topic: str,

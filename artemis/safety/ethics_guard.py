@@ -125,9 +125,7 @@ class EthicsGuard(SafetyMonitor):
         self._sensitivity = min(1.0, max(0.0, sensitivity))
         self._ethics_config = ethics_config or EthicsConfig()
         self._halt_on_violation = halt_on_violation
-        self._violation_history: dict[str, list[tuple[int, EthicsViolation, float]]] = (
-            {}
-        )
+        self._violation_history: dict[str, list[tuple[int, EthicsViolation, float]]] = {}
 
         super().__init__(config=config, mode=mode, **kwargs)
 
@@ -163,12 +161,8 @@ class EthicsGuard(SafetyMonitor):
         # Process violations
         for violation, severity, evidence in score.violations:
             if severity >= 0.3:
-                indicators.append(
-                    self._create_violation_indicator(violation, severity, evidence)
-                )
-                self._violation_history[agent].append(
-                    (turn.round, violation, severity)
-                )
+                indicators.append(self._create_violation_indicator(violation, severity, evidence))
+                self._violation_history[agent].append((turn.round, violation, severity))
 
         # Calculate overall severity
         if score.violations:
@@ -179,11 +173,7 @@ class EthicsGuard(SafetyMonitor):
             notes = f"Ethics violations: {', '.join(violation_names)}"
 
             # Check if we should halt
-            should_halt = (
-                self._halt_on_violation
-                and self.is_active
-                and severity >= 0.7
-            )
+            should_halt = self._halt_on_violation and self.is_active and severity >= 0.7
         else:
             severity = 0.0
             notes = None
@@ -239,12 +229,8 @@ class EthicsGuard(SafetyMonitor):
                 violations.append(fairness_result)
 
         # Calculate scores
-        harmful_score = sum(
-            sev for v, sev, _ in violations if v == EthicsViolation.HARMFUL_CONTENT
-        )
-        bias_score = sum(
-            sev for v, sev, _ in violations if v == EthicsViolation.BIAS_DETECTED
-        )
+        harmful_score = sum(sev for v, sev, _ in violations if v == EthicsViolation.HARMFUL_CONTENT)
+        bias_score = sum(sev for v, sev, _ in violations if v == EthicsViolation.BIAS_DETECTED)
 
         overall = 1.0 - min(1.0, (harmful_score + bias_score) / 2)
 
@@ -255,9 +241,7 @@ class EthicsGuard(SafetyMonitor):
             violations=violations,
         )
 
-    def _check_harmful_content(
-        self, content: str
-    ) -> tuple[EthicsViolation, float, str] | None:
+    def _check_harmful_content(self, content: str) -> tuple[EthicsViolation, float, str] | None:
         matches = []
         for pattern, weight in self.HARMFUL_PATTERNS:
             if pattern in content:
@@ -293,9 +277,7 @@ class EthicsGuard(SafetyMonitor):
 
         return None
 
-    def _check_manipulation(
-        self, content: str
-    ) -> tuple[EthicsViolation, float, str] | None:
+    def _check_manipulation(self, content: str) -> tuple[EthicsViolation, float, str] | None:
         matches = []
         for pattern, weight in self.MANIPULATION_PATTERNS:
             if pattern in content:
@@ -313,9 +295,7 @@ class EthicsGuard(SafetyMonitor):
 
         return None
 
-    def _check_privacy(
-        self, content: str
-    ) -> tuple[EthicsViolation, float, str] | None:
+    def _check_privacy(self, content: str) -> tuple[EthicsViolation, float, str] | None:
         matches = []
         for pattern, weight in self.PRIVACY_PATTERNS:
             if pattern in content:
@@ -333,9 +313,7 @@ class EthicsGuard(SafetyMonitor):
 
         return None
 
-    def _check_fairness(
-        self, content: str
-    ) -> tuple[EthicsViolation, float, str] | None:
+    def _check_fairness(self, content: str) -> tuple[EthicsViolation, float, str] | None:
         unfair_markers = [
             ("obviously right", 0.4),
             ("only idiots", 0.7),
@@ -374,9 +352,7 @@ class EthicsGuard(SafetyMonitor):
             metadata={"violation": violation.value},
         )
 
-    def get_violation_history(
-        self, agent: str
-    ) -> list[tuple[int, EthicsViolation, float]]:
+    def get_violation_history(self, agent: str) -> list[tuple[int, EthicsViolation, float]]:
         return self._violation_history.get(agent, [])
 
     def get_agent_ethics_summary(self, agent: str) -> dict:

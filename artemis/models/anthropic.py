@@ -61,8 +61,7 @@ class AnthropicModel(BaseModel):
             from anthropic import AsyncAnthropic
         except ImportError as e:
             raise ImportError(
-                "anthropic is required for Anthropic provider. "
-                "Install with: pip install anthropic"
+                "anthropic is required for Anthropic provider. Install with: pip install anthropic"
             ) from e
 
         self._client = AsyncAnthropic(

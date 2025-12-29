@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 
 # Default color palette
 DEFAULT_COLORS = {
-    "pro": "#4CAF50",      # Green
-    "con": "#F44336",      # Red
+    "pro": "#4CAF50",  # Green
+    "con": "#F44336",  # Red
     "agent_0": "#2196F3",  # Blue
     "agent_1": "#FF9800",  # Orange
     "agent_2": "#9C27B0",  # Purple
@@ -54,7 +54,7 @@ class SVGChart:
     def _svg_header(self) -> str:
         # XXX: viewBox ensures scaling works properly
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}" width="{self.width}" height="{self.height}">
-  <rect width="100%" height="100%" fill="{self.colors['background']}"/>'''
+  <rect width="100%" height="100%" fill="{self.colors["background"]}"/>'''
 
     def _svg_footer(self) -> str:
         return "</svg>"
@@ -119,7 +119,7 @@ class SVGChart:
             labels.append(
                 f'<text x="{self.width / 2}" y="{self.height - 10}" '
                 f'text-anchor="middle" font-size="12" fill="{self.colors["text"]}">'
-                f'{x_label}</text>'
+                f"{x_label}</text>"
             )
 
         # Y-axis label (rotated)
@@ -128,23 +128,31 @@ class SVGChart:
                 f'<text x="15" y="{self.height / 2}" '
                 f'text-anchor="middle" font-size="12" fill="{self.colors["text"]}" '
                 f'transform="rotate(-90 15 {self.height / 2})">'
-                f'{y_label}</text>'
+                f"{y_label}</text>"
             )
 
         # X-axis tick labels
         if x_values:
             for i, val in enumerate(x_values):
-                x = self.padding + (i / (len(x_values) - 1)) * self.chart_width if len(x_values) > 1 else self.padding + self.chart_width / 2
+                x = (
+                    self.padding + (i / (len(x_values) - 1)) * self.chart_width
+                    if len(x_values) > 1
+                    else self.padding + self.chart_width / 2
+                )
                 labels.append(
                     f'<text x="{x:.1f}" y="{self.padding + self.chart_height + 20}" '
                     f'text-anchor="middle" font-size="10" fill="{self.colors["text"]}">'
-                    f'{val}</text>'
+                    f"{val}</text>"
                 )
 
         # Y-axis tick labels
         if y_values:
             for i, val in enumerate(y_values):
-                y = self.padding + self.chart_height - (i / (len(y_values) - 1)) * self.chart_height if len(y_values) > 1 else self.padding + self.chart_height / 2
+                y = (
+                    self.padding + self.chart_height - (i / (len(y_values) - 1)) * self.chart_height
+                    if len(y_values) > 1
+                    else self.padding + self.chart_height / 2
+                )
                 labels.append(
                     f'<text x="{self.padding - 10}" y="{y:.1f}" '
                     f'text-anchor="end" font-size="10" fill="{self.colors["text"]}" '
@@ -153,7 +161,9 @@ class SVGChart:
 
         return "\n  ".join(labels)
 
-    def _draw_legend(self, items: list[tuple[str, str]], x: int | None = None, y: int | None = None) -> str:
+    def _draw_legend(
+        self, items: list[tuple[str, str]], x: int | None = None, y: int | None = None
+    ) -> str:
         if x is None:
             x = self.width - self.padding - 80
         if y is None:
@@ -197,7 +207,11 @@ class ScoreProgressionChart(SVGChart):
         if highlight_turning_points:
             for tp_round in highlight_turning_points:
                 if 0 <= tp_round < num_rounds:
-                    x = self._scale_x(tp_round, 0, num_rounds - 1) if num_rounds > 1 else self.padding + self.chart_width / 2
+                    x = (
+                        self._scale_x(tp_round, 0, num_rounds - 1)
+                        if num_rounds > 1
+                        else self.padding + self.chart_width / 2
+                    )
                     parts.append(
                         f'<rect x="{x - 5}" y="{self.padding}" width="10" '
                         f'height="{self.chart_height}" fill="#FFF3E0" opacity="0.7"/>'
@@ -213,7 +227,11 @@ class ScoreProgressionChart(SVGChart):
             points = []
             for round_idx, scores in enumerate(round_scores):
                 score = scores.get(agent, 0.0)
-                x = self._scale_x(round_idx, 0, num_rounds - 1) if num_rounds > 1 else self.padding + self.chart_width / 2
+                x = (
+                    self._scale_x(round_idx, 0, num_rounds - 1)
+                    if num_rounds > 1
+                    else self.padding + self.chart_width / 2
+                )
                 y = self._scale_y(score, min_score, max_score)
                 points.append((x, y))
 
@@ -230,9 +248,7 @@ class ScoreProgressionChart(SVGChart):
 
                 # Draw points
                 for x, y in points:
-                    parts.append(
-                        f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{color}"/>'
-                    )
+                    parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{color}"/>')
 
         # Draw axis labels
         x_values = [f"R{i}" for i in range(num_rounds)]
@@ -248,7 +264,7 @@ class ScoreProgressionChart(SVGChart):
     def _render_empty(self, message: str) -> str:
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
-  <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
+  <text x="{self.width / 2}" y="{self.height / 2}" text-anchor="middle" fill="#666">{message}</text>
 </svg>'''
 
 
@@ -300,7 +316,11 @@ class MomentumChart(SVGChart):
             # Build area path (filled from zero line)
             points = []
             for mp in agent_points:
-                x = self._scale_x(mp.round, min_round, max_round) if max_round > min_round else self.padding + self.chart_width / 2
+                x = (
+                    self._scale_x(mp.round, min_round, max_round)
+                    if max_round > min_round
+                    else self.padding + self.chart_width / 2
+                )
                 y = self._scale_y(mp.momentum, -1, 1)
                 points.append((x, y, mp.momentum))
 
@@ -311,9 +331,7 @@ class MomentumChart(SVGChart):
                     area_path += f" L {x:.1f} {y:.1f}"
                 area_path += f" L {points[-1][0]:.1f} {zero_y:.1f} Z"
 
-                parts.append(
-                    f'<path d="{area_path}" fill="{color}" opacity="0.2"/>'
-                )
+                parts.append(f'<path d="{area_path}" fill="{color}" opacity="0.2"/>')
 
                 # Draw line
                 line_path = f"M {points[0][0]:.1f} {points[0][1]:.1f}"
@@ -327,7 +345,9 @@ class MomentumChart(SVGChart):
 
                 # Draw points with color based on positive/negative
                 for x, y, momentum in points:
-                    point_color = self.colors["positive"] if momentum >= 0 else self.colors["negative"]
+                    point_color = (
+                        self.colors["positive"] if momentum >= 0 else self.colors["negative"]
+                    )
                     parts.append(
                         f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{point_color}" stroke="{color}" stroke-width="1"/>'
                     )
@@ -346,7 +366,7 @@ class MomentumChart(SVGChart):
     def _render_empty(self, message: str) -> str:
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
-  <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
+  <text x="{self.width / 2}" y="{self.height / 2}" text-anchor="middle" fill="#666">{message}</text>
 </svg>'''
 
 
@@ -464,7 +484,7 @@ class JuryVoteChart(SVGChart):
     def _render_empty(self, message: str) -> str:
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
-  <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
+  <text x="{self.width / 2}" y="{self.height / 2}" text-anchor="middle" fill="#666">{message}</text>
 </svg>'''
 
 
@@ -534,7 +554,11 @@ class ArgumentFlowDiagram(SVGChart):
                 turn_positions[turn.id] = (x + box_width / 2, y + box_height / 2)
 
                 # Draw box
-                level = turn.argument.level.value if turn.argument and hasattr(turn.argument.level, "value") else "?"
+                level = (
+                    turn.argument.level.value
+                    if turn.argument and hasattr(turn.argument.level, "value")
+                    else "?"
+                )
                 score = turn.evaluation.total_score if turn.evaluation else 0
 
                 # Color intensity based on score
@@ -586,12 +610,15 @@ class ArgumentFlowDiagram(SVGChart):
                         )
 
         # Add arrowhead marker definition
-        parts.insert(1, '''
+        parts.insert(
+            1,
+            """
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#F44336"/>
     </marker>
-  </defs>''')
+  </defs>""",
+        )
 
         parts.append(self._svg_footer())
         return "\n".join(parts)
@@ -599,7 +626,7 @@ class ArgumentFlowDiagram(SVGChart):
     def _render_empty(self, message: str) -> str:
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
-  <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
+  <text x="{self.width / 2}" y="{self.height / 2}" text-anchor="middle" fill="#666">{message}</text>
 </svg>'''
 
 
@@ -632,11 +659,11 @@ class TopicCoverageHeatmap(SVGChart):
         cell_height = min(25, (self.chart_height - 40) / len(topics))
 
         # Find max count for color scaling
-        max_count = max(
-            count
-            for agent_topics in coverage.values()
-            for count in agent_topics.values()
-        ) if coverage else 1
+        max_count = (
+            max(count for agent_topics in coverage.values() for count in agent_topics.values())
+            if coverage
+            else 1
+        )
 
         # Draw column headers (agents)
         for i, agent in enumerate(agents):
@@ -699,5 +726,5 @@ class TopicCoverageHeatmap(SVGChart):
     def _render_empty(self, message: str) -> str:
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
-  <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
+  <text x="{self.width / 2}" y="{self.height / 2}" text-anchor="middle" fill="#666">{message}</text>
 </svg>'''

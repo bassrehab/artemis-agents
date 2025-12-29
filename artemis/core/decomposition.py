@@ -183,9 +183,7 @@ class RuleBasedDecomposer(TopicDecomposer):
 
         return specs
 
-    def _select_dimensions(
-        self, topic: str
-    ) -> list[tuple[str, float, str]]:
+    def _select_dimensions(self, topic: str) -> list[tuple[str, float, str]]:
         """Select appropriate dimensions for the topic."""
         if self._custom_dimensions:
             return self._custom_dimensions

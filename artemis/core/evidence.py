@@ -65,9 +65,7 @@ class EvidenceExtractor:
             # Numbered citations: [1], [12], etc.
             "numbered_citation": re.compile(r"\[(\d+)\]"),
             # Statistics: percentages and numbers with units
-            "percentage": re.compile(
-                r"(\d+(?:\.\d+)?)\s*(?:%|percent|percentage)", re.IGNORECASE
-            ),
+            "percentage": re.compile(r"(\d+(?:\.\d+)?)\s*(?:%|percent|percentage)", re.IGNORECASE),
             "statistic_with_unit": re.compile(
                 r"(\d+(?:,\d{3})*(?:\.\d+)?)\s*(million|billion|trillion|thousand|"
                 r"people|users|cases|studies|participants|dollars|euros|pounds)",
@@ -400,9 +398,7 @@ class EvidenceLinker:
         ]
 
         for pos, neg in negation_pairs:
-            if (pos in content1 and neg in content2) or (
-                neg in content1 and pos in content2
-            ):
+            if (pos in content1 and neg in content2) or (neg in content1 and pos in content2):
                 # Additional check: same topic
                 words1 = set(content1.split()) - {pos, neg}
                 words2 = set(content2.split()) - {pos, neg}

@@ -53,7 +53,6 @@ Focus on:
 4. Overall message or implication
 
 Provide a clear, factual description.""",
-
         ExtractionType.DATA: """Extract all data, statistics, and numerical information from this image.
 Format as:
 - List each data point
@@ -62,7 +61,6 @@ Format as:
 - Identify the source if visible
 
 Be precise and accurate.""",
-
         ExtractionType.CLAIMS: """Identify all factual claims supported by this image.
 For each claim:
 1. State the claim clearly
@@ -70,7 +68,6 @@ For each claim:
 3. Rate confidence (high/medium/low)
 
 Focus on verifiable claims.""",
-
         ExtractionType.SUMMARY: """Provide a concise summary of this content.
 Include:
 - Main topic or subject
@@ -79,7 +76,6 @@ Include:
 - Any limitations or caveats
 
 Keep it brief but comprehensive.""",
-
         ExtractionType.TEXT: """Extract all text visible in this image or document.
 Include:
 - Headers and titles
@@ -292,20 +288,24 @@ class DocumentProcessor:
             return self._chunk_text(text)
 
         # Unknown format - return metadata only
-        return [{
-            "number": 1,
-            "text": f"[Binary document: {content.filename or 'unnamed'}]",
-            "type": content.media_type,
-        }]
+        return [
+            {
+                "number": 1,
+                "text": f"[Binary document: {content.filename or 'unnamed'}]",
+                "type": content.media_type,
+            }
+        ]
 
     def _process_pdf(self, data: bytes) -> list[dict[str, Any]]:
         # Stub - would use PyPDF2 in production
-        return [{
-            "number": 1,
-            "text": "[PDF content - requires PDF library for extraction]",
-            "type": "application/pdf",
-            "size": len(data),
-        }]
+        return [
+            {
+                "number": 1,
+                "text": "[PDF content - requires PDF library for extraction]",
+                "type": "application/pdf",
+                "size": len(data),
+            }
+        ]
 
     def _chunk_text(self, text: str) -> list[dict[str, Any]]:
         chunks = []
@@ -316,24 +316,28 @@ class DocumentProcessor:
         for line in lines:
             if len(current_chunk) + len(line) > self.chunk_size:
                 if current_chunk:
-                    chunks.append({
-                        "number": chunk_num,
-                        "text": current_chunk.strip(),
-                        "type": "text/plain",
-                    })
+                    chunks.append(
+                        {
+                            "number": chunk_num,
+                            "text": current_chunk.strip(),
+                            "type": "text/plain",
+                        }
+                    )
                     chunk_num += 1
                 current_chunk = line + "\n"
             else:
                 current_chunk += line + "\n"
 
         if current_chunk:
-            chunks.append({
-                "number": chunk_num,
-                "text": current_chunk.strip(),
-                "type": "text/plain",
-            })
+            chunks.append(
+                {
+                    "number": chunk_num,
+                    "text": current_chunk.strip(),
+                    "type": "text/plain",
+                }
+            )
 
-        return chunks[:self.max_pages]
+        return chunks[: self.max_pages]
 
 
 class ImageAnalyzer:

@@ -59,7 +59,9 @@ def get_prompt(
         "Evaluate the following argument..."
     """
     if version not in PROMPT_MODULES:
-        raise ValueError(f"Unknown prompt version: {version}. Available: {list(PROMPT_MODULES.keys())}")
+        raise ValueError(
+            f"Unknown prompt version: {version}. Available: {list(PROMPT_MODULES.keys())}"
+        )
 
     parts = prompt_key.split(".", 1)
     if len(parts) != 2:
@@ -68,7 +70,9 @@ def get_prompt(
     module_name, prompt_name = parts
 
     if module_name not in PROMPT_MODULES[version]:
-        raise KeyError(f"Unknown prompt module: {module_name}. Available: {list(PROMPT_MODULES[version].keys())}")
+        raise KeyError(
+            f"Unknown prompt module: {module_name}. Available: {list(PROMPT_MODULES[version].keys())}"
+        )
 
     module_path = PROMPT_MODULES[version][module_name]
     module = _load_module(module_path)
@@ -79,7 +83,9 @@ def get_prompt(
         # Try original case
         if not hasattr(module, prompt_name):
             available = [n for n in dir(module) if not n.startswith("_") and n.isupper()]
-            raise KeyError(f"Prompt '{prompt_name}' not found in {module_name}. Available: {available}")
+            raise KeyError(
+                f"Prompt '{prompt_name}' not found in {module_name}. Available: {available}"
+            )
         prompt = getattr(module, prompt_name)
     else:
         prompt = getattr(module, const_name)

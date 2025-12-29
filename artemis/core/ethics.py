@@ -121,29 +121,85 @@ class EthicsEvaluator:
     # Keywords indicating ethical consideration by framework
     FRAMEWORK_KEYWORDS = {
         EthicalFramework.UTILITARIAN: [
-            "benefit", "welfare", "outcome", "consequences", "greater good",
-            "maximize", "optimize", "efficiency", "cost-benefit", "utility",
-            "happiness", "well-being", "prosperity", "impact",
+            "benefit",
+            "welfare",
+            "outcome",
+            "consequences",
+            "greater good",
+            "maximize",
+            "optimize",
+            "efficiency",
+            "cost-benefit",
+            "utility",
+            "happiness",
+            "well-being",
+            "prosperity",
+            "impact",
         ],
         EthicalFramework.DEONTOLOGICAL: [
-            "right", "duty", "obligation", "principle", "rule", "law",
-            "rights", "justice", "fairness", "respect", "dignity",
-            "autonomy", "consent", "universal", "categorical",
+            "right",
+            "duty",
+            "obligation",
+            "principle",
+            "rule",
+            "law",
+            "rights",
+            "justice",
+            "fairness",
+            "respect",
+            "dignity",
+            "autonomy",
+            "consent",
+            "universal",
+            "categorical",
         ],
         EthicalFramework.VIRTUE: [
-            "character", "virtue", "integrity", "honesty", "courage",
-            "wisdom", "temperance", "excellence", "moral", "ethical",
-            "trustworthy", "responsible", "compassion", "humility",
+            "character",
+            "virtue",
+            "integrity",
+            "honesty",
+            "courage",
+            "wisdom",
+            "temperance",
+            "excellence",
+            "moral",
+            "ethical",
+            "trustworthy",
+            "responsible",
+            "compassion",
+            "humility",
         ],
         EthicalFramework.CARE: [
-            "care", "relationship", "responsibility", "nurture", "support",
-            "empathy", "compassion", "connection", "community", "family",
-            "vulnerable", "protect", "trust", "interdependence",
+            "care",
+            "relationship",
+            "responsibility",
+            "nurture",
+            "support",
+            "empathy",
+            "compassion",
+            "connection",
+            "community",
+            "family",
+            "vulnerable",
+            "protect",
+            "trust",
+            "interdependence",
         ],
         EthicalFramework.JUSTICE: [
-            "justice", "fair", "equal", "equity", "rights", "distribution",
-            "access", "opportunity", "discrimination", "bias", "inclusive",
-            "marginalized", "representation", "democratic",
+            "justice",
+            "fair",
+            "equal",
+            "equity",
+            "rights",
+            "distribution",
+            "access",
+            "opportunity",
+            "discrimination",
+            "bias",
+            "inclusive",
+            "marginalized",
+            "representation",
+            "democratic",
         ],
     }
 
@@ -160,27 +216,62 @@ class EthicsEvaluator:
     # Stakeholder keywords
     STAKEHOLDER_KEYWORDS = {
         StakeholderType.INDIVIDUALS: [
-            "person", "individual", "user", "consumer", "patient", "worker",
-            "citizen", "student", "employee",
+            "person",
+            "individual",
+            "user",
+            "consumer",
+            "patient",
+            "worker",
+            "citizen",
+            "student",
+            "employee",
         ],
         StakeholderType.COMMUNITIES: [
-            "community", "neighborhood", "local", "group", "culture", "tradition",
+            "community",
+            "neighborhood",
+            "local",
+            "group",
+            "culture",
+            "tradition",
         ],
         StakeholderType.ORGANIZATIONS: [
-            "company", "business", "organization", "institution", "corporation",
-            "enterprise", "firm",
+            "company",
+            "business",
+            "organization",
+            "institution",
+            "corporation",
+            "enterprise",
+            "firm",
         ],
         StakeholderType.SOCIETY: [
-            "society", "public", "nation", "country", "population", "people",
-            "humanity", "civilization",
+            "society",
+            "public",
+            "nation",
+            "country",
+            "population",
+            "people",
+            "humanity",
+            "civilization",
         ],
         StakeholderType.ENVIRONMENT: [
-            "environment", "nature", "climate", "ecosystem", "planet", "earth",
-            "species", "biodiversity", "sustainable",
+            "environment",
+            "nature",
+            "climate",
+            "ecosystem",
+            "planet",
+            "earth",
+            "species",
+            "biodiversity",
+            "sustainable",
         ],
         StakeholderType.FUTURE_GENERATIONS: [
-            "future", "children", "generations", "legacy", "long-term",
-            "sustainable", "inherit",
+            "future",
+            "children",
+            "generations",
+            "legacy",
+            "long-term",
+            "sustainable",
+            "inherit",
         ],
     }
 
@@ -232,8 +323,7 @@ class EthicsEvaluator:
 
         # Evaluate each framework
         framework_scores = [
-            self._evaluate_framework(argument, context, framework)
-            for framework in self.frameworks
+            self._evaluate_framework(argument, context, framework) for framework in self.frameworks
         ]
 
         # Analyze stakeholder impacts
@@ -243,9 +333,7 @@ class EthicsEvaluator:
         concerns = self._identify_concerns(argument, context)
 
         # Calculate overall score
-        overall_score = self._calculate_overall_score(
-            framework_scores, concerns, context
-        )
+        overall_score = self._calculate_overall_score(framework_scores, concerns, context)
 
         # Identify strengths
         strengths = self._identify_strengths(argument, framework_scores)
@@ -286,9 +374,7 @@ class EthicsEvaluator:
         keyword_score = min(1.0, matches / max(len(keywords) * 0.3, 1))
 
         # Analyze reasoning quality for this framework
-        reasoning_score = self._analyze_framework_reasoning(
-            argument, framework
-        )
+        reasoning_score = self._analyze_framework_reasoning(argument, framework)
 
         # Combine scores
         score = 0.4 * keyword_score + 0.6 * reasoning_score
@@ -311,9 +397,7 @@ class EthicsEvaluator:
         if reasoning_score < 0.4:
             weaknesses.append(f"Could strengthen {framework.value} arguments")
 
-        reasoning = self._generate_framework_reasoning(
-            framework, score, strengths, weaknesses
-        )
+        reasoning = self._generate_framework_reasoning(framework, score, strengths, weaknesses)
 
         return FrameworkScore(
             framework=framework,
@@ -371,10 +455,7 @@ class EthicsEvaluator:
         }
 
         framework_patterns = patterns.get(framework, [])
-        matches = sum(
-            1 for pattern in framework_patterns
-            if re.search(pattern, content)
-        )
+        matches = sum(1 for pattern in framework_patterns if re.search(pattern, content))
 
         return min(1.0, matches / max(len(framework_patterns) * 0.5, 1))
 
@@ -421,14 +502,10 @@ class EthicsEvaluator:
             impact_type = self._determine_impact_type(content, stakeholder)
 
             # Determine severity
-            severity = self._calculate_impact_severity(
-                content, stakeholder, context
-            )
+            severity = self._calculate_impact_severity(content, stakeholder, context)
 
             # Generate description
-            description = self._generate_impact_description(
-                stakeholder, impact_type, content
-            )
+            description = self._generate_impact_description(stakeholder, impact_type, content)
 
             impacts.append(
                 StakeholderImpact(
@@ -449,12 +526,26 @@ class EthicsEvaluator:
     ) -> str:
         """Determine the type of impact on a stakeholder."""
         positive_words = [
-            "benefit", "help", "improve", "protect", "support",
-            "enhance", "empower", "enable", "positive",
+            "benefit",
+            "help",
+            "improve",
+            "protect",
+            "support",
+            "enhance",
+            "empower",
+            "enable",
+            "positive",
         ]
         negative_words = [
-            "harm", "hurt", "damage", "risk", "threaten",
-            "undermine", "negative", "suffer", "lose",
+            "harm",
+            "hurt",
+            "damage",
+            "risk",
+            "threaten",
+            "undermine",
+            "negative",
+            "suffer",
+            "lose",
         ]
 
         pos_count = sum(1 for w in positive_words if w in content)
@@ -495,7 +586,7 @@ class EthicsEvaluator:
             base_severity *= 1.2
 
         # Adjust for topic sensitivity
-        base_severity *= (1 + context.topic_sensitivity * 0.2)
+        base_severity *= 1 + context.topic_sensitivity * 0.2
 
         return min(1.0, max(0.0, base_severity))
 
@@ -544,7 +635,7 @@ class EthicsEvaluator:
 
             # Determine severity
             severity = len(matches) / len(keywords) * 0.7
-            severity *= (1 + context.topic_sensitivity * 0.3)
+            severity *= 1 + context.topic_sensitivity * 0.3
             severity = min(1.0, severity)
 
             # Determine which framework is most relevant
@@ -591,9 +682,19 @@ class EthicsEvaluator:
     ) -> bool:
         """Check if the concern is addressed/mitigated in the argument."""
         mitigation_words = [
-            "however", "but", "although", "while", "despite",
-            "mitigate", "address", "prevent", "protect", "ensure",
-            "safeguard", "careful", "responsible",
+            "however",
+            "but",
+            "although",
+            "while",
+            "despite",
+            "mitigate",
+            "address",
+            "prevent",
+            "protect",
+            "ensure",
+            "safeguard",
+            "careful",
+            "responsible",
         ]
 
         # Check for mitigation language near concern
@@ -611,8 +712,7 @@ class EthicsEvaluator:
 
         # Weighted average of framework scores
         weighted_sum = sum(
-            fs.score * self.weights.get(fs.framework, 0.2)
-            for fs in framework_scores
+            fs.score * self.weights.get(fs.framework, 0.2) for fs in framework_scores
         )
 
         # Penalty for concerns
@@ -647,7 +747,8 @@ class EthicsEvaluator:
 
         # Check for stakeholder awareness
         stakeholder_count = sum(
-            1 for keywords in self.STAKEHOLDER_KEYWORDS.values()
+            1
+            for keywords in self.STAKEHOLDER_KEYWORDS.values()
             if any(kw in content for kw in keywords)
         )
         if stakeholder_count >= 3:
@@ -666,16 +767,12 @@ class EthicsEvaluator:
         # Address concerns
         for concern in concerns:
             if concern.severity >= 0.5 and not concern.mitigated:
-                recommendations.append(
-                    f"Address {concern.concern_type} concerns explicitly."
-                )
+                recommendations.append(f"Address {concern.concern_type} concerns explicitly.")
 
         # Strengthen weak frameworks
         for fs in framework_scores:
             if fs.score < 0.4:
-                recommendations.append(
-                    f"Strengthen {fs.framework.value} perspective."
-                )
+                recommendations.append(f"Strengthen {fs.framework.value} perspective.")
 
         # General recommendations
         if not recommendations:
@@ -688,12 +785,7 @@ class EthicsEvaluator:
         result: EthicsResult,
     ) -> dict[str, float]:
         """Get summary of framework scores."""
-        return {
-            fs.framework.value: fs.score
-            for fs in result.framework_scores
-        }
+        return {fs.framework.value: fs.score for fs in result.framework_scores}
 
     def __repr__(self) -> str:
-        return (
-            f"EthicsEvaluator(frameworks={[f.value for f in self.frameworks]})"
-        )
+        return f"EthicsEvaluator(frameworks={[f.value for f in self.frameworks]})"

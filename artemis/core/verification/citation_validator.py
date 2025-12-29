@@ -61,9 +61,7 @@ class CitationParser:
         "bracket_num": re.compile(r"\[(\d+)\]"),
         "doi": re.compile(r"10\.\d{4,}/[^\s]+"),
         "url": re.compile(r"https?://[^\s]+"),
-        "author_year_inline": re.compile(
-            r"(\b[A-Z][a-z]+(?:\s+et\s+al\.?)?)\s+\((\d{4})\)"
-        ),
+        "author_year_inline": re.compile(r"(\b[A-Z][a-z]+(?:\s+et\s+al\.?)?)\s+\((\d{4})\)"),
     }
 
     def parse(self, text: str) -> list[Citation]:
@@ -73,40 +71,48 @@ class CitationParser:
         # Author (Year) format
         for match in self.PATTERNS["author_year_paren"].finditer(text):
             author, year = match.groups()
-            citations.append(Citation(
-                raw_text=match.group(0),
-                author=author.strip(),
-                year=int(year),
-                citation_type="author_year",
-            ))
+            citations.append(
+                Citation(
+                    raw_text=match.group(0),
+                    author=author.strip(),
+                    year=int(year),
+                    citation_type="author_year",
+                )
+            )
 
         # [Number] format
         for match in self.PATTERNS["bracket_num"].finditer(text):
-            citations.append(Citation(
-                raw_text=match.group(0),
-                citation_type="numeric",
-                metadata={"number": int(match.group(1))},
-            ))
+            citations.append(
+                Citation(
+                    raw_text=match.group(0),
+                    citation_type="numeric",
+                    metadata={"number": int(match.group(1))},
+                )
+            )
 
         # DOI
         for match in self.PATTERNS["doi"].finditer(text):
             doi = match.group(0)
-            citations.append(Citation(
-                raw_text=doi,
-                doi=doi,
-                citation_type="doi",
-            ))
+            citations.append(
+                Citation(
+                    raw_text=doi,
+                    doi=doi,
+                    citation_type="doi",
+                )
+            )
 
         # URL
         for match in self.PATTERNS["url"].finditer(text):
             url = match.group(0)
             # Skip if already captured as DOI
             if not any(c.doi and c.doi in url for c in citations):
-                citations.append(Citation(
-                    raw_text=url,
-                    url=url,
-                    citation_type="url",
-                ))
+                citations.append(
+                    Citation(
+                        raw_text=url,
+                        url=url,
+                        citation_type="url",
+                    )
+                )
 
         return citations
 
@@ -247,6 +253,7 @@ class CitationValidator:
 
 
 # Example validation hooks for common sources
+
 
 async def validate_doi_crossref(citation: Citation) -> ValidationResult:
     """Validate DOI using CrossRef API (stub implementation)."""

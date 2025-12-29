@@ -139,11 +139,13 @@ class CausalChainRule(VerificationRuleBase):
         for node in graph:
             if node not in visited:
                 if has_cycle(node):
-                    violations.append(VerificationViolation(
-                        description="Circular reasoning detected in causal chain",
-                        severity=1.0,
-                        suggestion="Break the circular dependency between causes and effects",
-                    ))
+                    violations.append(
+                        VerificationViolation(
+                            description="Circular reasoning detected in causal chain",
+                            severity=1.0,
+                            suggestion="Break the circular dependency between causes and effects",
+                        )
+                    )
                     break
 
         # Check chain length
@@ -153,11 +155,13 @@ class CausalChainRule(VerificationRuleBase):
             max_chain_length = max(max_chain_length, length)
 
         if max_chain_length < min_chain_length:
-            violations.append(VerificationViolation(
-                description=f"Causal chain too short (length {max_chain_length}, minimum {min_chain_length})",
-                severity=0.5,
-                suggestion="Add more causal links to strengthen the reasoning",
-            ))
+            violations.append(
+                VerificationViolation(
+                    description=f"Causal chain too short (length {max_chain_length}, minimum {min_chain_length})",
+                    severity=0.5,
+                    suggestion="Add more causal links to strengthen the reasoning",
+                )
+            )
 
         # Check for unsupported claims (effects without causes)
         all_effects = {link.effect for link in causal_links}
@@ -167,11 +171,13 @@ class CausalChainRule(VerificationRuleBase):
         # It's okay to have some terminal effects, but flag if too many
         unsupported_ratio = len(unsupported) / len(all_effects) if all_effects else 0
         if unsupported_ratio > 0.7:
-            violations.append(VerificationViolation(
-                description=f"Many effects lack causal support ({len(unsupported)} unsupported)",
-                severity=0.3,
-                suggestion="Add causal links to support the claimed effects",
-            ))
+            violations.append(
+                VerificationViolation(
+                    description=f"Many effects lack causal support ({len(unsupported)} unsupported)",
+                    severity=0.3,
+                    suggestion="Add causal links to support the claimed effects",
+                )
+            )
 
         # Calculate score
         score = 1.0
@@ -272,11 +278,13 @@ class CitationRule(VerificationRuleBase):
         # Calculate score
         if not has_evidence and not citations_found:
             if require_citations:
-                violations.append(VerificationViolation(
-                    description="No citations or evidence sources found",
-                    severity=0.8,
-                    suggestion="Add citations or references to support claims",
-                ))
+                violations.append(
+                    VerificationViolation(
+                        description="No citations or evidence sources found",
+                        severity=0.8,
+                        suggestion="Add citations or references to support claims",
+                    )
+                )
                 score = 0.3
             else:
                 # Not required, just lower score
@@ -289,11 +297,13 @@ class CitationRule(VerificationRuleBase):
             score = min(1.0, 0.5 + citation_ratio * 0.5)
 
             if has_evidence and evidence_with_sources < total_evidence * 0.5:
-                violations.append(VerificationViolation(
-                    description="Some evidence lacks proper source attribution",
-                    severity=0.3,
-                    suggestion="Add source information to all evidence",
-                ))
+                violations.append(
+                    VerificationViolation(
+                        description="Some evidence lacks proper source attribution",
+                        severity=0.3,
+                        suggestion="Add source information to all evidence",
+                    )
+                )
 
         passed = score >= 0.6 and not any(v.severity >= 0.8 for v in violations)
 
@@ -351,33 +361,37 @@ class LogicalConsistencyRule(VerificationRuleBase):
         content = argument.content.lower()
 
         # Split into sentences
-        sentences = re.split(r'[.!?]', content)
+        sentences = re.split(r"[.!?]", content)
         sentences = [s.strip() for s in sentences if s.strip()]
 
         # Check for contradicting statements
         for i, sent1 in enumerate(sentences):
-            for sent2 in sentences[i + 1:]:
+            for sent2 in sentences[i + 1 :]:
                 for pos, neg in self.CONTRADICTION_PATTERNS:
                     # Check if one sentence uses positive and another uses negative
                     if re.search(pos, sent1) and re.search(neg, sent2):
                         # Check if they're about the same topic
                         common_words = set(sent1.split()) & set(sent2.split())
                         if len(common_words) > 2:
-                            violations.append(VerificationViolation(
-                                description="Potential contradiction detected between statements",
-                                location=f"'{sent1[:30]}...' vs '{sent2[:30]}...'",
-                                severity=0.6,
-                                suggestion="Review and resolve the apparent contradiction",
-                            ))
+                            violations.append(
+                                VerificationViolation(
+                                    description="Potential contradiction detected between statements",
+                                    location=f"'{sent1[:30]}...' vs '{sent2[:30]}...'",
+                                    severity=0.6,
+                                    suggestion="Review and resolve the apparent contradiction",
+                                )
+                            )
 
         # Check for "but" and "however" overuse (weak logic)
-        hedging_count = len(re.findall(r'\bbut\b|\bhowever\b|\balthough\b', content))
+        hedging_count = len(re.findall(r"\bbut\b|\bhowever\b|\balthough\b", content))
         if hedging_count > 3:
-            violations.append(VerificationViolation(
-                description="Excessive hedging may indicate weak logical structure",
-                severity=0.3,
-                suggestion="Strengthen logical connections between claims",
-            ))
+            violations.append(
+                VerificationViolation(
+                    description="Excessive hedging may indicate weak logical structure",
+                    severity=0.3,
+                    suggestion="Strengthen logical connections between claims",
+                )
+            )
 
         # Calculate score
         score = 1.0 - (sum(v.severity for v in violations) * 0.15)
@@ -392,7 +406,9 @@ class LogicalConsistencyRule(VerificationRuleBase):
             violations=violations,
             details={
                 "sentence_count": len(sentences),
-                "contradiction_count": sum(1 for v in violations if "contradiction" in v.description.lower()),
+                "contradiction_count": sum(
+                    1 for v in violations if "contradiction" in v.description.lower()
+                ),
             },
         )
 
@@ -443,10 +459,7 @@ class EvidenceSupportRule(VerificationRuleBase):
         content = argument.content.lower()
 
         # Count claim indicators
-        claim_count = sum(
-            len(re.findall(pattern, content))
-            for pattern in self.CLAIM_INDICATORS
-        )
+        claim_count = sum(len(re.findall(pattern, content)) for pattern in self.CLAIM_INDICATORS)
 
         evidence_count = len(argument.evidence or [])
         causal_count = len(argument.causal_links or [])
@@ -457,23 +470,27 @@ class EvidenceSupportRule(VerificationRuleBase):
         support_ratio = total_support / total_claims
 
         if support_ratio < min_evidence_ratio:
-            violations.append(VerificationViolation(
-                description=f"Insufficient evidence support (ratio: {support_ratio:.2f})",
-                severity=0.5,
-                suggestion="Add more evidence to support claims",
-            ))
+            violations.append(
+                VerificationViolation(
+                    description=f"Insufficient evidence support (ratio: {support_ratio:.2f})",
+                    severity=0.5,
+                    suggestion="Add more evidence to support claims",
+                )
+            )
 
         # Check for unsupported strong claims
         strong_claims = re.findall(
-            r'(certainly|obviously|undoubtedly|proves that)[^.!?]*[.!?]',
+            r"(certainly|obviously|undoubtedly|proves that)[^.!?]*[.!?]",
             content,
         )
         if strong_claims and evidence_count == 0:
-            violations.append(VerificationViolation(
-                description="Strong claims made without evidence",
-                severity=0.7,
-                suggestion="Provide evidence for strong assertions",
-            ))
+            violations.append(
+                VerificationViolation(
+                    description="Strong claims made without evidence",
+                    severity=0.7,
+                    suggestion="Provide evidence for strong assertions",
+                )
+            )
 
         # Calculate score
         score = min(1.0, 0.4 + support_ratio * 0.6)
@@ -559,12 +576,14 @@ class FallacyFreeRule(VerificationRuleBase):
             for pattern in patterns:
                 matches = re.findall(pattern, content, re.IGNORECASE)
                 if matches:
-                    violations.append(VerificationViolation(
-                        description=f"Possible {fallacy_name.replace('_', ' ')} fallacy detected",
-                        location=matches[0] if isinstance(matches[0], str) else str(matches[0]),
-                        severity=0.5,
-                        suggestion=f"Avoid {fallacy_name.replace('_', ' ')} reasoning",
-                    ))
+                    violations.append(
+                        VerificationViolation(
+                            description=f"Possible {fallacy_name.replace('_', ' ')} fallacy detected",
+                            location=matches[0] if isinstance(matches[0], str) else str(matches[0]),
+                            severity=0.5,
+                            suggestion=f"Avoid {fallacy_name.replace('_', ' ')} reasoning",
+                        )
+                    )
 
         # Calculate score
         score = 1.0 - (len(violations) * 0.15)

@@ -45,6 +45,7 @@ class LLMCausalExtractor:
         """Lazy-load model if not provided."""
         if self._model is None:
             from artemis.models.base import ModelRegistry
+
             self._model = ModelRegistry.create(self._model_name)
         return self._model
 
@@ -64,9 +65,8 @@ class LLMCausalExtractor:
             prompt = get_prompt("extraction.causal_extraction", content=content)
 
             from artemis.core.types import Message
-            response = await model.generate([
-                Message(role="user", content=prompt)
-            ])
+
+            response = await model.generate([Message(role="user", content=prompt)])
 
             # Parse JSON response
             result = self._parse_response(response.content)
@@ -104,11 +104,13 @@ class LLMCausalExtractor:
         links = []
         for item in raw_links:
             try:
-                links.append(CausalLink(
-                    cause=item.get("cause", "")[:100],
-                    effect=item.get("effect", "")[:100],
-                    strength=float(item.get("strength", 0.5)),
-                ))
+                links.append(
+                    CausalLink(
+                        cause=item.get("cause", "")[:100],
+                        effect=item.get("effect", "")[:100],
+                        strength=float(item.get("strength", 0.5)),
+                    )
+                )
             except (KeyError, ValueError) as e:
                 logger.debug("Skipping invalid causal link", error=str(e))
                 continue
@@ -132,6 +134,7 @@ class LLMEvidenceExtractor:
         """Lazy-load model if not provided."""
         if self._model is None:
             from artemis.models.base import ModelRegistry
+
             self._model = ModelRegistry.create(self._model_name)
         return self._model
 
@@ -151,9 +154,8 @@ class LLMEvidenceExtractor:
             prompt = get_prompt("extraction.evidence_extraction", content=content)
 
             from artemis.core.types import Message
-            response = await model.generate([
-                Message(role="user", content=prompt)
-            ])
+
+            response = await model.generate([Message(role="user", content=prompt)])
 
             # Parse JSON response
             result = self._parse_response(response.content)
@@ -189,12 +191,14 @@ class LLMEvidenceExtractor:
         evidence_list = []
         for item in raw_evidence:
             try:
-                evidence_list.append(Evidence(
-                    type=item.get("type", "quote"),
-                    content=item.get("content", "")[:500],
-                    source=item.get("source"),
-                    verified=False,
-                ))
+                evidence_list.append(
+                    Evidence(
+                        type=item.get("type", "quote"),
+                        content=item.get("content", "")[:500],
+                        source=item.get("source"),
+                        verified=False,
+                    )
+                )
             except (KeyError, ValueError) as e:
                 logger.debug("Skipping invalid evidence", error=str(e))
                 continue
@@ -211,6 +215,7 @@ class HybridCausalExtractor:
         use_cache: bool = True,
     ):
         from artemis.core.causal import CausalExtractor as RegexExtractor
+
         self._regex_extractor = RegexExtractor()
         self._llm_extractor = LLMCausalExtractor(
             model=model,
@@ -242,6 +247,7 @@ class HybridEvidenceExtractor:
         use_cache: bool = True,
     ):
         from artemis.core.evidence import EvidenceExtractor as RegexExtractor
+
         self._regex_extractor = RegexExtractor()
         self._llm_extractor = LLMEvidenceExtractor(
             model=model,

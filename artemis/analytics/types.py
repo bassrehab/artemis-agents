@@ -119,18 +119,11 @@ class DebateAnalytics(BaseModel):
 
     def get_momentum_trajectory(self, agent: str) -> list[float]:
         """Get momentum values over time for an agent."""
-        return [
-            mp.momentum
-            for mp in self.momentum_history
-            if mp.agent == agent
-        ]
+        return [mp.momentum for mp in self.momentum_history if mp.agent == agent]
 
     def get_score_trajectory(self, agent: str) -> list[float]:
         """Get score values over time for an agent."""
-        return [
-            rm.agent_scores.get(agent, 0.0)
-            for rm in self.round_metrics
-        ]
+        return [rm.agent_scores.get(agent, 0.0) for rm in self.round_metrics]
 
     def get_leader_per_round(self) -> list[str]:
         """Get the leading agent after each round."""
