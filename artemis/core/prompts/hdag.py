@@ -17,32 +17,49 @@ STRATEGIC_INSTRUCTIONS = """
 You are generating a STRATEGIC-level argument. This is the highest level
 in the argument hierarchy, focused on overarching positions and frameworks.
 
-Your argument should:
-1. **State your main thesis clearly** - What is your core position?
-2. **Outline key pillars** - What are the 2-3 main supporting themes?
-3. **Establish evaluation framework** - How should this issue be judged?
-4. **Consider long-term implications** - What are the broader consequences?
-5. **Address ethical dimensions** - What values are at stake?
+Your argument MUST include these labeled sections:
 
-Structure your response as a cohesive argument that can be supported by
-more detailed tactical and operational arguments later.
+**Thesis Statement**: [Your core position in 1-2 sentences]
+
+**Key Pillars**: [2-3 numbered main supporting themes]
+
+**Evaluation Framework**: [How should this issue be judged? What criteria matter?]
+
+**Long-term Implications**: [What are the broader consequences over time?]
+
+**Ethical Dimensions**: [What values are at stake? What moral considerations apply?]
+
+Structure your response with these exact headers to ensure clarity and rigor.
+Each section should build a coherent argument that can be supported by
+tactical and operational details later.
 """
 
 TACTICAL_INSTRUCTIONS = """
 ## Tactical Level Argument
 
 You are generating a TACTICAL-level argument. This is the middle level
-in the argument hierarchy, focused on supporting evidence and reasoning.
+in the argument hierarchy, focused on supporting evidence and causal reasoning.
 
-Your argument should:
-1. **Provide specific evidence** for the strategic position
-2. **Draw causal connections** - If X, then Y, because Z
-3. **Address likely counterarguments** - Anticipate and refute objections
-4. **Cite sources** where applicable - Reference studies, experts, data
-5. **Build logical chains** - Connect your points in a coherent flow
+Your argument MUST include:
 
-Structure your response to directly support the strategic-level thesis
-while providing enough detail to be convincing.
+1. **Explicit Causal Chains**: Use clear cause→effect reasoning:
+   - "A leads to B because..."
+   - "If X happens, then Y follows, which causes Z"
+   - Show second-order effects (what happens after the first consequence)
+
+2. **Evidence with Citations**: For each major claim, provide:
+   - [SOURCE: specific study/report/expert name]
+   - Statistics or data points where relevant
+
+3. **Counter-Argument Response**: Directly address opponent's points:
+   - "The opponent claims X, but this fails because..."
+   - "While Y seems reasonable, it overlooks..."
+
+4. **Logical Flow**: Number your supporting points (1, 2, 3...) and
+   ensure each builds on the previous
+
+Structure your response to directly support the strategic thesis with
+concrete reasoning chains and evidence.
 """
 
 OPERATIONAL_INSTRUCTIONS = """
@@ -224,13 +241,26 @@ Be confident but measured. This is your first impression.
 CLOSING_STATEMENT_PROMPT = """
 ## Closing Statement
 
-This is your closing statement in the debate. You should:
-1. Summarize your strongest arguments
-2. Address the key points raised by opponents
-3. Explain why your position should prevail
-4. End with a compelling conclusion
+This is your closing statement in the debate. Structure it as follows:
 
-Be persuasive and memorable. This is your final opportunity to convince.
+**Summary of Position**: Restate your thesis and how it was supported
+
+**Key Arguments Prevailed**: List your 2-3 strongest points that went unchallenged
+or were successfully defended
+
+**Opponent's Arguments Refuted**: Explain specifically why the opponent's
+main claims fail:
+- "Their argument about X was undermined by..."
+- "The claim that Y was shown to be flawed because..."
+
+**Synthesis**: Connect how all your arguments together form a coherent case:
+- How do the pieces fit together?
+- What's the overall narrative?
+
+**Conclusion**: A compelling final statement of why your position should prevail
+
+Be persuasive and memorable. Demonstrate intellectual rigor by showing
+how you've engaged with and defeated opposing arguments.
 """
 
 REBUTTAL_PROMPT = """

@@ -60,12 +60,14 @@ class ArtemisAdapter(DebateAdapter):
                 evaluation_mode=EvaluationMode.BALANCED,
             )
 
-            # Create and run debate
+            # Create and run debate with optimized settings for benchmarks
             debate = Debate(
                 topic=topic,
                 agents=[pro_agent, con_agent],
                 rounds=self.rounds,
                 config=config,
+                jury_model="gpt-4o-mini",  # Faster model for jury
+                jury_size=1,  # Single juror for speed (3 is default)
             )
 
             debate.assign_positions({
