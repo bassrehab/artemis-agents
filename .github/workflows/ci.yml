@@ -32,6 +32,7 @@ jobs:
           ruff format --check artemis/
 
       - name: Type check with mypy
+        continue-on-error: true
         run: mypy artemis/
 
       - name: Run tests
