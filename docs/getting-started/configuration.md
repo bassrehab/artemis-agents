@@ -59,9 +59,35 @@ debate = Debate(
 | `max_argument_tokens` | int | 1000 | Max tokens per argument |
 | `require_evidence` | bool | True | Require evidence in arguments |
 | `require_causal_links` | bool | True | Require causal reasoning |
+| `evaluation_mode` | EvaluationMode | BALANCED | Evaluation mode: QUALITY, BALANCED, or FAST |
 | `adaptation_enabled` | bool | True | Enable dynamic criteria adaptation |
 | `safety_mode` | str | "passive" | Safety monitoring mode |
 | `halt_on_safety_violation` | bool | False | Stop debate on safety alerts |
+
+## Evaluation Modes
+
+Control the accuracy vs cost tradeoff for argument evaluation:
+
+```python
+from artemis.core.types import DebateConfig, EvaluationMode
+
+# Maximum accuracy (benchmarking, critical decisions)
+config = DebateConfig(evaluation_mode=EvaluationMode.QUALITY)
+
+# Balanced (default - good accuracy, moderate cost)
+config = DebateConfig(evaluation_mode=EvaluationMode.BALANCED)
+
+# Fast (development, testing, cost-sensitive)
+config = DebateConfig(evaluation_mode=EvaluationMode.FAST)
+```
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `QUALITY` | LLM-native evaluation for all criteria | Benchmarking, critical accuracy |
+| `BALANCED` | Selective LLM use (jury + key decisions) | Production (default) |
+| `FAST` | Heuristic-only evaluation | Development, testing |
+
+See [L-AE-CR Evaluation Modes](../concepts/l-ae-cr.md#evaluation-modes) for detailed information.
 
 ## Agent Configuration
 

@@ -78,6 +78,87 @@ config = DebateConfig(
 )
 ```
 
+## Evaluation Modes
+
+ARTEMIS supports three evaluation modes to balance accuracy and cost:
+
+### EvaluationMode.QUALITY
+
+Uses LLM (e.g., gpt-4o-mini) to evaluate all criteria:
+
+- Highest accuracy for criterion scoring
+- Provides detailed reasoning for each score
+- Best for benchmarking and critical decisions
+- Highest cost per evaluation
+
+```python
+from artemis.core.types import DebateConfig, EvaluationMode
+
+config = DebateConfig(evaluation_mode=EvaluationMode.QUALITY)
+```
+
+### EvaluationMode.BALANCED (Default)
+
+Selective LLM usage for optimal cost/accuracy:
+
+- Uses LLM for jury verdicts and key decisions
+- Heuristics for in-debate turn evaluation
+- Good accuracy with moderate cost
+- Recommended for production use
+
+```python
+config = DebateConfig(evaluation_mode=EvaluationMode.BALANCED)
+```
+
+### EvaluationMode.FAST
+
+Pure heuristic evaluation:
+
+- No LLM calls during evaluation
+- Lowest cost, fastest execution
+- Backwards compatible with original behavior
+- Best for development, testing, or cost-sensitive deployments
+
+```python
+config = DebateConfig(evaluation_mode=EvaluationMode.FAST)
+```
+
+### LLMCriterionEvaluator
+
+When using `QUALITY` mode, the `LLMCriterionEvaluator` class performs evaluation:
+
+```python
+from artemis.core.llm_evaluation import LLMCriterionEvaluator
+
+evaluator = LLMCriterionEvaluator(
+    model="gpt-4o-mini",   # Model for evaluation
+    cache_enabled=True,     # Cache evaluations by content hash
+)
+
+# Evaluate a single argument
+result = await evaluator.evaluate_argument(argument, context)
+
+# Result contains scores and reasoning
+print(f"Total score: {result.total_score}")
+for detail in result.criterion_details:
+    print(f"{detail.criterion}: {detail.score:.2f} - {detail.reasoning}")
+```
+
+### EvaluatorFactory
+
+Create the appropriate evaluator based on mode:
+
+```python
+from artemis.core.llm_evaluation import EvaluatorFactory
+from artemis.core.types import EvaluationMode
+
+# Returns LLMCriterionEvaluator for QUALITY mode
+evaluator = EvaluatorFactory.create(EvaluationMode.QUALITY, model="gpt-4o-mini")
+
+# Returns AdaptiveEvaluator for BALANCED/FAST modes
+evaluator = EvaluatorFactory.create(EvaluationMode.FAST)
+```
+
 ## Argument Evaluation
 
 Each argument receives an `ArgumentEvaluation` with detailed scores:

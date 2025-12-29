@@ -191,6 +191,21 @@ class ArgumentLevel(str, Enum):
     OPERATIONAL = "operational"
 ```
 
+### EvaluationMode
+
+```python
+class EvaluationMode(str, Enum):
+    QUALITY = "quality"    # LLM-native evaluation for maximum accuracy
+    BALANCED = "balanced"  # Selective LLM use (default)
+    FAST = "fast"          # Heuristic-only for minimum cost
+```
+
+| Mode | Description |
+|------|-------------|
+| `QUALITY` | Uses LLM to evaluate all criteria. Highest accuracy, highest cost. |
+| `BALANCED` | Selective LLM use for jury and key decisions. Good accuracy, moderate cost. |
+| `FAST` | Heuristic-only evaluation. Lowest cost, backwards compatible. |
+
 ### Evidence
 
 ```python
@@ -435,6 +450,153 @@ async def compare(
 ```
 
 Compares two arguments and determines winner.
+
+---
+
+## LLM Evaluation
+
+LLM-based evaluation for maximum accuracy.
+
+```python
+from artemis.core.llm_evaluation import LLMCriterionEvaluator, EvaluatorFactory
+```
+
+### LLMCriterionEvaluator
+
+```python
+class LLMCriterionEvaluator:
+    def __init__(
+        self,
+        model: str | BaseModel = "gpt-4o-mini",
+        api_key: str | None = None,
+        cache_enabled: bool = True,
+        **model_kwargs,
+    ) -> None
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | str \| BaseModel | "gpt-4o-mini" | Model name or instance |
+| `api_key` | str | None | API key (uses env var if not provided) |
+| `cache_enabled` | bool | True | Cache evaluations by content hash |
+
+#### evaluate_argument
+
+```python
+async def evaluate_argument(
+    self,
+    argument: Argument,
+    context: DebateContext,
+    weights: dict[str, float] | None = None,
+) -> ArgumentEvaluation
+```
+
+Evaluates an argument using LLM judgment.
+
+**Returns:** `ArgumentEvaluation` with scores, weights, and reasoning.
+
+### EvaluatorFactory
+
+Factory for creating evaluators based on evaluation mode.
+
+```python
+class EvaluatorFactory:
+    @staticmethod
+    def create(
+        mode: EvaluationMode,
+        model: str = "gpt-4o-mini",
+        api_key: str | None = None,
+        **kwargs,
+    ) -> LLMCriterionEvaluator | AdaptiveEvaluator
+```
+
+| Mode | Returns |
+|------|---------|
+| `QUALITY` | `LLMCriterionEvaluator` |
+| `BALANCED` | `AdaptiveEvaluator` |
+| `FAST` | `AdaptiveEvaluator` |
+
+---
+
+## LLM Extraction
+
+LLM-based extraction for evidence and causal links.
+
+```python
+from artemis.core.llm_extraction import (
+    LLMCausalExtractor,
+    LLMEvidenceExtractor,
+    HybridCausalExtractor,
+    HybridEvidenceExtractor,
+    clear_extraction_cache,
+)
+```
+
+### LLMCausalExtractor
+
+Extracts causal relationships using LLM analysis.
+
+```python
+class LLMCausalExtractor:
+    def __init__(
+        self,
+        model: BaseModel | None = None,
+        model_name: str = "gpt-4o-mini",
+        use_cache: bool = True,
+    )
+```
+
+#### extract
+
+```python
+async def extract(self, content: str) -> list[CausalLink]
+```
+
+Extracts causal links from content.
+
+### LLMEvidenceExtractor
+
+Extracts evidence using LLM analysis.
+
+```python
+class LLMEvidenceExtractor:
+    def __init__(
+        self,
+        model: BaseModel | None = None,
+        model_name: str = "gpt-4o-mini",
+        use_cache: bool = True,
+    )
+```
+
+#### extract
+
+```python
+async def extract(self, content: str) -> list[Evidence]
+```
+
+Extracts evidence from content.
+
+### Hybrid Extractors
+
+Try regex first, fall back to LLM:
+
+```python
+class HybridCausalExtractor:
+    async def extract(self, content: str) -> list[CausalLink]
+
+class HybridEvidenceExtractor:
+    async def extract(self, content: str) -> list[Evidence]
+```
+
+### clear_extraction_cache
+
+```python
+def clear_extraction_cache() -> None
+```
+
+Clears the global extraction cache.
 
 ---
 

@@ -2,142 +2,150 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/contributing/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/api/core/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/api/integrations/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/api/models/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/api/safety/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/concepts/ethics/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/concepts/h-l-dag/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/concepts/jury/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/concepts/l-ae-cr/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
+    </url>
+    <url>
+         <loc>https://bassrehab.github.io/artemis-agents/concepts/llm-extraction/</loc>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/concepts/overview/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
+    </url>
+    <url>
+         <loc>https://bassrehab.github.io/artemis-agents/concepts/prompts/</loc>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/analytics/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/audit-logs/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/basic-debate/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/crewai-workflow/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/custom-jury/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/enterprise-decisions/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/ethical-dilemmas/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/google-adk/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/langgraph-workflow/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/multi-agent/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/safety-monitors/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/examples/streaming/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/getting-started/configuration/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/getting-started/installation/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/getting-started/quickstart/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/integrations/crewai/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/integrations/langchain/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/integrations/langgraph/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/integrations/mcp/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/safety/behavior/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/safety/deception/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/safety/ethics-guard/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/safety/overview/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
     <url>
          <loc>https://bassrehab.github.io/artemis-agents/safety/sandbagging/</loc>
-         <lastmod>2025-12-28</lastmod>
+         <lastmod>2025-12-29</lastmod>
     </url>
 </urlset>

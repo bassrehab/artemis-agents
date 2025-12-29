@@ -2,58 +2,25 @@
 ARTEMIS Jury Prompt Templates
 
 Prompts for jury evaluation from different perspectives.
+
+Uses centralized prompts from artemis.prompts for consistency and versioning.
 """
 
 from artemis.core.types import JuryPerspective
+from artemis.prompts import get_prompt
 
-# =============================================================================
-# Perspective-Specific Prompts
-# =============================================================================
 
-PERSPECTIVE_PROMPTS = {
-    JuryPerspective.ANALYTICAL: (
-        "You are an analytical juror who focuses on logic, evidence quality, "
-        "and the strength of reasoning chains. Evaluate arguments based on: "
-        "- Logical consistency and validity of inferences "
-        "- Quality and relevance of evidence cited "
-        "- Strength of causal reasoning "
-        "- Absence of logical fallacies"
-    ),
-    JuryPerspective.ETHICAL: (
-        "You are an ethical juror who focuses on moral implications and values. "
-        "Evaluate arguments based on: "
-        "- Consideration of ethical principles "
-        "- Attention to stakeholder welfare "
-        "- Fairness and justice concerns "
-        "- Long-term societal impact"
-    ),
-    JuryPerspective.PRACTICAL: (
-        "You are a practical juror who focuses on feasibility and real-world impact. "
-        "Evaluate arguments based on: "
-        "- Practicality of proposed solutions "
-        "- Real-world applicability "
-        "- Implementation challenges considered "
-        "- Cost-benefit analysis"
-    ),
-    JuryPerspective.ADVERSARIAL: (
-        "You are an adversarial juror who challenges all arguments critically. "
-        "Evaluate arguments based on: "
-        "- Ability to withstand counterarguments "
-        "- Acknowledgment of weaknesses "
-        "- Response to opposing views "
-        "- Robustness under scrutiny"
-    ),
-    JuryPerspective.SYNTHESIZING: (
-        "You are a synthesizing juror who seeks common ground and integration. "
-        "Evaluate arguments based on: "
-        "- Recognition of valid points from all sides "
-        "- Ability to build on others' arguments "
-        "- Constructive framing of disagreements "
-        "- Movement toward resolution"
-    ),
-}
-
-DEFAULT_PERSPECTIVE_PROMPT = "You are a fair and balanced juror."
+def _get_perspective_prompt(perspective: JuryPerspective) -> str:
+    """Get perspective-specific prompt from centralized prompts."""
+    perspective_map = {
+        JuryPerspective.ANALYTICAL: "jury.analytical_perspective",
+        JuryPerspective.ETHICAL: "jury.ethical_perspective",
+        JuryPerspective.PRACTICAL: "jury.practical_perspective",
+        JuryPerspective.ADVERSARIAL: "jury.adversarial_perspective",
+        JuryPerspective.SYNTHESIZING: "jury.default_perspective",  # Map to default for now
+    }
+    key = perspective_map.get(perspective, "jury.default_perspective")
+    return get_prompt(key)
 
 
 # =============================================================================
@@ -66,10 +33,7 @@ def build_reasoning_system_prompt(
     winner: str,
 ) -> str:
     """Build system prompt for jury reasoning generation."""
-    perspective_prompt = PERSPECTIVE_PROMPTS.get(
-        perspective,
-        DEFAULT_PERSPECTIVE_PROMPT,
-    )
+    perspective_prompt = _get_perspective_prompt(perspective)
 
     return f"""You are a debate juror evaluating the arguments.
 

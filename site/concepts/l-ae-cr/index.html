@@ -902,6 +902,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#evaluation-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Modes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation Modes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodequality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.QUALITY
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodebalanced-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.BALANCED (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodefast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.FAST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llmcriterionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLMCriterionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluatorfactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorFactory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#argument-evaluation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1236,6 +1308,62 @@
     
   
     Ethics Module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompts System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-extraction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Extraction
   
 
     
@@ -2332,6 +2460,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#evaluation-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Modes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation Modes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodequality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.QUALITY
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodebalanced-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.BALANCED (Default)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluationmodefast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationMode.FAST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llmcriterionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLMCriterionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluatorfactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorFactory
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#argument-evaluation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2728,21 +2928,83 @@
 <a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="n">adaptation_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
 <a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="p">)</span>
 </code></pre></div>
+<h2 id="evaluation-modes">Evaluation Modes<a class="headerlink" href="#evaluation-modes" title="Permanent link">&para;</a></h2>
+<p>ARTEMIS supports three evaluation modes to balance accuracy and cost:</p>
+<h3 id="evaluationmodequality">EvaluationMode.QUALITY<a class="headerlink" href="#evaluationmodequality" title="Permanent link">&para;</a></h3>
+<p>Uses LLM (e.g., gpt-4o-mini) to evaluate all criteria:</p>
+<ul>
+<li>Highest accuracy for criterion scoring</li>
+<li>Provides detailed reasoning for each score</li>
+<li>Best for benchmarking and critical decisions</li>
+<li>Highest cost per evaluation</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebateConfig</span><span class="p">,</span> <span class="n">EvaluationMode</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">DebateConfig</span><span class="p">(</span><span class="n">evaluation_mode</span><span class="o">=</span><span class="n">EvaluationMode</span><span class="o">.</span><span class="n">QUALITY</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="evaluationmodebalanced-default">EvaluationMode.BALANCED (Default)<a class="headerlink" href="#evaluationmodebalanced-default" title="Permanent link">&para;</a></h3>
+<p>Selective LLM usage for optimal cost/accuracy:</p>
+<ul>
+<li>Uses LLM for jury verdicts and key decisions</li>
+<li>Heuristics for in-debate turn evaluation</li>
+<li>Good accuracy with moderate cost</li>
+<li>Recommended for production use</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">DebateConfig</span><span class="p">(</span><span class="n">evaluation_mode</span><span class="o">=</span><span class="n">EvaluationMode</span><span class="o">.</span><span class="n">BALANCED</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="evaluationmodefast">EvaluationMode.FAST<a class="headerlink" href="#evaluationmodefast" title="Permanent link">&para;</a></h3>
+<p>Pure heuristic evaluation:</p>
+<ul>
+<li>No LLM calls during evaluation</li>
+<li>Lowest cost, fastest execution</li>
+<li>Backwards compatible with original behavior</li>
+<li>Best for development, testing, or cost-sensitive deployments</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">DebateConfig</span><span class="p">(</span><span class="n">evaluation_mode</span><span class="o">=</span><span class="n">EvaluationMode</span><span class="o">.</span><span class="n">FAST</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="llmcriterionevaluator">LLMCriterionEvaluator<a class="headerlink" href="#llmcriterionevaluator" title="Permanent link">&para;</a></h3>
+<p>When using <code>QUALITY</code> mode, the <code>LLMCriterionEvaluator</code> class performs evaluation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.llm_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">LLMCriterionEvaluator</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">LLMCriterionEvaluator</span><span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span>   <span class="c1"># Model for evaluation</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">cache_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># Cache evaluations by content hash</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># Evaluate a single argument</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate_argument</span><span class="p">(</span><span class="n">argument</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="c1"># Result contains scores and reasoning</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total score: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">total_score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="k">for</span> <span class="n">detail</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">criterion_details</span><span class="p">:</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">detail</span><span class="o">.</span><span class="n">criterion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">detail</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">detail</span><span class="o">.</span><span class="n">reasoning</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="evaluatorfactory">EvaluatorFactory<a class="headerlink" href="#evaluatorfactory" title="Permanent link">&para;</a></h3>
+<p>Create the appropriate evaluator based on mode:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.llm_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluatorFactory</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationMode</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Returns LLMCriterionEvaluator for QUALITY mode</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">EvaluatorFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">EvaluationMode</span><span class="o">.</span><span class="n">QUALITY</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Returns AdaptiveEvaluator for BALANCED/FAST modes</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">EvaluatorFactory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">EvaluationMode</span><span class="o">.</span><span class="n">FAST</span><span class="p">)</span>
+</code></pre></div>
 <h2 id="argument-evaluation">Argument Evaluation<a class="headerlink" href="#argument-evaluation" title="Permanent link">&para;</a></h2>
 <p>Each argument receives an <code>ArgumentEvaluation</code> with detailed scores:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># After running a debate</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">debate</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">for</span> <span class="n">turn</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">transcript</span><span class="p">:</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">if</span> <span class="n">turn</span><span class="o">.</span><span class="n">evaluation</span><span class="p">:</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="nb">eval</span> <span class="o">=</span> <span class="n">turn</span><span class="o">.</span><span class="n">evaluation</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent: </span><span class="si">{</span><span class="n">turn</span><span class="o">.</span><span class="n">agent</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Score: </span><span class="si">{</span><span class="nb">eval</span><span class="o">.</span><span class="n">total_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Criterion Scores:&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="k">for</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">eval</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">weight</span> <span class="o">=</span> <span class="nb">eval</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Causal Score: </span><span class="si">{</span><span class="nb">eval</span><span class="o">.</span><span class="n">causal_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># After running a debate</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">debate</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">for</span> <span class="n">turn</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">transcript</span><span class="p">:</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">if</span> <span class="n">turn</span><span class="o">.</span><span class="n">evaluation</span><span class="p">:</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="nb">eval</span> <span class="o">=</span> <span class="n">turn</span><span class="o">.</span><span class="n">evaluation</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent: </span><span class="si">{</span><span class="n">turn</span><span class="o">.</span><span class="n">agent</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Score: </span><span class="si">{</span><span class="nb">eval</span><span class="o">.</span><span class="n">total_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Criterion Scores:&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="k">for</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">eval</span><span class="o">.</span><span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="n">weight</span> <span class="o">=</span> <span class="nb">eval</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (weight: </span><span class="si">{</span><span class="n">weight</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Causal Score: </span><span class="si">{</span><span class="nb">eval</span><span class="o">.</span><span class="n">causal_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="argumentevaluation-fields">ArgumentEvaluation Fields<a class="headerlink" href="#argumentevaluation-fields" title="Permanent link">&para;</a></h3>
 <table>
@@ -2789,16 +3051,16 @@
 <h2 id="causal-reasoning-analysis">Causal Reasoning Analysis<a class="headerlink" href="#causal-reasoning-analysis" title="Permanent link">&para;</a></h2>
 <h3 id="causallink-structure">CausalLink Structure<a class="headerlink" href="#causallink-structure" title="Permanent link">&para;</a></h3>
 <p>Arguments contain causal links that are evaluated:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">CausalLink</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1"># Causal links in arguments</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">link</span> <span class="o">=</span> <span class="n">CausalLink</span><span class="p">(</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">cause</span><span class="o">=</span><span class="s2">&quot;increased_regulation&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">effect</span><span class="o">=</span><span class="s2">&quot;reduced_innovation_speed&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">mechanism</span><span class="o">=</span><span class="s2">&quot;Compliance overhead diverts resources&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">strength</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">bidirectional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">CausalLink</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># Causal links in arguments</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">link</span> <span class="o">=</span> <span class="n">CausalLink</span><span class="p">(</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="n">cause</span><span class="o">=</span><span class="s2">&quot;increased_regulation&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">effect</span><span class="o">=</span><span class="s2">&quot;reduced_innovation_speed&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="n">mechanism</span><span class="o">=</span><span class="s2">&quot;Compliance overhead diverts resources&quot;</span><span class="p">,</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="n">strength</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="n">bidirectional</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="causal-evaluation">Causal Evaluation<a class="headerlink" href="#causal-evaluation" title="Permanent link">&para;</a></h3>
 <p>The evaluation system assesses:</p>
@@ -2846,12 +3108,12 @@
     G --&gt; H[Return Evaluation]</code></pre>
 <h2 id="adaptive-weight-adjustment">Adaptive Weight Adjustment<a class="headerlink" href="#adaptive-weight-adjustment" title="Permanent link">&para;</a></h2>
 <p>When <code>adaptation_enabled=True</code>, weights are dynamically adjusted:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebateConfig</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">DebateConfig</span><span class="p">(</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">adaptation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">adaptation_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># How fast weights adjust (0-0.5)</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebateConfig</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">DebateConfig</span><span class="p">(</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">adaptation_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">adaptation_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># How fast weights adjust (0-0.5)</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">)</span>
 </code></pre></div>
 <h3 id="adaptation-factors">Adaptation Factors<a class="headerlink" href="#adaptation-factors" title="Permanent link">&para;</a></h3>
 <p>Weights adapt based on:</p>
@@ -2863,31 +3125,31 @@
 </ul>
 <h2 id="using-the-evaluator">Using the Evaluator<a class="headerlink" href="#using-the-evaluator" title="Permanent link">&para;</a></h2>
 <p>The <code>AdaptiveEvaluator</code> is used internally but can be accessed:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptiveEvaluator</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebateContext</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">AdaptiveEvaluator</span><span class="p">()</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="c1"># Evaluate a single argument</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">evaluation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate_argument</span><span class="p">(</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">argument</span><span class="o">=</span><span class="n">argument</span><span class="p">,</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">context</span><span class="o">=</span><span class="n">debate_context</span><span class="p">,</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Score: </span><span class="si">{</span><span class="n">evaluation</span><span class="o">.</span><span class="n">total_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Breakdown: </span><span class="si">{</span><span class="n">evaluation</span><span class="o">.</span><span class="n">scores</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptiveEvaluator</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebateContext</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">AdaptiveEvaluator</span><span class="p">()</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="c1"># Evaluate a single argument</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">evaluation</span> <span class="o">=</span> <span class="k">await</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate_argument</span><span class="p">(</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    <span class="n">argument</span><span class="o">=</span><span class="n">argument</span><span class="p">,</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>    <span class="n">context</span><span class="o">=</span><span class="n">debate_context</span><span class="p">,</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">)</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total Score: </span><span class="si">{</span><span class="n">evaluation</span><span class="o">.</span><span class="n">total_score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Breakdown: </span><span class="si">{</span><span class="n">evaluation</span><span class="o">.</span><span class="n">scores</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="integration-with-jury">Integration with Jury<a class="headerlink" href="#integration-with-jury" title="Permanent link">&para;</a></h2>
 <p>L-AE-CR provides scores to the jury mechanism:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.jury</span><span class="w"> </span><span class="kn">import</span> <span class="n">JuryPanel</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1"># Jury members receive evaluation results</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">panel</span> <span class="o">=</span> <span class="n">JuryPanel</span><span class="p">(</span><span class="n">evaluators</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="c1"># Each jury member considers:</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># - Evaluation scores from L-AE-CR</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="c1"># - Their perspective-specific weights</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="c1"># - Argument content and structure</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">artemis.core.jury</span><span class="w"> </span><span class="kn">import</span> <span class="n">JuryPanel</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1"># Jury members receive evaluation results</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">panel</span> <span class="o">=</span> <span class="n">JuryPanel</span><span class="p">(</span><span class="n">evaluators</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1"># Each jury member considers:</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="c1"># - Evaluation scores from L-AE-CR</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="c1"># - Their perspective-specific weights</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1"># - Argument content and structure</span>
 </code></pre></div>
 <h2 id="score-components">Score Components<a class="headerlink" href="#score-components" title="Permanent link">&para;</a></h2>
 <h3 id="logical-coherence-score">Logical Coherence Score<a class="headerlink" href="#logical-coherence-score" title="Permanent link">&para;</a></h3>

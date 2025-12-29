@@ -2,10 +2,12 @@
 ARTEMIS Prompt Templates
 
 Prompt templates for argument generation, evaluation, and debate management.
+
+Note: Raw prompts are now centralized in artemis.prompts. This module provides
+prompt builder functions that use the centralized prompts.
 """
 
 from artemis.core.prompts.hdag import (
-    LEVEL_INSTRUCTIONS,
     build_closing_prompt,
     build_context_prompt,
     build_generation_prompt,
@@ -14,14 +16,12 @@ from artemis.core.prompts.hdag import (
     build_system_prompt,
 )
 from artemis.core.prompts.jury import (
-    PERSPECTIVE_PROMPTS,
     build_reasoning_system_prompt,
     build_reasoning_user_prompt,
 )
 
 __all__ = [
     # H-L-DAG prompts
-    "LEVEL_INSTRUCTIONS",
     "build_system_prompt",
     "build_context_prompt",
     "build_generation_prompt",
@@ -29,7 +29,6 @@ __all__ = [
     "build_closing_prompt",
     "build_rebuttal_prompt",
     # Jury prompts
-    "PERSPECTIVE_PROMPTS",
     "build_reasoning_system_prompt",
     "build_reasoning_user_prompt",
 ]

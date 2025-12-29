@@ -11,6 +11,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from artemis.core.types import CausalLink, Evidence
+from artemis.prompts import get_prompt
 from artemis.utils.logging import get_logger
 
 if TYPE_CHECKING:
@@ -25,60 +26,6 @@ _extraction_cache: dict[str, Any] = {}
 def _hash_content(content: str) -> str:
     """Create a hash of content for caching."""
     return hashlib.sha256(content.encode()).hexdigest()[:16]
-
-
-CAUSAL_EXTRACTION_PROMPT = """Analyze the following argument and extract all causal relationships.
-
-A causal relationship is when one thing causes, leads to, enables, or prevents another.
-
-ARGUMENT:
-{content}
-
-Extract causal links in this exact JSON format:
-{{
-  "causal_links": [
-    {{
-      "cause": "the cause (brief phrase)",
-      "effect": "the effect (brief phrase)",
-      "relationship": "causes|enables|prevents|correlates",
-      "strength": 0.0-1.0,
-      "quote": "exact quote from text supporting this"
-    }}
-  ]
-}}
-
-Rules:
-- Only extract relationships explicitly stated or strongly implied
-- Keep cause/effect phrases concise (under 10 words each)
-- Strength: 1.0 = definite, 0.7 = likely, 0.4 = possible
-- If no causal relationships found, return {{"causal_links": []}}
-- Return ONLY valid JSON, no other text"""
-
-
-EVIDENCE_EXTRACTION_PROMPT = """Analyze the following argument and extract all evidence cited.
-
-Evidence includes: statistics, studies, expert quotes, historical examples, data points.
-
-ARGUMENT:
-{content}
-
-Extract evidence in this exact JSON format:
-{{
-  "evidence": [
-    {{
-      "type": "statistic|study|quote|example|data",
-      "content": "the evidence claim",
-      "source": "source if mentioned, null otherwise",
-      "credibility": "high|medium|low|unknown"
-    }}
-  ]
-}}
-
-Rules:
-- Only extract concrete evidence, not general assertions
-- Credibility: high = peer-reviewed/official, medium = reputable source, low = unverified
-- If no evidence found, return {{"evidence": []}}
-- Return ONLY valid JSON, no other text"""
 
 
 class LLMCausalExtractor:
@@ -114,7 +61,7 @@ class LLMCausalExtractor:
 
         try:
             model = await self._get_model()
-            prompt = CAUSAL_EXTRACTION_PROMPT.format(content=content)
+            prompt = get_prompt("extraction.causal_extraction", content=content)
 
             from artemis.core.types import Message
             response = await model.generate([
@@ -201,7 +148,7 @@ class LLMEvidenceExtractor:
 
         try:
             model = await self._get_model()
-            prompt = EVIDENCE_EXTRACTION_PROMPT.format(content=content)
+            prompt = get_prompt("extraction.evidence_extraction", content=content)
 
             from artemis.core.types import Message
             response = await model.generate([

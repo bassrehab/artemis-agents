@@ -20,6 +20,7 @@ from artemis.core.types import (
     EvaluationMode,
     Message,
 )
+from artemis.prompts import get_prompt
 from artemis.utils.logging import get_logger
 
 if TYPE_CHECKING:
@@ -44,55 +45,6 @@ class LLMEvaluationResult(PydanticBaseModel):
     ethical_alignment: CriterionResult
     persuasiveness: CriterionResult
     overall_assessment: str
-
-
-# Prompt for LLM-based evaluation
-EVALUATION_SYSTEM_PROMPT = """You are an expert debate evaluator. Your task is to assess arguments on multiple dimensions with precise, objective scoring.
-
-For each criterion, provide:
-1. A score from 0-100 (be discriminating - use the full range)
-2. A brief reasoning (1-2 sentences) explaining the score
-
-Scoring guidelines:
-- 0-20: Very poor, major flaws
-- 21-40: Below average, notable weaknesses
-- 41-60: Average, meets basic expectations
-- 61-80: Good, clear strengths
-- 81-100: Excellent, exceptional quality
-
-Be objective and consistent. Don't inflate scores."""
-
-EVALUATION_USER_PROMPT = """Evaluate the following argument from a debate on: "{topic}"
-
-**Argument** (Level: {level}):
-{content}
-
-**Context**:
-- Round {round} of {total_rounds}
-- Agent position: {position}
-- Previous arguments in debate: {prev_count}
-
-Evaluate on these criteria:
-
-1. **Logical Coherence**: Does the argument have clear premises that lead to valid conclusions? Are there logical fallacies?
-
-2. **Evidence Quality**: Does the argument cite credible sources, statistics, or examples? Is evidence relevant and well-integrated?
-
-3. **Causal Reasoning**: Does the argument establish clear cause-effect relationships? Are causal claims well-supported?
-
-4. **Ethical Alignment**: Does the argument consider ethical implications? Does it avoid manipulation or misleading rhetoric?
-
-5. **Persuasiveness**: How compelling is the argument? Does it effectively address the audience and counter opposing views?
-
-Respond with a JSON object in this exact format:
-{{
-    "logical_coherence": {{"score": <0-100>, "reasoning": "<brief explanation>"}},
-    "evidence_quality": {{"score": <0-100>, "reasoning": "<brief explanation>"}},
-    "causal_reasoning": {{"score": <0-100>, "reasoning": "<brief explanation>"}},
-    "ethical_alignment": {{"score": <0-100>, "reasoning": "<brief explanation>"}},
-    "persuasiveness": {{"score": <0-100>, "reasoning": "<brief explanation>"}},
-    "overall_assessment": "<1-2 sentence summary of argument quality>"
-}}"""
 
 
 class LLMCriterionEvaluator:
@@ -167,7 +119,11 @@ class LLMCriterionEvaluator:
         position = context.agent_positions.get(argument.agent, "unknown")
         prev_count = len(context.transcript)
 
-        user_prompt = EVALUATION_USER_PROMPT.format(
+        # Get prompts from centralized store
+        system_prompt = get_prompt("evaluation.system")
+        user_prompt_template = get_prompt("evaluation.user")
+
+        user_prompt = user_prompt_template.format(
             topic=context.topic,
             level=argument.level.value,
             content=argument.content[:2000],  # Truncate very long arguments
@@ -178,7 +134,7 @@ class LLMCriterionEvaluator:
         )
 
         messages = [
-            Message(role="system", content=EVALUATION_SYSTEM_PROMPT),
+            Message(role="system", content=system_prompt),
             Message(role="user", content=user_prompt),
         ]
 
@@ -194,14 +150,9 @@ class LLMCriterionEvaluator:
             result = self._fallback_evaluation()
 
         # Convert to ArgumentEvaluation
-        default_weights = {
-            "logical_coherence": 0.25,
-            "evidence_quality": 0.25,
-            "causal_reasoning": 0.20,
-            "ethical_alignment": 0.15,
-            "persuasiveness": 0.15,
-        }
-        weights = weights or default_weights
+        # Get default weights from centralized prompts
+        from artemis.prompts.v1.evaluation import DEFAULT_WEIGHTS
+        weights = weights or DEFAULT_WEIGHTS
 
         # Normalize scores from 0-100 to 0-1
         scores = {
