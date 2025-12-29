@@ -1,0 +1,644 @@
+======================================================================
+STATISTICAL BENCHMARK - 3 trials × 3 topics
+Model: gpt-4o | Rounds: 2
+======================================================================
+
+======================================================================
+FRAMEWORK: ARTEMIS
+======================================================================
+
+[1/27] artemis | Trial 1 | Should governments mandate AI safety tes...
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "topic": "Should governments mandate AI safety testing?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:19:02.659946Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "event": "Starting debate", "timestamp": "2025-12-29T13:19:02.660124Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "event": "Opening statements phase", "timestamp": "2025-12-29T13:19:02.660138Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:19:02.660172Z"}
+{"agent": "pro", "argument_id": "9b666566-bf5e-4f00-af42-63988e518a36", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:19:10.544388Z"}
+{"argument_id": "9b666566-bf5e-4f00-af42-63988e518a36", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:19:10.544534Z"}
+{"argument_id": "9b666566-bf5e-4f00-af42-63988e518a36", "total_score": 0.5860000000000001, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9400000000000004, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:19:10.621210Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:19:10.676697Z"}
+{"agent": "con", "argument_id": "838af56a-cf3d-4ada-839f-3964c6f50932", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:19:20.219871Z"}
+{"argument_id": "838af56a-cf3d-4ada-839f-3964c6f50932", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:19:20.220029Z"}
+{"argument_id": "838af56a-cf3d-4ada-839f-3964c6f50932", "total_score": 0.552, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:19:20.300939Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:19:20.301024Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:19:20.449639Z"}
+{"agent": "pro", "argument_id": "ec2b6801-1f87-4d71-a963-b46a11eac45a", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:19:33.658150Z"}
+{"argument_id": "ec2b6801-1f87-4d71-a963-b46a11eac45a", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:19:33.658262Z"}
+{"argument_id": "ec2b6801-1f87-4d71-a963-b46a11eac45a", "total_score": 0.6026506024096385, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:19:33.786477Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:19:34.112902Z"}
+{"agent": "con", "argument_id": "61e5adbb-72f7-43fc-9934-862865217c96", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:19:47.002054Z"}
+{"argument_id": "61e5adbb-72f7-43fc-9934-862865217c96", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:19:47.002180Z"}
+{"argument_id": "61e5adbb-72f7-43fc-9934-862865217c96", "total_score": 0.5910843373493976, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7600000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:19:47.115309Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:19:47.470824Z"}
+{"agent": "pro", "argument_id": "9d58d3c2-954d-42fc-ab69-aa28bc722bfd", "level": "tactical", "strategy": "synthesize", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:19:58.644480Z"}
+{"argument_id": "9d58d3c2-954d-42fc-ab69-aa28bc722bfd", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:19:58.644585Z"}
+{"argument_id": "9d58d3c2-954d-42fc-ab69-aa28bc722bfd", "total_score": 0.6437209302325582, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.8000000000000003, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:19:58.757456Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:19:59.247576Z"}
+{"agent": "con", "argument_id": "f20023ae-65d0-4ffb-802d-25ede9faffb0", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:20:12.830272Z"}
+{"argument_id": "f20023ae-65d0-4ffb-802d-25ede9faffb0", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:12.830370Z"}
+{"argument_id": "f20023ae-65d0-4ffb-802d-25ede9faffb0", "total_score": 0.498139534883721, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6100000000000001, "persuasiveness": 0.56}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:12.981936Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:20:12.982058Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:20:13.288854Z"}
+{"agent": "pro", "argument_id": "e10582df-868d-4265-b981-d02cf99ce51c", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:20:24.348594Z"}
+{"argument_id": "e10582df-868d-4265-b981-d02cf99ce51c", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:24.348665Z"}
+{"argument_id": "e10582df-868d-4265-b981-d02cf99ce51c", "total_score": 0.578139534883721, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8900000000000003, "persuasiveness": 0.8200000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:24.440829Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:20:24.768855Z"}
+{"agent": "con", "argument_id": "9050ee14-f24f-4117-b1e1-d4e8b5748622", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:20:33.684868Z"}
+{"argument_id": "9050ee14-f24f-4117-b1e1-d4e8b5748622", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:33.684930Z"}
+{"argument_id": "9050ee14-f24f-4117-b1e1-d4e8b5748622", "total_score": 0.5223255813953489, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:33.764702Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:20:33.764776Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:20:33.764804Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:20:33.764881Z"}
+{"argument_id": "9b666566-bf5e-4f00-af42-63988e518a36", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:33.764898Z"}
+{"argument_id": "9b666566-bf5e-4f00-af42-63988e518a36", "total_score": 0.5660465116279071, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9400000000000004, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:33.820760Z"}
+{"argument_id": "838af56a-cf3d-4ada-839f-3964c6f50932", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:33.820799Z"}
+{"argument_id": "838af56a-cf3d-4ada-839f-3964c6f50932", "total_score": 0.5344186046511629, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:33.895364Z"}
+{"argument_id": "ec2b6801-1f87-4d71-a963-b46a11eac45a", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:33.895418Z"}
+{"argument_id": "ec2b6801-1f87-4d71-a963-b46a11eac45a", "total_score": 0.5920930232558139, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:33.999211Z"}
+{"argument_id": "61e5adbb-72f7-43fc-9934-862865217c96", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:33.999259Z"}
+{"argument_id": "61e5adbb-72f7-43fc-9934-862865217c96", "total_score": 0.5809302325581396, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7600000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:34.105994Z"}
+{"argument_id": "9d58d3c2-954d-42fc-ab69-aa28bc722bfd", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:34.106042Z"}
+{"argument_id": "9d58d3c2-954d-42fc-ab69-aa28bc722bfd", "total_score": 0.6437209302325582, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.8000000000000003, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:34.195780Z"}
+{"argument_id": "f20023ae-65d0-4ffb-802d-25ede9faffb0", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:34.195832Z"}
+{"argument_id": "f20023ae-65d0-4ffb-802d-25ede9faffb0", "total_score": 0.498139534883721, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6100000000000001, "persuasiveness": 0.56}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:34.323114Z"}
+{"argument_id": "e10582df-868d-4265-b981-d02cf99ce51c", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:34.323163Z"}
+{"argument_id": "e10582df-868d-4265-b981-d02cf99ce51c", "total_score": 0.578139534883721, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8900000000000003, "persuasiveness": 0.8200000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:34.401202Z"}
+{"argument_id": "9050ee14-f24f-4117-b1e1-d4e8b5748622", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:34.401248Z"}
+{"argument_id": "9050ee14-f24f-4117-b1e1-d4e8b5748622", "total_score": 0.5223255813953489, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:34.472759Z"}
+{"decision": "pro", "confidence": 0.8140000000000001, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:20:37.585170Z"}
+{"debate_id": "9ac40eaf-a7d2-4839-826d-1aef5482b95f", "state": "complete", "verdict": "pro", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:20:37.585298Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 95s
+
+[2/27] artemis | Trial 2 | Should governments mandate AI safety tes...
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "topic": "Should governments mandate AI safety testing?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:20:45.130887Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "event": "Starting debate", "timestamp": "2025-12-29T13:20:45.130933Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "event": "Opening statements phase", "timestamp": "2025-12-29T13:20:45.130947Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:20:45.130975Z"}
+{"agent": "pro", "argument_id": "ee6e8163-f0b2-44fc-9a42-25b20fc5eaaa", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:20:53.403644Z"}
+{"argument_id": "ee6e8163-f0b2-44fc-9a42-25b20fc5eaaa", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:20:53.403696Z"}
+{"argument_id": "ee6e8163-f0b2-44fc-9a42-25b20fc5eaaa", "total_score": 0.5670000000000001, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:20:53.460694Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:20:53.515809Z"}
+{"agent": "con", "argument_id": "3ac1d6d0-f8a6-42a6-8d19-fcf775dd6233", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:21:01.776733Z"}
+{"argument_id": "3ac1d6d0-f8a6-42a6-8d19-fcf775dd6233", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:21:01.776838Z"}
+{"argument_id": "3ac1d6d0-f8a6-42a6-8d19-fcf775dd6233", "total_score": 0.546, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.7900000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:21:01.850842Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:21:01.850916Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:21:01.971065Z"}
+{"agent": "pro", "argument_id": "9fc1bd48-1c36-4c77-8cee-531205e745af", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:21:17.031951Z"}
+{"argument_id": "9fc1bd48-1c36-4c77-8cee-531205e745af", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:21:17.032123Z"}
+{"argument_id": "9fc1bd48-1c36-4c77-8cee-531205e745af", "total_score": 0.5742168674698794, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:21:17.086148Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:21:17.293036Z"}
+{"agent": "con", "argument_id": "12612951-b56d-4a45-8a4b-c054b07653bf", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:21:26.698862Z"}
+{"argument_id": "12612951-b56d-4a45-8a4b-c054b07653bf", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:21:26.698975Z"}
+{"argument_id": "12612951-b56d-4a45-8a4b-c054b07653bf", "total_score": 0.5399999999999999, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:21:26.794901Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:21:27.060657Z"}
+{"agent": "pro", "argument_id": "badb96d5-8e67-4d02-a9c2-d427ddba4e36", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:21:38.098692Z"}
+{"argument_id": "badb96d5-8e67-4d02-a9c2-d427ddba4e36", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:21:38.098876Z"}
+{"argument_id": "badb96d5-8e67-4d02-a9c2-d427ddba4e36", "total_score": 0.5483720930232558, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:21:38.200603Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:21:38.553143Z"}
+{"agent": "con", "argument_id": "8bb48460-08f3-47c5-9397-019739d6a73d", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:21:54.071771Z"}
+{"argument_id": "8bb48460-08f3-47c5-9397-019739d6a73d", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:21:54.071867Z"}
+{"argument_id": "8bb48460-08f3-47c5-9397-019739d6a73d", "total_score": 0.6076744186046511, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.45, "causal_reasoning": 0.5, "ethical_alignment": 0.7600000000000002, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:21:54.267462Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:21:54.267577Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:21:54.564656Z"}
+{"agent": "pro", "argument_id": "ae2ca08b-cad6-4e4e-91bf-e3b31fd16f83", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:22:09.202743Z"}
+{"argument_id": "ae2ca08b-cad6-4e4e-91bf-e3b31fd16f83", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:09.202861Z"}
+{"argument_id": "ae2ca08b-cad6-4e4e-91bf-e3b31fd16f83", "total_score": 0.6069767441860466, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9700000000000004, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:09.305531Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:22:09.556297Z"}
+{"agent": "con", "argument_id": "e353d90d-fe0b-4f74-9455-18df8e92f669", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:22:21.618576Z"}
+{"argument_id": "e353d90d-fe0b-4f74-9455-18df8e92f669", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.618651Z"}
+{"argument_id": "e353d90d-fe0b-4f74-9455-18df8e92f669", "total_score": 0.5586046511627907, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7900000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:21.735854Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:22:21.735923Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:22:21.735943Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:22:21.736014Z"}
+{"argument_id": "ee6e8163-f0b2-44fc-9a42-25b20fc5eaaa", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.736028Z"}
+{"argument_id": "ee6e8163-f0b2-44fc-9a42-25b20fc5eaaa", "total_score": 0.5483720930232558, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:21.790118Z"}
+{"argument_id": "3ac1d6d0-f8a6-42a6-8d19-fcf775dd6233", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.790165Z"}
+{"argument_id": "3ac1d6d0-f8a6-42a6-8d19-fcf775dd6233", "total_score": 0.5288372093023257, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.7900000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:21.849295Z"}
+{"argument_id": "9fc1bd48-1c36-4c77-8cee-531205e745af", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.849345Z"}
+{"argument_id": "9fc1bd48-1c36-4c77-8cee-531205e745af", "total_score": 0.5646511627906977, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:21.897265Z"}
+{"argument_id": "12612951-b56d-4a45-8a4b-c054b07653bf", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.897306Z"}
+{"argument_id": "12612951-b56d-4a45-8a4b-c054b07653bf", "total_score": 0.5316279069767442, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:21.967637Z"}
+{"argument_id": "badb96d5-8e67-4d02-a9c2-d427ddba4e36", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:21.967677Z"}
+{"argument_id": "badb96d5-8e67-4d02-a9c2-d427ddba4e36", "total_score": 0.5483720930232558, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:22.040613Z"}
+{"argument_id": "8bb48460-08f3-47c5-9397-019739d6a73d", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:22.040664Z"}
+{"argument_id": "8bb48460-08f3-47c5-9397-019739d6a73d", "total_score": 0.6076744186046511, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.45, "causal_reasoning": 0.5, "ethical_alignment": 0.7600000000000002, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:22.213371Z"}
+{"argument_id": "ae2ca08b-cad6-4e4e-91bf-e3b31fd16f83", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:22.213418Z"}
+{"argument_id": "ae2ca08b-cad6-4e4e-91bf-e3b31fd16f83", "total_score": 0.6069767441860466, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9700000000000004, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:22.290676Z"}
+{"argument_id": "e353d90d-fe0b-4f74-9455-18df8e92f669", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:22.290725Z"}
+{"argument_id": "e353d90d-fe0b-4f74-9455-18df8e92f669", "total_score": 0.5586046511627907, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7900000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:22.387474Z"}
+{"decision": "con", "confidence": 0.8063, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:22:24.903024Z"}
+{"debate_id": "8adba58c-976b-4663-b890-f0a40ca4068d", "state": "complete", "verdict": "con", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:22:24.903175Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 100s
+
+[3/27] artemis | Trial 3 | Should governments mandate AI safety tes...
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "topic": "Should governments mandate AI safety testing?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:22:32.730808Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "event": "Starting debate", "timestamp": "2025-12-29T13:22:32.730887Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "event": "Opening statements phase", "timestamp": "2025-12-29T13:22:32.730910Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:22:32.730950Z"}
+{"agent": "pro", "argument_id": "220c738d-7dc1-4c81-a50b-bc4fbcd9d010", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:22:44.942096Z"}
+{"argument_id": "220c738d-7dc1-4c81-a50b-bc4fbcd9d010", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:44.942169Z"}
+{"argument_id": "220c738d-7dc1-4c81-a50b-bc4fbcd9d010", "total_score": 0.577, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:45.023878Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:22:45.085165Z"}
+{"agent": "con", "argument_id": "64ca7af7-e03f-47ed-84d6-1391726a8c4f", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:22:58.817639Z"}
+{"argument_id": "64ca7af7-e03f-47ed-84d6-1391726a8c4f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:22:58.817742Z"}
+{"argument_id": "64ca7af7-e03f-47ed-84d6-1391726a8c4f", "total_score": 0.5615, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7100000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:22:58.924511Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:22:58.924578Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:22:59.084904Z"}
+{"agent": "pro", "argument_id": "7dd52ea1-15f9-4844-a359-d01313ad8929", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:23:08.706742Z"}
+{"argument_id": "7dd52ea1-15f9-4844-a359-d01313ad8929", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:23:08.706818Z"}
+{"argument_id": "7dd52ea1-15f9-4844-a359-d01313ad8929", "total_score": 0.6151807228915662, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:23:08.799384Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:23:09.066222Z"}
+{"agent": "con", "argument_id": "9e223a5a-73a7-4f88-80be-a7c5369f61b3", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:23:21.929302Z"}
+{"argument_id": "9e223a5a-73a7-4f88-80be-a7c5369f61b3", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:23:21.929377Z"}
+{"argument_id": "9e223a5a-73a7-4f88-80be-a7c5369f61b3", "total_score": 0.5915662650602409, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:23:22.026451Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:23:22.357046Z"}
+{"agent": "pro", "argument_id": "2ec00b66-80ae-4526-803f-a8f7288f3256", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:23:32.960323Z"}
+{"argument_id": "2ec00b66-80ae-4526-803f-a8f7288f3256", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:23:32.960502Z"}
+{"argument_id": "2ec00b66-80ae-4526-803f-a8f7288f3256", "total_score": 0.5765116279069769, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.8900000000000003, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:23:33.104326Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:23:33.661527Z"}
+{"agent": "con", "argument_id": "c8740102-6c7c-4eca-a655-a1af8fc4bdff", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:23:45.528098Z"}
+{"argument_id": "c8740102-6c7c-4eca-a655-a1af8fc4bdff", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:23:45.528199Z"}
+{"argument_id": "c8740102-6c7c-4eca-a655-a1af8fc4bdff", "total_score": 0.5186046511627906, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.53, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:23:45.646133Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:23:45.646229Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:23:45.903998Z"}
+{"agent": "pro", "argument_id": "7adac3fc-aa49-4445-b581-618b13e628ef", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:23:55.920950Z"}
+{"argument_id": "7adac3fc-aa49-4445-b581-618b13e628ef", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:23:55.921231Z"}
+{"argument_id": "7adac3fc-aa49-4445-b581-618b13e628ef", "total_score": 0.5995348837209302, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:23:55.996366Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:23:56.326848Z"}
+{"agent": "con", "argument_id": "e50cb4b1-493a-42f7-a37c-e6ee5fb34461", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:24:06.731059Z"}
+{"argument_id": "e50cb4b1-493a-42f7-a37c-e6ee5fb34461", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:06.731125Z"}
+{"argument_id": "e50cb4b1-493a-42f7-a37c-e6ee5fb34461", "total_score": 0.5544186046511628, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:06.820132Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:24:06.820199Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:24:06.820217Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:24:06.820277Z"}
+{"argument_id": "220c738d-7dc1-4c81-a50b-bc4fbcd9d010", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:06.820292Z"}
+{"argument_id": "220c738d-7dc1-4c81-a50b-bc4fbcd9d010", "total_score": 0.5576744186046513, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:06.882707Z"}
+{"argument_id": "64ca7af7-e03f-47ed-84d6-1391726a8c4f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:06.882739Z"}
+{"argument_id": "64ca7af7-e03f-47ed-84d6-1391726a8c4f", "total_score": 0.5432558139534884, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7100000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:06.964783Z"}
+{"argument_id": "7dd52ea1-15f9-4844-a359-d01313ad8929", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:06.964830Z"}
+{"argument_id": "7dd52ea1-15f9-4844-a359-d01313ad8929", "total_score": 0.604186046511628, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.039230Z"}
+{"argument_id": "9e223a5a-73a7-4f88-80be-a7c5369f61b3", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:07.039278Z"}
+{"argument_id": "9e223a5a-73a7-4f88-80be-a7c5369f61b3", "total_score": 0.5813953488372093, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.123147Z"}
+{"argument_id": "2ec00b66-80ae-4526-803f-a8f7288f3256", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:07.123200Z"}
+{"argument_id": "2ec00b66-80ae-4526-803f-a8f7288f3256", "total_score": 0.5765116279069769, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.8900000000000003, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.251493Z"}
+{"argument_id": "c8740102-6c7c-4eca-a655-a1af8fc4bdff", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:07.251541Z"}
+{"argument_id": "c8740102-6c7c-4eca-a655-a1af8fc4bdff", "total_score": 0.5186046511627906, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.53, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.348903Z"}
+{"argument_id": "7adac3fc-aa49-4445-b581-618b13e628ef", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:07.348948Z"}
+{"argument_id": "7adac3fc-aa49-4445-b581-618b13e628ef", "total_score": 0.5995348837209302, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 1.0, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.418314Z"}
+{"argument_id": "e50cb4b1-493a-42f7-a37c-e6ee5fb34461", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:07.418360Z"}
+{"argument_id": "e50cb4b1-493a-42f7-a37c-e6ee5fb34461", "total_score": 0.5544186046511628, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:07.498438Z"}
+{"decision": "pro", "confidence": 0.80465, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:24:10.129857Z"}
+{"debate_id": "dbd955f0-fe5f-4ee1-8f05-6c1c4a4dee6c", "state": "complete", "verdict": "pro", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:24:10.130176Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 97s
+
+[4/27] artemis | Trial 1 | Is remote work better than office work?
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "topic": "Is remote work better than office work?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:24:18.883205Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "event": "Starting debate", "timestamp": "2025-12-29T13:24:18.883266Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "event": "Opening statements phase", "timestamp": "2025-12-29T13:24:18.883284Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:24:18.883322Z"}
+{"agent": "pro", "argument_id": "4ed052ba-dd2c-4c00-a334-bb9def180a44", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:24:28.605921Z"}
+{"argument_id": "4ed052ba-dd2c-4c00-a334-bb9def180a44", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:28.605978Z"}
+{"argument_id": "4ed052ba-dd2c-4c00-a334-bb9def180a44", "total_score": 0.5445000000000001, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:28.690853Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:24:28.757060Z"}
+{"agent": "con", "argument_id": "e68b263f-b587-4aca-b5cb-6ea00e87eba3", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:24:37.486750Z"}
+{"argument_id": "e68b263f-b587-4aca-b5cb-6ea00e87eba3", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:37.486865Z"}
+{"argument_id": "e68b263f-b587-4aca-b5cb-6ea00e87eba3", "total_score": 0.551, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:37.583776Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:24:37.583850Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:24:37.729397Z"}
+{"agent": "pro", "argument_id": "aa7ae432-d6f2-4c0c-98d6-8b96c84f8593", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:24:47.569515Z"}
+{"argument_id": "aa7ae432-d6f2-4c0c-98d6-8b96c84f8593", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:47.569614Z"}
+{"argument_id": "aa7ae432-d6f2-4c0c-98d6-8b96c84f8593", "total_score": 0.5004819277108433, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.6400000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:47.647712Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:24:47.891224Z"}
+{"agent": "con", "argument_id": "fb77f653-977e-489e-8a0e-829749f129ce", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:24:56.770930Z"}
+{"argument_id": "fb77f653-977e-489e-8a0e-829749f129ce", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:24:56.770991Z"}
+{"argument_id": "fb77f653-977e-489e-8a0e-829749f129ce", "total_score": 0.560722891566265, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.8200000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:24:56.861843Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:24:57.155081Z"}
+{"agent": "pro", "argument_id": "a9f2e9f7-0992-41b2-a2e5-b320cb3d40a0", "level": "tactical", "strategy": "synthesize", "evidence_count": 1, "causal_links_count": 3, "event": "Argument generated", "timestamp": "2025-12-29T13:25:10.923659Z"}
+{"argument_id": "a9f2e9f7-0992-41b2-a2e5-b320cb3d40a0", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:10.923762Z"}
+{"argument_id": "a9f2e9f7-0992-41b2-a2e5-b320cb3d40a0", "total_score": 0.666046511627907, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.8999999999999999, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:11.020976Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:25:11.413305Z"}
+{"agent": "con", "argument_id": "8d29e2ea-6cbc-465a-b3e7-93d84cb64272", "level": "tactical", "strategy": "synthesize", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:25:21.639168Z"}
+{"argument_id": "8d29e2ea-6cbc-465a-b3e7-93d84cb64272", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:21.639264Z"}
+{"argument_id": "8d29e2ea-6cbc-465a-b3e7-93d84cb64272", "total_score": 0.6211627906976744, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.55, "causal_reasoning": 0.5, "ethical_alignment": 0.55, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:21.747333Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:25:21.747431Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:25:21.977953Z"}
+{"agent": "pro", "argument_id": "0b21ca82-d917-459c-876f-f9cdefc95768", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:25:33.957153Z"}
+{"argument_id": "0b21ca82-d917-459c-876f-f9cdefc95768", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:33.957236Z"}
+{"argument_id": "0b21ca82-d917-459c-876f-f9cdefc95768", "total_score": 0.5662790697674419, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.45, "causal_reasoning": 0.45, "ethical_alignment": 0.7000000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:34.044553Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:25:34.302588Z"}
+{"agent": "con", "argument_id": "b8f1500f-0dda-4103-8f68-8edd0c218b97", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:25:43.313457Z"}
+{"argument_id": "b8f1500f-0dda-4103-8f68-8edd0c218b97", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.313527Z"}
+{"argument_id": "b8f1500f-0dda-4103-8f68-8edd0c218b97", "total_score": 0.5306976744186047, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7900000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.405824Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:25:43.405903Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:25:43.405924Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:25:43.405986Z"}
+{"argument_id": "4ed052ba-dd2c-4c00-a334-bb9def180a44", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.406000Z"}
+{"argument_id": "4ed052ba-dd2c-4c00-a334-bb9def180a44", "total_score": 0.5274418604651163, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.470318Z"}
+{"argument_id": "e68b263f-b587-4aca-b5cb-6ea00e87eba3", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.470357Z"}
+{"argument_id": "e68b263f-b587-4aca-b5cb-6ea00e87eba3", "total_score": 0.5334883720930232, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.539067Z"}
+{"argument_id": "aa7ae432-d6f2-4c0c-98d6-8b96c84f8593", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.539118Z"}
+{"argument_id": "aa7ae432-d6f2-4c0c-98d6-8b96c84f8593", "total_score": 0.4934883720930233, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.6400000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.592125Z"}
+{"argument_id": "fb77f653-977e-489e-8a0e-829749f129ce", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.592157Z"}
+{"argument_id": "fb77f653-977e-489e-8a0e-829749f129ce", "total_score": 0.5516279069767442, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.8200000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.668486Z"}
+{"argument_id": "a9f2e9f7-0992-41b2-a2e5-b320cb3d40a0", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.668538Z"}
+{"argument_id": "a9f2e9f7-0992-41b2-a2e5-b320cb3d40a0", "total_score": 0.666046511627907, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.8999999999999999, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.740072Z"}
+{"argument_id": "8d29e2ea-6cbc-465a-b3e7-93d84cb64272", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.740115Z"}
+{"argument_id": "8d29e2ea-6cbc-465a-b3e7-93d84cb64272", "total_score": 0.6211627906976744, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.55, "causal_reasoning": 0.5, "ethical_alignment": 0.55, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.821238Z"}
+{"argument_id": "0b21ca82-d917-459c-876f-f9cdefc95768", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.821290Z"}
+{"argument_id": "0b21ca82-d917-459c-876f-f9cdefc95768", "total_score": 0.5662790697674419, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.45, "causal_reasoning": 0.45, "ethical_alignment": 0.7000000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.891692Z"}
+{"argument_id": "b8f1500f-0dda-4103-8f68-8edd0c218b97", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:25:43.891742Z"}
+{"argument_id": "b8f1500f-0dda-4103-8f68-8edd0c218b97", "total_score": 0.5306976744186047, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7900000000000003}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:25:43.961287Z"}
+{"decision": "pro", "confidence": 0.80375, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:25:49.766790Z"}
+{"debate_id": "3adfc4b8-9373-4992-aca9-db0a97d933cc", "state": "complete", "verdict": "pro", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:25:49.766907Z"}
+  Quality: 85 | Accuracy: 86 | Depth: 75 | Avg: 82.0 | Time: 91s
+
+[5/27] artemis | Trial 2 | Is remote work better than office work?
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "topic": "Is remote work better than office work?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:25:59.198596Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "event": "Starting debate", "timestamp": "2025-12-29T13:25:59.198690Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "event": "Opening statements phase", "timestamp": "2025-12-29T13:25:59.198713Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:25:59.198763Z"}
+{"agent": "pro", "argument_id": "dd3ec397-48d8-4937-b42b-9396b800b348", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:26:07.356133Z"}
+{"argument_id": "dd3ec397-48d8-4937-b42b-9396b800b348", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:26:07.356316Z"}
+{"argument_id": "dd3ec397-48d8-4937-b42b-9396b800b348", "total_score": 0.5525, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:26:07.417959Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:26:07.463540Z"}
+{"agent": "con", "argument_id": "aaed3c1a-1f73-4917-bb40-a5a35ce0b142", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:26:15.334527Z"}
+{"argument_id": "aaed3c1a-1f73-4917-bb40-a5a35ce0b142", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:26:15.334624Z"}
+{"argument_id": "aaed3c1a-1f73-4917-bb40-a5a35ce0b142", "total_score": 0.5265000000000001, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.7000000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:26:15.391177Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:26:15.391243Z"}
+{"agent": "pro", "level": "tactical", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:26:15.480382Z"}
+{"agent": "pro", "argument_id": "58d7c44d-8bea-4595-bf6d-894bb5365a6b", "level": "tactical", "strategy": "adapt", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:26:27.513801Z"}
+{"argument_id": "58d7c44d-8bea-4595-bf6d-894bb5365a6b", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:26:27.513985Z"}
+{"argument_id": "58d7c44d-8bea-4595-bf6d-894bb5365a6b", "total_score": 0.6346987951807228, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:26:27.613091Z"}
+{"agent": "con", "level": "tactical", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:26:27.846008Z"}
+{"agent": "con", "argument_id": "cfbbc44f-7192-4607-9bcb-dac125d21ddc", "level": "tactical", "strategy": "counter", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:26:40.420393Z"}
+{"argument_id": "cfbbc44f-7192-4607-9bcb-dac125d21ddc", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:26:40.420473Z"}
+{"argument_id": "cfbbc44f-7192-4607-9bcb-dac125d21ddc", "total_score": 0.6140963855421686, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.55, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:26:40.539487Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:26:40.822087Z"}
+{"agent": "pro", "argument_id": "25945cf4-8cc0-46fa-afb0-f84019d984e5", "level": "tactical", "strategy": "synthesize", "evidence_count": 1, "causal_links_count": 1, "event": "Argument generated", "timestamp": "2025-12-29T13:26:53.020973Z"}
+{"argument_id": "25945cf4-8cc0-46fa-afb0-f84019d984e5", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:26:53.021050Z"}
+{"argument_id": "25945cf4-8cc0-46fa-afb0-f84019d984e5", "total_score": 0.6004651162790697, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.5, "causal_reasoning": 0.7, "ethical_alignment": 0.5, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:26:53.167464Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:26:53.661899Z"}
+{"agent": "con", "argument_id": "feeb4af3-df98-4007-b841-d2c569f473af", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 1, "event": "Argument generated", "timestamp": "2025-12-29T13:27:00.746935Z"}
+{"argument_id": "feeb4af3-df98-4007-b841-d2c569f473af", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:00.747100Z"}
+{"argument_id": "feeb4af3-df98-4007-b841-d2c569f473af", "total_score": 0.6425581395348837, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.45, "causal_reasoning": 0.7, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:00.871574Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:27:00.871670Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:27:01.111554Z"}
+{"agent": "pro", "argument_id": "5c26b810-fd3b-4b8c-bfcb-e54fc3e3f71c", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:27:11.306282Z"}
+{"argument_id": "5c26b810-fd3b-4b8c-bfcb-e54fc3e3f71c", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:11.306406Z"}
+{"argument_id": "5c26b810-fd3b-4b8c-bfcb-e54fc3e3f71c", "total_score": 0.5069767441860465, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:11.407752Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:27:11.722630Z"}
+{"agent": "con", "argument_id": "29d38d4f-6240-4bec-9c55-9a46c3ec9fcc", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:27:23.967250Z"}
+{"argument_id": "29d38d4f-6240-4bec-9c55-9a46c3ec9fcc", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:23.967324Z"}
+{"argument_id": "29d38d4f-6240-4bec-9c55-9a46c3ec9fcc", "total_score": 0.5186046511627908, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.063083Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:27:24.063150Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:27:24.063169Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:27:24.063229Z"}
+{"argument_id": "dd3ec397-48d8-4937-b42b-9396b800b348", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.063245Z"}
+{"argument_id": "dd3ec397-48d8-4937-b42b-9396b800b348", "total_score": 0.5348837209302325, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.107754Z"}
+{"argument_id": "aaed3c1a-1f73-4917-bb40-a5a35ce0b142", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.107800Z"}
+{"argument_id": "aaed3c1a-1f73-4917-bb40-a5a35ce0b142", "total_score": 0.5106976744186047, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.7000000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.151007Z"}
+{"argument_id": "58d7c44d-8bea-4595-bf6d-894bb5365a6b", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.151042Z"}
+{"argument_id": "58d7c44d-8bea-4595-bf6d-894bb5365a6b", "total_score": 0.6334883720930233, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.224877Z"}
+{"argument_id": "cfbbc44f-7192-4607-9bcb-dac125d21ddc", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.224931Z"}
+{"argument_id": "cfbbc44f-7192-4607-9bcb-dac125d21ddc", "total_score": 0.6118604651162791, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.55, "causal_reasoning": 0.5, "ethical_alignment": 0.6500000000000001, "persuasiveness": 0.7100000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.330815Z"}
+{"argument_id": "25945cf4-8cc0-46fa-afb0-f84019d984e5", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.330881Z"}
+{"argument_id": "25945cf4-8cc0-46fa-afb0-f84019d984e5", "total_score": 0.6004651162790697, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.5, "causal_reasoning": 0.7, "ethical_alignment": 0.5, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.455288Z"}
+{"argument_id": "feeb4af3-df98-4007-b841-d2c569f473af", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.455337Z"}
+{"argument_id": "feeb4af3-df98-4007-b841-d2c569f473af", "total_score": 0.6425581395348837, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.45, "causal_reasoning": 0.7, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.553005Z"}
+{"argument_id": "5c26b810-fd3b-4b8c-bfcb-e54fc3e3f71c", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.553044Z"}
+{"argument_id": "5c26b810-fd3b-4b8c-bfcb-e54fc3e3f71c", "total_score": 0.5069767441860465, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.630800Z"}
+{"argument_id": "29d38d4f-6240-4bec-9c55-9a46c3ec9fcc", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:24.630873Z"}
+{"argument_id": "29d38d4f-6240-4bec-9c55-9a46c3ec9fcc", "total_score": 0.5186046511627908, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:24.710202Z"}
+{"decision": "pro", "confidence": 0.8053, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:27:36.664942Z"}
+{"debate_id": "a29c23a4-4645-47f1-8e56-9d91a9fcf8a3", "state": "complete", "verdict": "pro", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:27:36.665029Z"}
+  Quality: 85 | Accuracy: 86 | Depth: 78 | Avg: 83.0 | Time: 97s
+
+[6/27] artemis | Trial 3 | Is remote work better than office work?
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "topic": "Is remote work better than office work?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:27:49.194107Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "event": "Starting debate", "timestamp": "2025-12-29T13:27:49.194149Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "event": "Opening statements phase", "timestamp": "2025-12-29T13:27:49.194163Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:27:49.194187Z"}
+{"agent": "pro", "argument_id": "72b71983-3445-4e6b-bf2f-641baff2f6d2", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:27:57.074164Z"}
+{"argument_id": "72b71983-3445-4e6b-bf2f-641baff2f6d2", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:27:57.074233Z"}
+{"argument_id": "72b71983-3445-4e6b-bf2f-641baff2f6d2", "total_score": 0.5205000000000001, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.6400000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:27:57.147548Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:27:57.206053Z"}
+{"agent": "con", "argument_id": "f088f1d8-5ecd-47bd-8c05-439c6f35dd6f", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:28:05.645196Z"}
+{"argument_id": "f088f1d8-5ecd-47bd-8c05-439c6f35dd6f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:28:05.645278Z"}
+{"argument_id": "f088f1d8-5ecd-47bd-8c05-439c6f35dd6f", "total_score": 0.5245000000000001, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:28:05.723460Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:28:05.723532Z"}
+{"agent": "pro", "level": "tactical", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:28:05.837647Z"}
+{"agent": "pro", "argument_id": "1eee8e37-b008-4cae-ac93-ef34724878cd", "level": "tactical", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:28:24.998547Z"}
+{"argument_id": "1eee8e37-b008-4cae-ac93-ef34724878cd", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:28:24.998738Z"}
+{"argument_id": "1eee8e37-b008-4cae-ac93-ef34724878cd", "total_score": 0.5587951807228915, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.5, "causal_reasoning": 0.5, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.64}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:28:25.090709Z"}
+{"agent": "con", "level": "tactical", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:28:25.353218Z"}
+{"agent": "con", "argument_id": "67dc1ec6-d347-4c50-b985-bc3e6659fd97", "level": "tactical", "strategy": "counter", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:28:37.479501Z"}
+{"argument_id": "67dc1ec6-d347-4c50-b985-bc3e6659fd97", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:28:37.479604Z"}
+{"argument_id": "67dc1ec6-d347-4c50-b985-bc3e6659fd97", "total_score": 0.616867469879518, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:28:37.555037Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:28:37.780753Z"}
+{"agent": "pro", "argument_id": "1efafb9c-c761-41f0-bc98-a3382c7aedaf", "level": "tactical", "strategy": "synthesize", "evidence_count": 1, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:28:53.576891Z"}
+{"argument_id": "1efafb9c-c761-41f0-bc98-a3382c7aedaf", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:28:53.576952Z"}
+{"argument_id": "1efafb9c-c761-41f0-bc98-a3382c7aedaf", "total_score": 0.6269767441860465, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.55, "persuasiveness": 0.56}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:28:53.694384Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:28:54.160878Z"}
+{"agent": "con", "argument_id": "5fb1f6a8-841a-46b5-9bfd-84d0896b5992", "level": "tactical", "strategy": "synthesize", "evidence_count": 2, "causal_links_count": 1, "event": "Argument generated", "timestamp": "2025-12-29T13:29:04.807952Z"}
+{"argument_id": "5fb1f6a8-841a-46b5-9bfd-84d0896b5992", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:04.808101Z"}
+{"argument_id": "5fb1f6a8-841a-46b5-9bfd-84d0896b5992", "total_score": 0.721860465116279, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.7, "causal_reasoning": 0.7, "ethical_alignment": 0.7100000000000002, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:04.926415Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:29:04.926513Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:29:05.145563Z"}
+{"agent": "pro", "argument_id": "0fdeee4f-5a4e-4d53-8a30-7848fa7c11d8", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:29:13.724448Z"}
+{"argument_id": "0fdeee4f-5a4e-4d53-8a30-7848fa7c11d8", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:13.724494Z"}
+{"argument_id": "0fdeee4f-5a4e-4d53-8a30-7848fa7c11d8", "total_score": 0.606279069767442, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:13.807893Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:29:14.110775Z"}
+{"agent": "con", "argument_id": "cb65774b-b8b2-43f7-a8f2-aad81ec11291", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:29:26.029842Z"}
+{"argument_id": "cb65774b-b8b2-43f7-a8f2-aad81ec11291", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.029976Z"}
+{"argument_id": "cb65774b-b8b2-43f7-a8f2-aad81ec11291", "total_score": 0.5195348837209303, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6600000000000001, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.125694Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:29:26.125763Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:29:26.125780Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:29:26.125840Z"}
+{"argument_id": "72b71983-3445-4e6b-bf2f-641baff2f6d2", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.125855Z"}
+{"argument_id": "72b71983-3445-4e6b-bf2f-641baff2f6d2", "total_score": 0.5051162790697675, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7300000000000002, "persuasiveness": 0.6400000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.183598Z"}
+{"argument_id": "f088f1d8-5ecd-47bd-8c05-439c6f35dd6f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.183644Z"}
+{"argument_id": "f088f1d8-5ecd-47bd-8c05-439c6f35dd6f", "total_score": 0.5088372093023256, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.6800000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.242863Z"}
+{"argument_id": "1eee8e37-b008-4cae-ac93-ef34724878cd", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.242914Z"}
+{"argument_id": "1eee8e37-b008-4cae-ac93-ef34724878cd", "total_score": 0.5567441860465117, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.5, "causal_reasoning": 0.5, "ethical_alignment": 0.6000000000000001, "persuasiveness": 0.64}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.314369Z"}
+{"argument_id": "67dc1ec6-d347-4c50-b985-bc3e6659fd97", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.314415Z"}
+{"argument_id": "67dc1ec6-d347-4c50-b985-bc3e6659fd97", "total_score": 0.616279069767442, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.5800000000000001, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.366101Z"}
+{"argument_id": "1efafb9c-c761-41f0-bc98-a3382c7aedaf", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.366150Z"}
+{"argument_id": "1efafb9c-c761-41f0-bc98-a3382c7aedaf", "total_score": 0.6269767441860465, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.6000000000000001, "causal_reasoning": 0.5, "ethical_alignment": 0.55, "persuasiveness": 0.56}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.468295Z"}
+{"argument_id": "5fb1f6a8-841a-46b5-9bfd-84d0896b5992", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.468340Z"}
+{"argument_id": "5fb1f6a8-841a-46b5-9bfd-84d0896b5992", "total_score": 0.721860465116279, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.7, "causal_reasoning": 0.7, "ethical_alignment": 0.7100000000000002, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.578137Z"}
+{"argument_id": "0fdeee4f-5a4e-4d53-8a30-7848fa7c11d8", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.578187Z"}
+{"argument_id": "0fdeee4f-5a4e-4d53-8a30-7848fa7c11d8", "total_score": 0.606279069767442, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.649321Z"}
+{"argument_id": "cb65774b-b8b2-43f7-a8f2-aad81ec11291", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:26.649373Z"}
+{"argument_id": "cb65774b-b8b2-43f7-a8f2-aad81ec11291", "total_score": 0.5195348837209303, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6600000000000001, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:26.721487Z"}
+{"decision": "con", "confidence": 0.8046, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:29:29.183412Z"}
+{"debate_id": "f04acf4d-8390-4525-86dc-1d01eab67505", "state": "complete", "verdict": "con", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:29:29.183624Z"}
+  Quality: 81 | Accuracy: 86 | Depth: 75 | Avg: 80.7 | Time: 100s
+
+[7/27] artemis | Trial 1 | Should social media verify user ages?
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "topic": "Should social media verify user ages?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:29:43.382631Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "event": "Starting debate", "timestamp": "2025-12-29T13:29:43.382688Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "event": "Opening statements phase", "timestamp": "2025-12-29T13:29:43.382707Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:29:43.382742Z"}
+{"agent": "pro", "argument_id": "e38c9dc8-65ed-493d-bfcb-f9a4bac1e738", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:29:55.171351Z"}
+{"argument_id": "e38c9dc8-65ed-493d-bfcb-f9a4bac1e738", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:29:55.171468Z"}
+{"argument_id": "e38c9dc8-65ed-493d-bfcb-f9a4bac1e738", "total_score": 0.5495000000000001, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.9000000000000004, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:29:55.268873Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:29:55.343308Z"}
+{"agent": "con", "argument_id": "d3eb7e34-c6ce-49d9-b329-39f3b26c10d4", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:30:04.895086Z"}
+{"argument_id": "d3eb7e34-c6ce-49d9-b329-39f3b26c10d4", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:30:04.895135Z"}
+{"argument_id": "d3eb7e34-c6ce-49d9-b329-39f3b26c10d4", "total_score": 0.6005, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:30:04.957268Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:30:04.957336Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:30:05.058772Z"}
+{"agent": "pro", "argument_id": "50845d47-674f-4f65-86aa-6eaf28d751d8", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:30:15.606327Z"}
+{"argument_id": "50845d47-674f-4f65-86aa-6eaf28d751d8", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:30:15.606440Z"}
+{"argument_id": "50845d47-674f-4f65-86aa-6eaf28d751d8", "total_score": 0.5886746987951806, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8500000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:30:15.734190Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:30:16.099261Z"}
+{"agent": "con", "argument_id": "ed03d764-7cd9-4d66-a66a-a68110805986", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:30:25.359094Z"}
+{"argument_id": "ed03d764-7cd9-4d66-a66a-a68110805986", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:30:25.359167Z"}
+{"argument_id": "ed03d764-7cd9-4d66-a66a-a68110805986", "total_score": 0.5486746987951807, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:30:25.424954Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:30:25.623402Z"}
+{"agent": "pro", "argument_id": "ca4ec804-f5f0-482c-bb80-d802960ffb57", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:30:39.622494Z"}
+{"argument_id": "ca4ec804-f5f0-482c-bb80-d802960ffb57", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:30:39.622605Z"}
+{"argument_id": "ca4ec804-f5f0-482c-bb80-d802960ffb57", "total_score": 0.5590697674418605, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6900000000000002, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:30:39.764506Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:30:40.376734Z"}
+{"agent": "con", "argument_id": "35d4e4a3-19a4-442f-b454-bd05829eaf2a", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:30:52.115808Z"}
+{"argument_id": "35d4e4a3-19a4-442f-b454-bd05829eaf2a", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:30:52.115861Z"}
+{"argument_id": "35d4e4a3-19a4-442f-b454-bd05829eaf2a", "total_score": 0.636279069767442, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.5, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:30:52.227989Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:30:52.228082Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:30:52.429847Z"}
+{"agent": "pro", "argument_id": "928a6183-bb0a-43c1-a9d5-fc2173805871", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:31:03.618815Z"}
+{"argument_id": "928a6183-bb0a-43c1-a9d5-fc2173805871", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:03.618862Z"}
+{"argument_id": "928a6183-bb0a-43c1-a9d5-fc2173805871", "total_score": 0.56, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8800000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:03.706544Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:31:04.088720Z"}
+{"agent": "con", "argument_id": "18b84012-0ddd-4b4d-911a-f0dd1a334efc", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:31:13.594670Z"}
+{"argument_id": "18b84012-0ddd-4b4d-911a-f0dd1a334efc", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.594716Z"}
+{"argument_id": "18b84012-0ddd-4b4d-911a-f0dd1a334efc", "total_score": 0.5776744186046512, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:13.681600Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:31:13.681671Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:31:13.681689Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:31:13.688164Z"}
+{"argument_id": "e38c9dc8-65ed-493d-bfcb-f9a4bac1e738", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.688209Z"}
+{"argument_id": "e38c9dc8-65ed-493d-bfcb-f9a4bac1e738", "total_score": 0.5320930232558141, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.9000000000000004, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:13.763839Z"}
+{"argument_id": "d3eb7e34-c6ce-49d9-b329-39f3b26c10d4", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.763884Z"}
+{"argument_id": "d3eb7e34-c6ce-49d9-b329-39f3b26c10d4", "total_score": 0.5795348837209303, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:13.813981Z"}
+{"argument_id": "50845d47-674f-4f65-86aa-6eaf28d751d8", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.814027Z"}
+{"argument_id": "50845d47-674f-4f65-86aa-6eaf28d751d8", "total_score": 0.5786046511627907, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8500000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:13.932574Z"}
+{"argument_id": "ed03d764-7cd9-4d66-a66a-a68110805986", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.932619Z"}
+{"argument_id": "ed03d764-7cd9-4d66-a66a-a68110805986", "total_score": 0.54, "scores": {"logical_coherence": 0.7, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:13.982089Z"}
+{"argument_id": "ca4ec804-f5f0-482c-bb80-d802960ffb57", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:13.982140Z"}
+{"argument_id": "ca4ec804-f5f0-482c-bb80-d802960ffb57", "total_score": 0.5590697674418605, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.6900000000000002, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:14.098597Z"}
+{"argument_id": "35d4e4a3-19a4-442f-b454-bd05829eaf2a", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:14.098644Z"}
+{"argument_id": "35d4e4a3-19a4-442f-b454-bd05829eaf2a", "total_score": 0.636279069767442, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.5, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.5900000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:14.203891Z"}
+{"argument_id": "928a6183-bb0a-43c1-a9d5-fc2173805871", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:14.203938Z"}
+{"argument_id": "928a6183-bb0a-43c1-a9d5-fc2173805871", "total_score": 0.56, "scores": {"logical_coherence": 0.75, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8800000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:14.293098Z"}
+{"argument_id": "18b84012-0ddd-4b4d-911a-f0dd1a334efc", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:14.293150Z"}
+{"argument_id": "18b84012-0ddd-4b4d-911a-f0dd1a334efc", "total_score": 0.5776744186046512, "scores": {"logical_coherence": 0.7999999999999999, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:14.367447Z"}
+{"decision": "con", "confidence": 0.8160499999999999, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:31:16.950354Z"}
+{"debate_id": "893aef39-43b1-4672-95dc-27518b939553", "state": "complete", "verdict": "con", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:31:16.950728Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 94s
+
+[8/27] artemis | Trial 2 | Should social media verify user ages?
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "topic": "Should social media verify user ages?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:31:26.694797Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "event": "Starting debate", "timestamp": "2025-12-29T13:31:26.694842Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "event": "Opening statements phase", "timestamp": "2025-12-29T13:31:26.694854Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:31:26.694879Z"}
+{"agent": "pro", "argument_id": "c8f1c496-2539-4615-a036-401b0b2c7146", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:31:42.056297Z"}
+{"argument_id": "c8f1c496-2539-4615-a036-401b0b2c7146", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:42.056360Z"}
+{"argument_id": "c8f1c496-2539-4615-a036-401b0b2c7146", "total_score": 0.5355000000000001, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.35, "causal_reasoning": 0.35, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:42.146460Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:31:42.226241Z"}
+{"agent": "con", "argument_id": "75b5e3b9-e4a4-4527-ad97-5d78ffc9e35c", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:31:54.030878Z"}
+{"argument_id": "75b5e3b9-e4a4-4527-ad97-5d78ffc9e35c", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:31:54.030977Z"}
+{"argument_id": "75b5e3b9-e4a4-4527-ad97-5d78ffc9e35c", "total_score": 0.5135000000000001, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:31:54.104885Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:31:54.104957Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:31:54.209120Z"}
+{"agent": "pro", "argument_id": "ba053372-27e1-455d-99c4-8ea246688fb1", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:32:04.814610Z"}
+{"argument_id": "ba053372-27e1-455d-99c4-8ea246688fb1", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:32:04.814667Z"}
+{"argument_id": "ba053372-27e1-455d-99c4-8ea246688fb1", "total_score": 0.5316867469879518, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.35, "causal_reasoning": 0.35, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:32:04.906054Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:32:05.226692Z"}
+{"agent": "con", "argument_id": "9870050d-403b-42ca-b6e4-3ff1c760b5a8", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:32:15.779628Z"}
+{"argument_id": "9870050d-403b-42ca-b6e4-3ff1c760b5a8", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:32:15.779730Z"}
+{"argument_id": "9870050d-403b-42ca-b6e4-3ff1c760b5a8", "total_score": 0.5313253012048194, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7400000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:32:15.859700Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:32:16.091073Z"}
+{"agent": "pro", "argument_id": "bced908b-3980-473e-8f98-250ee0dc7a0d", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:32:30.139943Z"}
+{"argument_id": "bced908b-3980-473e-8f98-250ee0dc7a0d", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:32:30.140027Z"}
+{"argument_id": "bced908b-3980-473e-8f98-250ee0dc7a0d", "total_score": 0.5800000000000001, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:32:30.280426Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:32:30.849126Z"}
+{"agent": "con", "argument_id": "3a098286-66a4-414e-a367-13cd98c9bfb0", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:32:40.292238Z"}
+{"argument_id": "3a098286-66a4-414e-a367-13cd98c9bfb0", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:32:40.292358Z"}
+{"argument_id": "3a098286-66a4-414e-a367-13cd98c9bfb0", "total_score": 0.6039534883720931, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.45, "causal_reasoning": 0.4, "ethical_alignment": 0.6700000000000002, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:32:40.421646Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:32:40.421746Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:32:40.652655Z"}
+{"agent": "pro", "argument_id": "0ccc466e-5b11-4b50-a1ec-0edc0bc753de", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:32:53.749425Z"}
+{"argument_id": "0ccc466e-5b11-4b50-a1ec-0edc0bc753de", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:32:53.749480Z"}
+{"argument_id": "0ccc466e-5b11-4b50-a1ec-0edc0bc753de", "total_score": 0.5330232558139536, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9000000000000004, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:32:53.846653Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:32:54.214749Z"}
+{"agent": "con", "argument_id": "ee8ec1d7-e0fa-4cd7-a394-a67775ec224f", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:33:16.537916Z"}
+{"argument_id": "ee8ec1d7-e0fa-4cd7-a394-a67775ec224f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.538064Z"}
+{"argument_id": "ee8ec1d7-e0fa-4cd7-a394-a67775ec224f", "total_score": 0.5330232558139535, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:16.647290Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:33:16.647351Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:33:16.647368Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:33:16.647446Z"}
+{"argument_id": "c8f1c496-2539-4615-a036-401b0b2c7146", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.647478Z"}
+{"argument_id": "c8f1c496-2539-4615-a036-401b0b2c7146", "total_score": 0.5225581395348838, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.35, "causal_reasoning": 0.35, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:16.727945Z"}
+{"argument_id": "75b5e3b9-e4a4-4527-ad97-5d78ffc9e35c", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.727999Z"}
+{"argument_id": "75b5e3b9-e4a4-4527-ad97-5d78ffc9e35c", "total_score": 0.49860465116279074, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:16.782900Z"}
+{"argument_id": "ba053372-27e1-455d-99c4-8ea246688fb1", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.782953Z"}
+{"argument_id": "ba053372-27e1-455d-99c4-8ea246688fb1", "total_score": 0.5253488372093025, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.35, "causal_reasoning": 0.35, "ethical_alignment": 0.8400000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:16.868082Z"}
+{"argument_id": "9870050d-403b-42ca-b6e4-3ff1c760b5a8", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.868134Z"}
+{"argument_id": "9870050d-403b-42ca-b6e4-3ff1c760b5a8", "total_score": 0.5232558139534884, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7400000000000002, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:16.926615Z"}
+{"argument_id": "bced908b-3980-473e-8f98-250ee0dc7a0d", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:16.926653Z"}
+{"argument_id": "bced908b-3980-473e-8f98-250ee0dc7a0d", "total_score": 0.5800000000000001, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:17.046344Z"}
+{"argument_id": "3a098286-66a4-414e-a367-13cd98c9bfb0", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:17.046396Z"}
+{"argument_id": "3a098286-66a4-414e-a367-13cd98c9bfb0", "total_score": 0.6039534883720931, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.45, "causal_reasoning": 0.4, "ethical_alignment": 0.6700000000000002, "persuasiveness": 0.6500000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:17.154390Z"}
+{"argument_id": "0ccc466e-5b11-4b50-a1ec-0edc0bc753de", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:17.154490Z"}
+{"argument_id": "0ccc466e-5b11-4b50-a1ec-0edc0bc753de", "total_score": 0.5330232558139536, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.9000000000000004, "persuasiveness": 0.6700000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:17.250296Z"}
+{"argument_id": "ee8ec1d7-e0fa-4cd7-a394-a67775ec224f", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:17.250344Z"}
+{"argument_id": "ee8ec1d7-e0fa-4cd7-a394-a67775ec224f", "total_score": 0.5330232558139535, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.9200000000000004, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:17.332383Z"}
+{"decision": "con", "confidence": 0.8013, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:33:20.297543Z"}
+{"debate_id": "5b5b3003-b179-4ea0-b602-b1da3e667663", "state": "complete", "verdict": "con", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:33:20.297682Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 114s
+
+[9/27] artemis | Trial 3 | Should social media verify user ages?
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "topic": "Should social media verify user ages?", "agents": ["pro", "con"], "rounds": 2, "event": "Debate initialized", "timestamp": "2025-12-29T13:33:30.645072Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "event": "Starting debate", "timestamp": "2025-12-29T13:33:30.645138Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "event": "Opening statements phase", "timestamp": "2025-12-29T13:33:30.645161Z"}
+{"agent": "pro", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:33:30.645203Z"}
+{"agent": "pro", "argument_id": "bb331e6e-79da-4135-a5a6-5c13bc49d26f", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:33:44.132253Z"}
+{"argument_id": "bb331e6e-79da-4135-a5a6-5c13bc49d26f", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:44.132362Z"}
+{"argument_id": "bb331e6e-79da-4135-a5a6-5c13bc49d26f", "total_score": 0.558, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7700000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:44.223296Z"}
+{"agent": "con", "level": "strategic", "round": 0, "strategy": "establish", "event": "Generating argument", "timestamp": "2025-12-29T13:33:44.292333Z"}
+{"agent": "con", "argument_id": "0a682172-f11a-4ba4-ad6b-46056cf51057", "level": "strategic", "strategy": "establish", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:33:58.063555Z"}
+{"argument_id": "0a682172-f11a-4ba4-ad6b-46056cf51057", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:33:58.063636Z"}
+{"argument_id": "0a682172-f11a-4ba4-ad6b-46056cf51057", "total_score": 0.5505000000000001, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:33:58.137805Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "rounds": 2, "event": "Main debate phase", "timestamp": "2025-12-29T13:33:58.137877Z"}
+{"agent": "pro", "level": "strategic", "round": 1, "strategy": "adapt", "event": "Generating argument", "timestamp": "2025-12-29T13:33:58.240418Z"}
+{"agent": "pro", "argument_id": "0c10c42c-d89f-4369-a488-77d74b401c65", "level": "strategic", "strategy": "adapt", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:34:15.213116Z"}
+{"argument_id": "0c10c42c-d89f-4369-a488-77d74b401c65", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:34:15.213214Z"}
+{"argument_id": "0c10c42c-d89f-4369-a488-77d74b401c65", "total_score": 0.5327710843373494, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.8000000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:34:15.309876Z"}
+{"agent": "con", "level": "strategic", "round": 1, "strategy": "counter", "event": "Generating argument", "timestamp": "2025-12-29T13:34:15.595171Z"}
+{"agent": "con", "argument_id": "b90e5a93-cbbc-4383-83c0-9d84e8adac61", "level": "strategic", "strategy": "counter", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:34:27.084522Z"}
+{"argument_id": "b90e5a93-cbbc-4383-83c0-9d84e8adac61", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:34:27.084606Z"}
+{"argument_id": "b90e5a93-cbbc-4383-83c0-9d84e8adac61", "total_score": 0.5226506024096386, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7400000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:34:27.158716Z"}
+{"agent": "pro", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:34:27.371610Z"}
+{"agent": "pro", "argument_id": "cd7495c7-2127-452f-895a-57db79df4397", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:34:46.323828Z"}
+{"argument_id": "cd7495c7-2127-452f-895a-57db79df4397", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:34:46.323936Z"}
+{"argument_id": "cd7495c7-2127-452f-895a-57db79df4397", "total_score": 0.6076744186046512, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:34:46.430634Z"}
+{"agent": "con", "level": "tactical", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:34:46.919567Z"}
+{"agent": "con", "argument_id": "3cd46bc2-404e-4d3f-b824-27511edb4ec8", "level": "tactical", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:34:57.349230Z"}
+{"argument_id": "3cd46bc2-404e-4d3f-b824-27511edb4ec8", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:34:57.349351Z"}
+{"argument_id": "3cd46bc2-404e-4d3f-b824-27511edb4ec8", "total_score": 0.5897674418604651, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.5, "causal_reasoning": 0.35, "ethical_alignment": 0.6400000000000001, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:34:57.470563Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "event": "Closing arguments phase", "timestamp": "2025-12-29T13:34:57.470666Z"}
+{"agent": "pro", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:34:57.671398Z"}
+{"agent": "pro", "argument_id": "fc485bd7-5371-48d5-ab2f-dd7b562ea12b", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:35:21.039082Z"}
+{"argument_id": "fc485bd7-5371-48d5-ab2f-dd7b562ea12b", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:21.039177Z"}
+{"argument_id": "fc485bd7-5371-48d5-ab2f-dd7b562ea12b", "total_score": 0.562093023255814, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:21.142999Z"}
+{"agent": "con", "level": "strategic", "round": 2, "strategy": "synthesize", "event": "Generating argument", "timestamp": "2025-12-29T13:35:21.467574Z"}
+{"agent": "con", "argument_id": "1318b3d1-5590-484a-b6ff-ae8c64e16c76", "level": "strategic", "strategy": "synthesize", "evidence_count": 0, "causal_links_count": 0, "event": "Argument generated", "timestamp": "2025-12-29T13:35:34.581040Z"}
+{"argument_id": "1318b3d1-5590-484a-b6ff-ae8c64e16c76", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.581133Z"}
+{"argument_id": "1318b3d1-5590-484a-b6ff-ae8c64e16c76", "total_score": 0.5325581395348837, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:34.682533Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "event": "Jury deliberation phase", "timestamp": "2025-12-29T13:35:34.682599Z"}
+{"jurors": 1, "turns": 8, "event": "Jury deliberation started", "timestamp": "2025-12-29T13:35:34.682615Z"}
+{"juror_id": "juror_0", "perspective": "analytical", "turns": 8, "event": "Juror evaluating debate", "timestamp": "2025-12-29T13:35:34.682672Z"}
+{"argument_id": "bb331e6e-79da-4135-a5a6-5c13bc49d26f", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.682686Z"}
+{"argument_id": "bb331e6e-79da-4135-a5a6-5c13bc49d26f", "total_score": 0.54, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7700000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:34.751479Z"}
+{"argument_id": "0a682172-f11a-4ba4-ad6b-46056cf51057", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.751529Z"}
+{"argument_id": "0a682172-f11a-4ba4-ad6b-46056cf51057", "total_score": 0.5330232558139535, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.5, "ethical_alignment": 0.7200000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:34.802406Z"}
+{"argument_id": "0c10c42c-d89f-4369-a488-77d74b401c65", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.802439Z"}
+{"argument_id": "0c10c42c-d89f-4369-a488-77d74b401c65", "total_score": 0.5246511627906978, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.35, "ethical_alignment": 0.8000000000000003, "persuasiveness": 0.7600000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:34.876622Z"}
+{"argument_id": "b90e5a93-cbbc-4383-83c0-9d84e8adac61", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.876671Z"}
+{"argument_id": "b90e5a93-cbbc-4383-83c0-9d84e8adac61", "total_score": 0.5148837209302326, "scores": {"logical_coherence": 0.6, "evidence_quality": 0.3, "causal_reasoning": 0.45, "ethical_alignment": 0.7400000000000002, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:34.931254Z"}
+{"argument_id": "cd7495c7-2127-452f-895a-57db79df4397", "agent": "pro", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:34.931299Z"}
+{"argument_id": "cd7495c7-2127-452f-895a-57db79df4397", "total_score": 0.6076744186046512, "scores": {"logical_coherence": 0.9, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.7500000000000002, "persuasiveness": 0.6800000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:35.030820Z"}
+{"argument_id": "3cd46bc2-404e-4d3f-b824-27511edb4ec8", "agent": "con", "level": "tactical", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:35.030872Z"}
+{"argument_id": "3cd46bc2-404e-4d3f-b824-27511edb4ec8", "total_score": 0.5897674418604651, "scores": {"logical_coherence": 0.85, "evidence_quality": 0.5, "causal_reasoning": 0.35, "ethical_alignment": 0.6400000000000001, "persuasiveness": 0.6200000000000001}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:35.132254Z"}
+{"argument_id": "fc485bd7-5371-48d5-ab2f-dd7b562ea12b", "agent": "pro", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:35.132301Z"}
+{"argument_id": "fc485bd7-5371-48d5-ab2f-dd7b562ea12b", "total_score": 0.562093023255814, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.35, "causal_reasoning": 0.5, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7000000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:35.213477Z"}
+{"argument_id": "1318b3d1-5590-484a-b6ff-ae8c64e16c76", "agent": "con", "level": "strategic", "event": "Evaluating argument", "timestamp": "2025-12-29T13:35:35.213532Z"}
+{"argument_id": "1318b3d1-5590-484a-b6ff-ae8c64e16c76", "total_score": 0.5325581395348837, "scores": {"logical_coherence": 0.65, "evidence_quality": 0.3, "causal_reasoning": 0.4, "ethical_alignment": 0.8200000000000003, "persuasiveness": 0.7300000000000002}, "event": "Argument evaluated", "timestamp": "2025-12-29T13:35:35.305568Z"}
+{"decision": "pro", "confidence": 0.8058000000000001, "unanimous": true, "dissents": 0, "event": "Jury verdict reached", "timestamp": "2025-12-29T13:35:38.895173Z"}
+{"debate_id": "0e6628c7-94bd-4e33-b66e-e8297f5a1207", "state": "complete", "verdict": "pro", "turns": 8, "event": "Debate complete", "timestamp": "2025-12-29T13:35:38.895237Z"}
+  Quality: 75 | Accuracy: 86 | Depth: 75 | Avg: 78.7 | Time: 128s
+
+======================================================================
+FRAMEWORK: CREWAI
+======================================================================
+
+[10/27] crewai | Trial 1 | Should governments mandate AI safety tes...
+  Quality: 85 | Accuracy: 55 | Depth: 75 | Avg: 71.7 | Time: 66s
+
+[11/27] crewai | Trial 2 | Should governments mandate AI safety tes...
+  Quality: 50 | Accuracy: 0 | Depth: 50 | Avg: 33.3 | Time: 35s
+
+[12/27] crewai | Trial 3 | Should governments mandate AI safety tes...
+  Quality: 41 | Accuracy: 0 | Depth: 45 | Avg: 28.7 | Time: 169s
+
+[13/27] crewai | Trial 1 | Is remote work better than office work?
+  Quality: 95 | Accuracy: 55 | Depth: 85 | Avg: 78.3 | Time: 57s
+
+[14/27] crewai | Trial 2 | Is remote work better than office work?
+  Quality: 85 | Accuracy: 55 | Depth: 78 | Avg: 72.7 | Time: 48s
+
+[15/27] crewai | Trial 3 | Is remote work better than office work?
+  Quality: 75 | Accuracy: 55 | Depth: 45 | Avg: 58.3 | Time: 37s
+
+[16/27] crewai | Trial 1 | Should social media verify user ages?
+  Quality: 85 | Accuracy: 55 | Depth: 45 | Avg: 61.7 | Time: 37s
+
+[17/27] crewai | Trial 2 | Should social media verify user ages?
+  Quality: 75 | Accuracy: 55 | Depth: 45 | Avg: 58.3 | Time: 26s
+
+[18/27] crewai | Trial 3 | Should social media verify user ages?
+  Quality: 85 | Accuracy: 55 | Depth: 45 | Avg: 61.7 | Time: 22s
+
+======================================================================
+FRAMEWORK: AUTOGEN
+======================================================================
+
+[19/27] autogen | Trial 1 | Should governments mandate AI safety tes...
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 33s
+
+[20/27] autogen | Trial 2 | Should governments mandate AI safety tes...
+  Quality: 75 | Accuracy: 55 | Depth: 75 | Avg: 68.3 | Time: 36s
+
+[21/27] autogen | Trial 3 | Should governments mandate AI safety tes...
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 40s
+
+[22/27] autogen | Trial 1 | Is remote work better than office work?
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 38s
+
+[23/27] autogen | Trial 2 | Is remote work better than office work?
+  Quality: 78 | Accuracy: 55 | Depth: 72 | Avg: 68.3 | Time: 29s
+
+[24/27] autogen | Trial 3 | Is remote work better than office work?
+  Quality: 75 | Accuracy: 55 | Depth: 75 | Avg: 68.3 | Time: 27s
+
+[25/27] autogen | Trial 1 | Should social media verify user ages?
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 39s
+
+[26/27] autogen | Trial 2 | Should social media verify user ages?
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 32s
+
+[27/27] autogen | Trial 3 | Should social media verify user ages?
+  Quality: 78 | Accuracy: 55 | Depth: 75 | Avg: 69.3 | Time: 49s
+
+======================================================================
+CALCULATING STATISTICS
+======================================================================
+
+======================================================================
+FINAL RESULTS (mean ± std)
+======================================================================
+
+Metric                           ARTEMIS              CREWAI             AUTOGEN
+--------------------------------------------------------------------------------
+Argument Quality          77.9 ± 4.2         75.1 ± 16.9        77.3 ± 1.2   
+Decision Accuracy         86.0 ± 0.0         42.8 ± 22.9        55.0 ± 0.0   
+Reasoning Depth           75.3 ± 0.9         57.0 ± 16.0        74.7 ± 0.9   
+AVERAGE                   79.7 ± 1.6         58.3 ± 16.0        69.0 ± 0.5   
+Time (seconds)           101.8 ± 11.1        55.2 ± 42.5        35.8 ± 6.2   
+--------------------------------------------------------------------------------
+Valid Trials                           9                   9                   9
+Errors                                 0                   0                   0
+
+======================================================================
+WINNER: ARTEMIS (79.7 average)
+======================================================================
+
+Results saved to: benchmarks/results/benchmark_20251229_211902.json

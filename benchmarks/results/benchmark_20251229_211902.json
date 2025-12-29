@@ -1,0 +1,449 @@
+{
+  "timestamp": "20251229_211902",
+  "config": {
+    "model": "gpt-4o",
+    "rounds": 2,
+    "trials": 3,
+    "topics": [
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "pro": "Governments should mandate AI safety testing",
+        "con": "Governments should not mandate AI safety testing"
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "pro": "Remote work is better than office work",
+        "con": "Office work is better than remote work"
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "pro": "Social media should verify user ages",
+        "con": "Social media should not verify user ages"
+      }
+    ]
+  },
+  "raw_results": {
+    "artemis": [
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 94.94877409934998,
+        "verdict": "pro",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 99.78342890739441,
+        "verdict": "con",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 97.41787528991699,
+        "verdict": "pro",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 82.0,
+        "time": 90.89955592155457,
+        "verdict": "pro",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 1,
+        "argument_quality": 85.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 78.0,
+        "average": 83.0,
+        "time": 97.48712301254272,
+        "verdict": "pro",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 2,
+        "argument_quality": 81.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 80.66666666666667,
+        "time": 99.99998712539673,
+        "verdict": "con",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 0,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 93.58321166038513,
+        "verdict": "con",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 113.61322021484375,
+        "verdict": "con",
+        "transcript_length": 8
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 86.0,
+        "reasoning_depth": 75.0,
+        "average": 78.66666666666667,
+        "time": 128.26865196228027,
+        "verdict": "pro",
+        "transcript_length": 8
+      }
+    ],
+    "crewai": [
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 71.66666666666667,
+        "time": 65.70178198814392,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 1,
+        "argument_quality": 50.0,
+        "decision_accuracy": 0,
+        "reasoning_depth": 50.0,
+        "average": 33.333333333333336,
+        "time": 34.768296003341675,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 2,
+        "argument_quality": 41.0,
+        "decision_accuracy": 0,
+        "reasoning_depth": 45.0,
+        "average": 28.666666666666668,
+        "time": 169.46570587158203,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 0,
+        "argument_quality": 95.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 85.0,
+        "average": 78.33333333333333,
+        "time": 56.58101725578308,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 1,
+        "argument_quality": 85.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 78.0,
+        "average": 72.66666666666667,
+        "time": 48.195687770843506,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 45.0,
+        "average": 58.333333333333336,
+        "time": 37.193955183029175,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 0,
+        "argument_quality": 85.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 45.0,
+        "average": 61.666666666666664,
+        "time": 37.08732628822327,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 45.0,
+        "average": 58.333333333333336,
+        "time": 26.315327167510986,
+        "verdict": null,
+        "transcript_length": 4
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 2,
+        "argument_quality": 85.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 45.0,
+        "average": 61.666666666666664,
+        "time": 21.750772953033447,
+        "verdict": null,
+        "transcript_length": 4
+      }
+    ],
+    "autogen": [
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 33.174299240112305,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 1,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 68.33333333333333,
+        "time": 36.2945671081543,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Should governments mandate AI safety testing?",
+        "trial": 2,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 39.71423602104187,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 37.89278793334961,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 72.0,
+        "average": 68.33333333333333,
+        "time": 29.03071904182434,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Is remote work better than office work?",
+        "trial": 2,
+        "argument_quality": 75.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 68.33333333333333,
+        "time": 26.71267795562744,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 0,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 39.01686191558838,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 1,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 31.627583026885986,
+        "verdict": null,
+        "transcript_length": 5
+      },
+      {
+        "topic": "Should social media verify user ages?",
+        "trial": 2,
+        "argument_quality": 78.0,
+        "decision_accuracy": 55.0,
+        "reasoning_depth": 75.0,
+        "average": 69.33333333333333,
+        "time": 48.54845118522644,
+        "verdict": null,
+        "transcript_length": 5
+      }
+    ]
+  },
+  "summary": {
+    "artemis": {
+      "argument_quality": {
+        "mean": 77.88888888888889,
+        "std": 4.228066131208989,
+        "min": 75.0,
+        "max": 85.0,
+        "n": 9
+      },
+      "decision_accuracy": {
+        "mean": 86.0,
+        "std": 0.0,
+        "min": 86.0,
+        "max": 86.0,
+        "n": 9
+      },
+      "reasoning_depth": {
+        "mean": 75.33333333333333,
+        "std": 0.9428090415820634,
+        "min": 75.0,
+        "max": 78.0,
+        "n": 9
+      },
+      "average": {
+        "mean": 79.74074074074073,
+        "std": 1.6161054984645484,
+        "min": 78.66666666666667,
+        "max": 83.0,
+        "n": 9
+      },
+      "time": {
+        "mean": 101.77798091040717,
+        "std": 11.148106282897315,
+        "min": 90.89955592155457,
+        "max": 128.26865196228027,
+        "n": 9
+      },
+      "trials": 9,
+      "errors": 0
+    },
+    "crewai": {
+      "argument_quality": {
+        "mean": 75.11111111111111,
+        "std": 16.934149878242053,
+        "min": 41.0,
+        "max": 95.0,
+        "n": 9
+      },
+      "decision_accuracy": {
+        "mean": 42.77777777777778,
+        "std": 22.8656840302852,
+        "min": 0,
+        "max": 55.0,
+        "n": 9
+      },
+      "reasoning_depth": {
+        "mean": 57.0,
+        "std": 16.048537489614297,
+        "min": 45.0,
+        "max": 85.0,
+        "n": 9
+      },
+      "average": {
+        "mean": 58.29629629629629,
+        "std": 16.022703371142335,
+        "min": 28.666666666666668,
+        "max": 78.33333333333333,
+        "n": 9
+      },
+      "time": {
+        "mean": 55.22887449794345,
+        "std": 42.47981913007969,
+        "min": 21.750772953033447,
+        "max": 169.46570587158203,
+        "n": 9
+      },
+      "trials": 9,
+      "errors": 0
+    },
+    "autogen": {
+      "argument_quality": {
+        "mean": 77.33333333333333,
+        "std": 1.247219128924647,
+        "min": 75.0,
+        "max": 78.0,
+        "n": 9
+      },
+      "decision_accuracy": {
+        "mean": 55.0,
+        "std": 0.0,
+        "min": 55.0,
+        "max": 55.0,
+        "n": 9
+      },
+      "reasoning_depth": {
+        "mean": 74.66666666666667,
+        "std": 0.9428090415820634,
+        "min": 72.0,
+        "max": 75.0,
+        "n": 9
+      },
+      "average": {
+        "mean": 69.0,
+        "std": 0.47140452079103173,
+        "min": 68.33333333333333,
+        "max": 69.33333333333333,
+        "n": 9
+      },
+      "time": {
+        "mean": 35.779131491978966,
+        "std": 6.196045735862945,
+        "min": 26.71267795562744,
+        "max": 48.54845118522644,
+        "n": 9
+      },
+      "trials": 9,
+      "errors": 0
+    }
+  }
+}
