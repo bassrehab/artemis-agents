@@ -349,6 +349,14 @@ class DebateMetadata(BaseModel):
     model_usage: dict[str, dict[str, int]] = Field(default_factory=dict)
     """Token usage per model: {model: {prompt_tokens, completion_tokens}}."""
 
+    # V2 Features
+    steering_config: dict[str, Any] | None = None
+    """Steering vector configuration: {vector: {...}, mode, strength, adaptive}."""
+    hierarchical_config: dict[str, Any] | None = None
+    """Hierarchical debate config: {decomposition_strategy, aggregation_method, max_depth}."""
+    verification_spec: dict[str, Any] | None = None
+    """Verification specification: {rules: [...], strict_mode, min_score}."""
+
 
 class DebateResult(BaseModel):
     """Complete result of a debate."""
@@ -360,6 +368,14 @@ class DebateResult(BaseModel):
     safety_alerts: list[SafetyAlert] = Field(default_factory=list)
     metadata: DebateMetadata
     final_state: DebateState = DebateState.COMPLETE
+
+    # V2 Features
+    compound_verdict: "CompoundVerdict | None" = None
+    """For hierarchical debates: aggregated verdict with sub-verdicts."""
+    verification_reports: list["VerificationReport"] = Field(default_factory=list)
+    """Verification reports for arguments."""
+    sub_debates: list[dict[str, Any]] = Field(default_factory=list)
+    """Sub-debate summaries for hierarchical debates."""
 
 
 # =============================================================================
