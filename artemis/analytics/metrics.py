@@ -14,37 +14,19 @@ if TYPE_CHECKING:
 
 
 class DebateMetricsCalculator:
-    """Computes aggregate metrics from debate transcript.
-
-    Metrics are computed lazily and cached for efficiency.
-
-    Example:
-        calc = DebateMetricsCalculator(transcript, agents)
-        print(calc.rebuttal_effectiveness)
-        print(calc.evidence_utilization)
-    """
+    """Computes aggregate metrics from debate transcript."""
 
     def __init__(
         self,
         transcript: list[Turn],
         agents: list[str],
     ) -> None:
-        """Initialize calculator.
-
-        Args:
-            transcript: List of Turn objects from the debate
-            agents: List of agent names
-        """
         self._transcript = transcript
         self._agents = agents
         self._cache: dict[str, Any] = {}
 
     def compute_all(self) -> dict[str, Any]:
-        """Compute all metrics.
-
-        Returns:
-            Dictionary containing all computed metrics
-        """
+        """Compute all metrics and return as dict."""
         return {
             "rebuttal_effectiveness": self.rebuttal_effectiveness,
             "evidence_utilization": self.evidence_utilization,
@@ -55,14 +37,8 @@ class DebateMetricsCalculator:
 
     @cached_property
     def rebuttal_effectiveness(self) -> dict[str, float]:
-        """Compute rebuttal effectiveness per agent.
-
-        Measures how effective each agent's rebuttals are at
-        reducing opponent scores vs gaining own score.
-
-        Formula: avg(own_score_when_rebutting) / avg(all_own_scores)
-        Higher value = more effective rebuttals
-        """
+        """Compute rebuttal effectiveness per agent."""
+        # XXX: formula is avg(own_score_when_rebutting) / avg(all_own_scores)
         agent_rebuttal_scores: dict[str, list[float]] = {a: [] for a in self._agents}
         agent_all_scores: dict[str, list[float]] = {a: [] for a in self._agents}
 
@@ -99,13 +75,7 @@ class DebateMetricsCalculator:
 
     @cached_property
     def evidence_utilization(self) -> dict[str, float]:
-        """Compute evidence utilization rate per agent.
-
-        Measures how much evidence each agent provides, weighted
-        by confidence and verification status.
-
-        Formula: weighted_evidence_count / total_arguments
-        """
+        """Compute evidence utilization rate per agent."""
         agent_evidence: dict[str, float] = dict.fromkeys(self._agents, 0.0)
         agent_turns: dict[str, int] = dict.fromkeys(self._agents, 0)
 
@@ -134,7 +104,7 @@ class DebateMetricsCalculator:
             evidence = agent_evidence.get(agent, 0.0)
 
             if turns > 0:
-                # Normalize to 0-1 (assuming max ~3 evidence per turn as baseline)
+                # ugh, normalizing this properly is tricky
                 utilization[agent] = min(1.0, evidence / (turns * 3))
             else:
                 utilization[agent] = 0.0
@@ -143,13 +113,7 @@ class DebateMetricsCalculator:
 
     @cached_property
     def argument_diversity_index(self) -> dict[str, float]:
-        """Compute argument level diversity per agent.
-
-        Uses entropy measure: higher = more balanced distribution
-        across strategic/tactical/operational levels.
-
-        Returns values in range [0, 1] where 1 = perfectly balanced.
-        """
+        """Compute argument level diversity per agent using entropy."""
         agent_levels: dict[str, dict[str, int]] = {a: {} for a in self._agents}
 
         for turn in self._transcript:
@@ -191,10 +155,7 @@ class DebateMetricsCalculator:
 
     @cached_property
     def topic_coverage(self) -> dict[str, list[str]]:
-        """Extract key topics/concepts covered by each agent.
-
-        Uses causal graph nodes and evidence sources.
-        """
+        """Extract key topics/concepts covered by each agent."""
         agent_topics: dict[str, set[str]] = {a: set() for a in self._agents}
 
         for turn in self._transcript:
@@ -223,7 +184,6 @@ class DebateMetricsCalculator:
         return {agent: list(topics) for agent, topics in agent_topics.items()}
 
     def _extract_key_terms(self, text: str) -> list[str]:
-        """Extract key terms from text (simplified implementation)."""
         if not text:
             return []
 
@@ -232,14 +192,7 @@ class DebateMetricsCalculator:
         return [w for w in words if len(w) > 5][:5]  # Top 5 longer words
 
     def get_round_metrics(self, round_num: int) -> RoundMetrics:
-        """Get metrics for a specific round.
-
-        Args:
-            round_num: The round number to analyze
-
-        Returns:
-            RoundMetrics for the specified round
-        """
+        """Get metrics for a specific round."""
         round_turns = [t for t in self._transcript if t.round == round_num]
 
         if not round_turns:
@@ -291,7 +244,6 @@ class DebateMetricsCalculator:
         )
 
     def get_all_round_metrics(self) -> list[RoundMetrics]:
-        """Get metrics for all rounds."""
         if not self._transcript:
             return []
 
@@ -299,7 +251,6 @@ class DebateMetricsCalculator:
         return [self.get_round_metrics(r) for r in rounds]
 
     def _get_previous_round_metrics(self, round_num: int) -> RoundMetrics | None:
-        """Get metrics from the previous round (cached)."""
         cache_key = f"round_{round_num - 1}"
         if cache_key in self._cache:
             return self._cache[cache_key]
@@ -313,7 +264,6 @@ class DebateMetricsCalculator:
         return metrics
 
     def _compute_round_rebuttal(self, round_turns: list[Turn]) -> dict[str, float]:
-        """Compute rebuttal effectiveness for a single round."""
         result = {}
         for agent in self._agents:
             agent_turns = [t for t in round_turns if t.agent == agent]
@@ -338,7 +288,6 @@ class DebateMetricsCalculator:
         return result
 
     def _compute_round_evidence(self, round_turns: list[Turn]) -> dict[str, float]:
-        """Compute evidence utilization for a single round."""
         result = {}
         for agent in self._agents:
             agent_turns = [t for t in round_turns if t.agent == agent]
@@ -360,7 +309,6 @@ class DebateMetricsCalculator:
         self,
         round_turns: list[Turn],
     ) -> dict[str, dict[str, int]]:
-        """Compute argument level distribution for a round."""
         result: dict[str, dict[str, int]] = {}
 
         for agent in self._agents:
@@ -379,21 +327,10 @@ class RebuttalAnalyzer:
     """Analyze rebuttal patterns and effectiveness."""
 
     def __init__(self, transcript: list[Turn]) -> None:
-        """Initialize analyzer.
-
-        Args:
-            transcript: List of Turn objects from the debate
-        """
         self._transcript = transcript
 
     def analyze_rebuttal_chain(self) -> list[dict]:
-        """Trace argument-rebuttal chains through the debate.
-
-        Uses Argument.rebuts field to build chains.
-
-        Returns:
-            List of {argument_id, rebutted_by, effectiveness_score}
-        """
+        """Trace argument-rebuttal chains through the debate."""
         chains = []
 
         # Build index of arguments by ID
@@ -422,14 +359,7 @@ class RebuttalAnalyzer:
         return chains
 
     def compute_rebuttal_success_rate(self, agent: str) -> float:
-        """Compute how often agent's rebuttals scored higher than originals.
-
-        Args:
-            agent: Agent name to analyze
-
-        Returns:
-            Success rate (0-1)
-        """
+        """Compute how often agent's rebuttals scored higher than originals."""
         chains = self.analyze_rebuttal_chain()
         agent_rebuttals = [c for c in chains if c["rebutter_agent"] == agent]
 
@@ -444,14 +374,7 @@ class RebuttalAnalyzer:
         return successful / len(agent_rebuttals)
 
     def get_most_rebutted_arguments(self, top_n: int = 5) -> list[dict]:
-        """Find arguments that were rebutted most often.
-
-        Args:
-            top_n: Number of results to return
-
-        Returns:
-            List of {argument_id, rebuttal_count, agent}
-        """
+        """Find arguments that were rebutted most often."""
         rebuttal_counts: dict[str, int] = defaultdict(int)
         arg_agents: dict[str, str] = {}
 

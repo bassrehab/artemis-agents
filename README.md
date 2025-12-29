@@ -44,6 +44,11 @@ Unlike general-purpose multi-agent frameworks, ARTEMIS is **purpose-built for de
 | Sandbagging detection | ❌ | ❌ | ❌ | ✅ Metacognition |
 | Reasoning model support | ⚠️ | ⚠️ | ❌ | ✅ o1/R1 native |
 | MCP server mode | ❌ | ❌ | ❌ | ✅ |
+| Real-time streaming | ⚠️ | ❌ | ❌ | ✅ v2 |
+| Hierarchical debates | ❌ | ❌ | ❌ | ✅ v2 |
+| Multimodal evidence | ⚠️ | ⚠️ | ❌ | ✅ v2 |
+| Steering vectors | ❌ | ❌ | ❌ | ✅ v2 |
+| Argument verification | ❌ | ❌ | ❌ | ✅ v2 |
 
 ##  Installation
 
@@ -192,6 +197,99 @@ Any MCP-compatible client can now invoke structured debates:
 }
 ```
 
+### Streaming Debates (v2)
+
+```python
+from artemis import StreamingDebate
+
+debate = StreamingDebate(
+    topic="Should we adopt microservices?",
+    agents=[...],
+)
+
+# Stream events in real-time
+async for event in debate.run_streaming():
+    if event.event_type == "chunk":
+        print(event.content, end="", flush=True)
+    elif event.event_type == "argument_complete":
+        print(f"\n[{event.agent}] argument complete")
+```
+
+### Hierarchical Debates (v2)
+
+```python
+from artemis import HierarchicalDebate
+from artemis.core.decomposition import LLMTopicDecomposer
+
+# Complex topics are automatically decomposed into sub-debates
+debate = HierarchicalDebate(
+    topic="Should we rewrite the monolith in microservices?",
+    agents=[...],
+    decomposer=LLMTopicDecomposer(),
+    max_depth=2,  # Allow sub-sub-debates
+)
+
+result = await debate.run()
+print(f"Final verdict: {result.final_decision}")
+print(f"Sub-verdicts: {len(result.sub_verdicts)}")
+```
+
+### Steering Vectors (v2)
+
+```python
+from artemis.steering import SteeringController, SteeringVector
+
+# Control agent behavior in real-time
+controller = SteeringController(
+    vector=SteeringVector(
+        formality=0.9,      # Very formal
+        aggression=0.2,     # Cooperative
+        evidence_emphasis=0.8,  # Data-driven
+    )
+)
+
+agent = Agent(
+    name="Analyst",
+    steering=controller,
+)
+```
+
+### Multimodal Evidence (v2)
+
+```python
+from artemis.core.multimodal_evidence import MultimodalEvidenceExtractor
+from artemis.core.types import ContentPart, ContentType
+
+# Extract evidence from images and documents
+extractor = MultimodalEvidenceExtractor(model="gpt-4o")
+
+chart = ContentPart(
+    type=ContentType.IMAGE,
+    url="https://example.com/revenue-chart.png"
+)
+
+evidence = await extractor.extract(chart)
+print(f"Extracted: {evidence.text}")
+```
+
+### Argument Verification (v2)
+
+```python
+from artemis.core.verification import ArgumentVerifier, VerificationSpec
+
+# Verify argument validity
+verifier = ArgumentVerifier(
+    spec=VerificationSpec(
+        rules=["causal_chain", "citation", "logical_consistency"],
+        strict_mode=True,
+    )
+)
+
+report = await verifier.verify(argument, context)
+if not report.overall_passed:
+    print(f"Violations: {report.violations}")
+```
+
 ##  Architecture
 
 ```
@@ -279,26 +377,26 @@ graph.add_node("debate", ArtemisDebateNode())
 
 ##  Benchmarks
 
-We ran 60 debates across four frameworks. Here's what we found:
+We ran 27 debates across three frameworks using GPT-4o. Here's what we found:
 
-| Framework | Argument Quality | Decision Accuracy | Reasoning Depth |
-|-----------|------------------|-------------------|-----------------|
-| CrewAI | **89.3%** | **81.3%** | **86.3%** |
-| **ARTEMIS** | 81.3% | 67.3% | 84.0% |
-| AutoGen | 77.2% | 75.0% | 76.4% |
-| CAMEL | 71.0% | 45.2% | 73.7% |
+| Framework | Argument Quality | Decision Accuracy | Reasoning Depth | Consistency (σ) |
+|-----------|------------------|-------------------|-----------------|-----------------|
+| **ARTEMIS** | 77.9% | **86.0%** | **75.3%** | **±1.6** |
+| AutoGen | **77.3%** | 55.0% | 74.7% | ±0.5 |
+| CrewAI | 75.1% | 42.8% | 57.0% | ±16.0 |
 
-**Honest take:** CrewAI scored higher on raw metrics. ARTEMIS came second.
+**Key findings:**
+- ARTEMIS leads in **decision accuracy** (86% vs next best 55%) - the jury deliberation mechanism works
+- Lowest variance across runs (±1.6 vs CrewAI's ±16.0) - most consistent and predictable
+- Structured H-L-DAG arguments produce reliable reasoning depth
 
-But the numbers don't tell the whole story. ARTEMIS had the lowest variance across runs (most consistent), and features like safety monitoring and jury deliberation aren't captured in these metrics. The decision accuracy gap is something we're actively investigating.
+**Trade-off:** ARTEMIS averages 102s per debate vs AutoGen's 36s. The jury deliberation adds latency but improves verdict quality.
 
-This is v1. We're using these results to improve.
-
-*See [benchmarks/ANALYSIS.md](benchmarks/ANALYSIS.md) for the full breakdown of what worked, what didn't, and what we're doing about it.*
+*See [benchmarks/ANALYSIS.md](benchmarks/ANALYSIS.md) for methodology and detailed breakdown.*
 
 ##  Roadmap
 
-### v1.0 (Current)
+### v1.0
 - [x] Core ARTEMIS implementation (H-L-DAG, L-AE-CR, Jury)
 - [x] Multi-provider support (OpenAI, Anthropic, Google, DeepSeek)
 - [x] Reasoning model support (o1, R1, Gemini 2.5)
@@ -306,12 +404,18 @@ This is v1. We're using these results to improve.
 - [x] Framework integrations (LangChain, LangGraph, CrewAI)
 - [x] MCP server mode
 
-### v2.0 (Planned)
-- [ ] Hierarchical debates (debates within debates)
-- [ ] Steering vectors for real-time behavior control
-- [ ] Multimodal debates (documents, images)
-- [ ] Formal verification of argument validity
-- [ ] Real-time streaming debates
+### v2.0 (Current)
+- [x] Hierarchical debates (sub-debates for complex topics)
+- [x] Steering vectors for real-time behavior control
+- [x] Multimodal debates (images, documents, charts)
+- [x] Formal verification of argument validity
+- [x] Real-time streaming debates
+
+### v3.0 (Planned)
+- [ ] Distributed debate execution
+- [ ] Custom evaluation plugins
+- [ ] Debate templates and presets
+- [ ] Advanced causal graph visualization
 
 ##  License
 

@@ -1,12 +1,4 @@
-"""
-ARTEMIS Safety Module
-
-Safety monitoring capabilities for multi-agent debates:
-- Sandbagging detection
-- Deception monitoring
-- Behavioral drift tracking
-- Ethics boundary enforcement
-"""
+"""Safety monitoring for multi-agent debates."""
 
 from artemis.safety.base import (
     CompositeMonitor,

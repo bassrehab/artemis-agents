@@ -41,14 +41,7 @@ class SVGChart:
         padding: int = 50,
         colors: dict[str, str] | None = None,
     ) -> None:
-        """Initialize chart.
-
-        Args:
-            width: Chart width in pixels
-            height: Chart height in pixels
-            padding: Padding around the chart area
-            colors: Custom color palette
-        """
+        """Initialize chart with dimensions and optional color palette."""
         self.width = width
         self.height = height
         self.padding = padding
@@ -59,30 +52,27 @@ class SVGChart:
         self.chart_height = height - 2 * padding
 
     def _svg_header(self) -> str:
-        """Generate SVG opening tag with viewBox."""
+        # XXX: viewBox ensures scaling works properly
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}" width="{self.width}" height="{self.height}">
   <rect width="100%" height="100%" fill="{self.colors['background']}"/>'''
 
     def _svg_footer(self) -> str:
-        """Generate SVG closing tag."""
         return "</svg>"
 
     def _scale_x(self, value: float, min_val: float, max_val: float) -> float:
-        """Scale value to chart X coordinate."""
         if max_val == min_val:
             return self.padding + self.chart_width / 2
         ratio = (value - min_val) / (max_val - min_val)
         return self.padding + ratio * self.chart_width
 
     def _scale_y(self, value: float, min_val: float, max_val: float) -> float:
-        """Scale value to chart Y coordinate (inverted for SVG)."""
+        # SVG Y-axis is inverted (0 at top)
         if max_val == min_val:
             return self.padding + self.chart_height / 2
         ratio = (value - min_val) / (max_val - min_val)
         return self.padding + self.chart_height - ratio * self.chart_height
 
     def _get_agent_color(self, agent: str, index: int = 0) -> str:
-        """Get color for an agent."""
         if agent.lower() in ["pro", "proponent"]:
             return self.colors["pro"]
         elif agent.lower() in ["con", "opponent"]:
@@ -93,7 +83,6 @@ class SVGChart:
             return self.colors.get(f"agent_{index % 4}", "#2196F3")
 
     def _draw_grid(self, x_ticks: int = 5, y_ticks: int = 5) -> str:
-        """Draw background grid lines."""
         lines = []
 
         # Vertical grid lines
@@ -123,7 +112,6 @@ class SVGChart:
         x_values: list[str] | None = None,
         y_values: list[str] | None = None,
     ) -> str:
-        """Draw axis labels."""
         labels = []
 
         # X-axis label
@@ -166,13 +154,6 @@ class SVGChart:
         return "\n  ".join(labels)
 
     def _draw_legend(self, items: list[tuple[str, str]], x: int | None = None, y: int | None = None) -> str:
-        """Draw legend.
-
-        Args:
-            items: List of (label, color) tuples
-            x: X position (default: top right)
-            y: Y position (default: top right)
-        """
         if x is None:
             x = self.width - self.padding - 80
         if y is None:
@@ -198,16 +179,7 @@ class ScoreProgressionChart(SVGChart):
         agents: list[str],
         highlight_turning_points: list[int] | None = None,
     ) -> str:
-        """Render score progression as SVG.
-
-        Args:
-            round_scores: List of {agent: score} dicts, one per round
-            agents: List of agent names
-            highlight_turning_points: Round numbers to highlight
-
-        Returns:
-            SVG string
-        """
+        """Render score progression as SVG."""
         if not round_scores or not agents:
             return self._render_empty("No score data available")
 
@@ -274,7 +246,6 @@ class ScoreProgressionChart(SVGChart):
         return "\n".join(parts)
 
     def _render_empty(self, message: str) -> str:
-        """Render empty state."""
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
   <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
@@ -290,16 +261,7 @@ class MomentumChart(SVGChart):
         agents: list[str],
         show_confidence_bands: bool = True,
     ) -> str:
-        """Render momentum chart as SVG.
-
-        Args:
-            momentum_history: List of MomentumPoint objects
-            agents: List of agent names
-            show_confidence_bands: Whether to show uncertainty bands
-
-        Returns:
-            SVG string
-        """
+        """Render momentum chart as SVG."""
         if not momentum_history or not agents:
             return self._render_empty("No momentum data available")
 
@@ -370,7 +332,7 @@ class MomentumChart(SVGChart):
                         f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{point_color}" stroke="{color}" stroke-width="1"/>'
                     )
 
-        # Draw axis labels
+        # ugh, getting the axis labels right took forever
         y_values = ["-1.0", "-0.5", "0", "0.5", "1.0"]
         x_values = [f"R{r}" for r in rounds]
         parts.append(self._draw_axis_labels("Round", "Momentum", x_values, y_values))
@@ -382,7 +344,6 @@ class MomentumChart(SVGChart):
         return "\n".join(parts)
 
     def _render_empty(self, message: str) -> str:
-        """Render empty state."""
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
   <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
@@ -398,16 +359,7 @@ class JuryVoteChart(SVGChart):
         show_perspectives: bool = False,
         perspective_breakdown: dict[str, dict[str, float]] | None = None,
     ) -> str:
-        """Render as horizontal bar chart.
-
-        Args:
-            agent_scores: Dict of agent -> score
-            show_perspectives: Whether to show perspective breakdown
-            perspective_breakdown: Perspective -> agent -> score
-
-        Returns:
-            SVG string
-        """
+        """Render as horizontal bar chart."""
         if not agent_scores:
             return self._render_empty("No score data available")
 
@@ -455,14 +407,7 @@ class JuryVoteChart(SVGChart):
         self,
         agent_scores: dict[str, float],
     ) -> str:
-        """Render as pie chart.
-
-        Args:
-            agent_scores: Dict of agent -> score
-
-        Returns:
-            SVG string
-        """
+        """Render as pie chart."""
         if not agent_scores:
             return self._render_empty("No score data available")
 
@@ -495,6 +440,7 @@ class JuryVoteChart(SVGChart):
             x2 = cx + radius * math.cos(end_rad)
             y2 = cy + radius * math.sin(end_rad)
 
+            # NOTE: large_arc flag is needed for arcs > 180 degrees
             large_arc = 1 if slice_angle > 180 else 0
 
             path = (
@@ -516,7 +462,6 @@ class JuryVoteChart(SVGChart):
         return "\n".join(parts)
 
     def _render_empty(self, message: str) -> str:
-        """Render empty state."""
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
   <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
@@ -527,7 +472,6 @@ class ArgumentFlowDiagram(SVGChart):
     """Diagram showing argument-rebuttal relationships."""
 
     def __init__(self, width: int = 800, height: int = 600, **kwargs: Any) -> None:
-        """Initialize with larger default size."""
         super().__init__(width=width, height=height, **kwargs)
 
     def render(
@@ -536,16 +480,7 @@ class ArgumentFlowDiagram(SVGChart):
         agents: list[str],
         max_depth: int = 10,
     ) -> str:
-        """Render argument flow as SVG.
-
-        Args:
-            transcript: List of Turn objects
-            agents: List of agent names
-            max_depth: Maximum number of arguments to show per agent
-
-        Returns:
-            SVG string
-        """
+        """Render argument flow as SVG with swimlanes per agent."""
         if not transcript or not agents:
             return self._render_empty("No argument data available")
 
@@ -662,7 +597,6 @@ class ArgumentFlowDiagram(SVGChart):
         return "\n".join(parts)
 
     def _render_empty(self, message: str) -> str:
-        """Render empty state."""
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
   <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>
@@ -677,15 +611,7 @@ class TopicCoverageHeatmap(SVGChart):
         coverage: dict[str, dict[str, int]],
         agents: list[str],
     ) -> str:
-        """Render topic coverage heatmap.
-
-        Args:
-            coverage: Agent -> topic -> mention count
-            agents: List of agent names
-
-        Returns:
-            SVG string
-        """
+        """Render topic coverage heatmap."""
         if not coverage or not agents:
             return self._render_empty("No coverage data available")
 
@@ -760,7 +686,6 @@ class TopicCoverageHeatmap(SVGChart):
         return "\n".join(parts)
 
     def _get_heat_color(self, intensity: float) -> str:
-        """Get color for heat intensity (0-1)."""
         if intensity == 0:
             return "#f5f5f5"
 
@@ -772,7 +697,6 @@ class TopicCoverageHeatmap(SVGChart):
         return f"rgb({r},{g},{b})"
 
     def _render_empty(self, message: str) -> str:
-        """Render empty state."""
         return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.width} {self.height}">
   <rect width="100%" height="100%" fill="#f5f5f5"/>
   <text x="{self.width/2}" y="{self.height/2}" text-anchor="middle" fill="#666">{message}</text>

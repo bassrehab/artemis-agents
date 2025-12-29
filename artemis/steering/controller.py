@@ -31,45 +31,14 @@ class SteeringApplication:
 
 
 class SteeringController:
-    """Controls the application of steering vectors to agent behavior.
-
-    Provides methods for modifying prompts based on steering vectors,
-    analyzing outputs for effectiveness, and adapting the steering
-    based on feedback.
-
-    Example:
-        ```python
-        from artemis.steering import SteeringController, SteeringConfig, SteeringVector
-
-        config = SteeringConfig(
-            vector=SteeringVector(formality=0.9, confidence=0.8),
-            mode=SteeringMode.PROMPT,
-            adaptive=True,
-        )
-        controller = SteeringController(config)
-
-        # Apply to prompt
-        modified_prompt = controller.apply_to_prompt(original_prompt)
-
-        # After getting output, record and optionally adapt
-        controller.record_output(output)
-
-        # Get effectiveness report
-        report = controller.get_effectiveness_report()
-        ```
-    """
+    """Controls the application of steering vectors to agent behavior."""
 
     def __init__(
         self,
         config: SteeringConfig,
         formatter: SteeringFormatter | None = None,
     ) -> None:
-        """Initialize the controller.
-
-        Args:
-            config: Steering configuration.
-            formatter: Optional custom formatter.
-        """
+        """Initialize the controller."""
         self.config = config
         self.formatter = formatter or SteeringFormatter()
         self._history: list[SteeringApplication] = []
@@ -86,14 +55,7 @@ class SteeringController:
         return self.config.strength
 
     def apply_to_prompt(self, prompt: str) -> str:
-        """Apply steering to a prompt.
-
-        Args:
-            prompt: The original prompt.
-
-        Returns:
-            Modified prompt with steering instructions.
-        """
+        """Apply steering to a prompt."""
         if self.config.mode == SteeringMode.OUTPUT:
             # Output mode doesn't modify prompts
             return prompt
@@ -121,14 +83,7 @@ class SteeringController:
         return modified
 
     def apply_to_system_prompt(self, system_prompt: str) -> str:
-        """Apply steering to a system prompt.
-
-        Args:
-            system_prompt: The original system prompt.
-
-        Returns:
-            Modified system prompt with steering addon.
-        """
+        """Apply steering to a system prompt."""
         if self.config.mode == SteeringMode.OUTPUT:
             return system_prompt
 
@@ -143,11 +98,7 @@ class SteeringController:
         return system_prompt + addon
 
     def record_output(self, output: str) -> None:
-        """Record an output for effectiveness analysis.
-
-        Args:
-            output: The generated output.
-        """
+        """Record an output for effectiveness analysis."""
         if self._current_application:
             self._current_application.output = output
             self._history.append(self._current_application)
@@ -158,11 +109,6 @@ class SteeringController:
                 self._adapt(output)
 
     def _adapt(self, output: str) -> None:
-        """Adapt steering based on output.
-
-        Adjusts strength based on how well the output matches
-        the target steering vector.
-        """
         # Import here to avoid circular import
         from artemis.steering.analyzer import SteeringEffectivenessAnalyzer
 
@@ -197,11 +143,7 @@ class SteeringController:
         self.config = self.config.with_strength(new_strength)
 
     def get_effectiveness_report(self) -> dict:
-        """Generate an effectiveness report.
-
-        Returns:
-            Dictionary with effectiveness metrics.
-        """
+        """Generate an effectiveness report."""
         if not self._history:
             return {
                 "applications": 0,
@@ -235,24 +177,16 @@ class SteeringController:
         }
 
     def reset_history(self) -> None:
-        """Clear application history."""
+        # lol just nuke everything
         self._history = []
         self._current_application = None
 
     def set_vector(self, vector: SteeringVector) -> None:
-        """Update the steering vector.
-
-        Args:
-            vector: New steering vector.
-        """
+        """Update the steering vector."""
         self.config = self.config.with_vector(vector)
 
     def set_strength(self, strength: float) -> None:
-        """Update the application strength.
-
-        Args:
-            strength: New strength value (0.0-1.0).
-        """
+        """Update the application strength."""
         self.config = self.config.with_strength(strength)
 
     def __repr__(self) -> str:

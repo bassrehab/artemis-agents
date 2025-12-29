@@ -39,31 +39,7 @@ class VerificationError(Exception):
 
 
 class ArgumentVerifier:
-    """Verifies arguments against configured rules.
-
-    Orchestrates multiple verification rules and produces
-    a comprehensive report.
-
-    Example:
-        ```python
-        spec = VerificationSpec(
-            rules=[
-                VerificationRule(rule_type=VerificationRuleType.CAUSAL_CHAIN),
-                VerificationRule(rule_type=VerificationRuleType.CITATION),
-            ],
-            strict_mode=False,
-            min_score=0.6,
-        )
-
-        verifier = ArgumentVerifier(spec)
-        report = await verifier.verify(argument, context)
-
-        if not report.overall_passed:
-            for result in report.results:
-                for violation in result.violations:
-                    print(f"{result.rule_type}: {violation.description}")
-        ```
-    """
+    """Verifies arguments against configured rules."""
 
     # Registry of rule implementations
     RULE_REGISTRY: dict[VerificationRuleType, type[VerificationRuleBase]] = {
@@ -75,16 +51,10 @@ class ArgumentVerifier:
     }
 
     def __init__(self, spec: VerificationSpec) -> None:
-        """Initialize the verifier.
-
-        Args:
-            spec: Verification specification.
-        """
         self.spec = spec
         self._rules = self._load_rules()
 
     def _load_rules(self) -> list[tuple[VerificationRule, VerificationRuleBase]]:
-        """Load rule implementations based on spec."""
         rules = []
 
         for rule_config in self.spec.rules:
@@ -107,18 +77,7 @@ class ArgumentVerifier:
         argument: "Argument",
         context: "DebateContext | None" = None,
     ) -> VerificationReport:
-        """Verify an argument against all configured rules.
-
-        Args:
-            argument: The argument to verify.
-            context: Optional debate context.
-
-        Returns:
-            VerificationReport with all results.
-
-        Raises:
-            VerificationError: If strict_mode is True and verification fails.
-        """
+        """Verify an argument against all configured rules."""
         logger.info(
             "Verifying argument",
             argument_id=argument.id,
@@ -129,6 +88,7 @@ class ArgumentVerifier:
         total_score = 0.0
         total_weight = 0.0
 
+        # NOTE: rules are run sequentially to avoid race conditions on shared state
         for rule_config, rule in self._rules:
             try:
                 result = await rule.verify(
@@ -209,26 +169,14 @@ class ArgumentVerifier:
         arguments: list["Argument"],
         context: "DebateContext | None" = None,
     ) -> list[VerificationReport]:
-        """Verify multiple arguments.
-
-        Args:
-            arguments: List of arguments to verify.
-            context: Optional debate context.
-
-        Returns:
-            List of verification reports.
-        """
+        """Verify multiple arguments concurrently."""
         import asyncio
 
         tasks = [self.verify(arg, context) for arg in arguments]
         return await asyncio.gather(*tasks, return_exceptions=False)
 
     def get_rule_descriptions(self) -> dict[str, str]:
-        """Get descriptions of enabled rules.
-
-        Returns:
-            Dictionary mapping rule types to descriptions.
-        """
+        """Get descriptions of enabled rules."""
         descriptions = {
             VerificationRuleType.CAUSAL_CHAIN: (
                 "Verifies causal reasoning chains are valid and connected"
@@ -257,21 +205,7 @@ def create_default_verifier(
     strict: bool = False,
     min_score: float = 0.6,
 ) -> ArgumentVerifier:
-    """Create a verifier with default rules.
-
-    Args:
-        strict: Enable strict mode.
-        min_score: Minimum passing score.
-
-    Returns:
-        Configured ArgumentVerifier.
-
-    Example:
-        ```python
-        verifier = create_default_verifier(strict=True)
-        report = await verifier.verify(argument)
-        ```
-    """
+    """Create a verifier with default rules enabled."""
     spec = VerificationSpec(
         rules=[
             VerificationRule(

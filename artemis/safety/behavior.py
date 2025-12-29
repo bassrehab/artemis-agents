@@ -1,13 +1,4 @@
-"""
-ARTEMIS Behavioral Drift Tracker
-
-Monitors agent behavior patterns over time to detect concerning drift:
-- Style changes: Sudden shifts in communication patterns
-- Consistency drift: Decreasing consistency in responses
-- Personality shifts: Changes in agent "personality" markers
-- Goal alignment: Drift away from stated objectives
-- Engagement patterns: Changes in interaction style
-"""
+"""Behavioral drift detection for agents."""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -27,56 +18,32 @@ logger = get_logger(__name__)
 
 
 class DriftSignal(str, Enum):
-    """Types of behavioral drift signals."""
-
     STYLE_CHANGE = "style_change"
-    """Sudden change in communication style."""
-
     CONSISTENCY_DRIFT = "consistency_drift"
-    """Decreasing consistency over time."""
-
     PERSONALITY_SHIFT = "personality_shift"
-    """Change in characteristic markers."""
-
     GOAL_MISALIGNMENT = "goal_misalignment"
-    """Drift from stated objectives."""
-
     ENGAGEMENT_CHANGE = "engagement_change"
-    """Change in interaction patterns."""
-
     FORMALITY_SHIFT = "formality_shift"
-    """Change in formality level."""
-
     AGGRESSION_INCREASE = "aggression_increase"
-    """Increasing aggressive tone."""
-
     COOPERATION_DECREASE = "cooperation_decrease"
-    """Decreasing cooperative behavior."""
 
 
 @dataclass
 class StyleMetrics:
-    """Metrics capturing communication style."""
+    """Communication style metrics."""
 
-    formality_score: float = 0.5
-    """0=casual, 1=formal."""
-    aggression_score: float = 0.0
-    """0=peaceful, 1=aggressive."""
-    cooperation_score: float = 0.5
-    """0=competitive, 1=cooperative."""
+    formality_score: float = 0.5  # 0=casual, 1=formal
+    aggression_score: float = 0.0  # 0=peaceful, 1=aggressive
+    cooperation_score: float = 0.5  # 0=competitive, 1=cooperative
     verbosity: float = 0.5
-    """0=terse, 1=verbose."""
     certainty_level: float = 0.5
-    """0=uncertain, 1=certain."""
     question_ratio: float = 0.0
-    """Ratio of questions to statements."""
     first_person_ratio: float = 0.0
-    """Use of first person pronouns."""
 
 
 @dataclass
 class BehaviorSnapshot:
-    """Snapshot of agent behavior at a point in time."""
+    """Agent behavior at a point in time."""
 
     round: int
     style: StyleMetrics
@@ -84,19 +51,17 @@ class BehaviorSnapshot:
     sentence_count: int
     evidence_used: int
     position_strength: float = 0.5
-    """How strongly the agent advocates their position."""
 
 
 @dataclass
 class AgentBehaviorProfile:
-    """Profile of an agent's behavioral patterns."""
+    """Tracks an agent's behavioral patterns over time."""
 
     snapshots: list[BehaviorSnapshot] = field(default_factory=list)
     baseline_style: StyleMetrics | None = None
     drift_events: list[tuple[int, str, float]] = field(default_factory=list)
-    """(round, signal, severity) tuples."""
 
-    # Running statistics
+    # running stats
     avg_formality: float = 0.5
     avg_aggression: float = 0.0
     avg_cooperation: float = 0.5
@@ -106,22 +71,7 @@ class AgentBehaviorProfile:
 
 
 class BehaviorTracker(SafetyMonitor):
-    """
-    Tracks behavioral patterns and detects concerning drift.
-
-    Monitors for gradual or sudden changes in agent behavior that
-    may indicate issues like goal drift, personality changes, or
-    concerning behavioral patterns.
-
-    Example:
-        >>> tracker = BehaviorTracker(
-        ...     mode=MonitorMode.PASSIVE,
-        ...     sensitivity=0.6,
-        ... )
-        >>> result = await tracker.analyze(turn, context)
-        >>> if result.should_alert:
-        ...     print(f"Drift detected: {result.analysis_notes}")
-    """
+    """Tracks behavioral patterns and detects concerning drift."""
 
     def __init__(
         self,
@@ -133,18 +83,6 @@ class BehaviorTracker(SafetyMonitor):
         aggression_threshold: float = 0.6,
         **kwargs,
     ) -> None:
-        """
-        Initialize the behavior tracker.
-
-        Args:
-            config: Monitor configuration.
-            mode: Operating mode.
-            sensitivity: Detection sensitivity (0-1).
-            baseline_turns: Turns to establish baseline.
-            drift_threshold: Threshold for detecting drift (0-1).
-            aggression_threshold: Threshold for aggression alerts.
-            **kwargs: Additional configuration.
-        """
         self._sensitivity = min(1.0, max(0.0, sensitivity))
         self._baseline_turns = baseline_turns
         self._drift_threshold = drift_threshold
@@ -172,16 +110,7 @@ class BehaviorTracker(SafetyMonitor):
         turn: Turn,
         _context: DebateContext,
     ) -> SafetyResult:
-        """
-        Analyze a turn for behavioral drift.
-
-        Args:
-            turn: The turn to analyze.
-            context: Current debate context.
-
-        Returns:
-            SafetyResult with drift severity and indicators.
-        """
+        """Analyze a turn for behavioral drift."""
         agent = turn.agent
         argument = turn.argument
 
@@ -281,7 +210,7 @@ class BehaviorTracker(SafetyMonitor):
         )
 
     def _extract_style_metrics(self, content: str) -> StyleMetrics:
-        """Extract style metrics from content."""
+        # could be smarter about this - maybe use NLP later
         content_lower = content.lower()
         words = content.split()
         word_count = len(words)
@@ -363,12 +292,10 @@ class BehaviorTracker(SafetyMonitor):
         )
 
     def _count_sentences(self, content: str) -> int:
-        """Count sentences in content."""
         endings = content.count(".") + content.count("!") + content.count("?")
         return max(1, endings)
 
     def _estimate_position_strength(self, content: str) -> float:
-        """Estimate how strongly the agent advocates their position."""
         content_lower = content.lower()
 
         strong_markers = [
@@ -387,7 +314,6 @@ class BehaviorTracker(SafetyMonitor):
         return min(1.0, max(0.0, strength))
 
     def _update_baseline(self, profile: AgentBehaviorProfile) -> None:
-        """Update baseline from initial snapshots."""
         if not profile.snapshots:
             return
 
@@ -411,7 +337,6 @@ class BehaviorTracker(SafetyMonitor):
         profile: AgentBehaviorProfile,
         style: StyleMetrics,
     ) -> None:
-        """Update running statistics."""
         n = len(profile.snapshots)
         if n == 0:
             return
@@ -444,7 +369,6 @@ class BehaviorTracker(SafetyMonitor):
         current: StyleMetrics,
         profile: AgentBehaviorProfile,
     ) -> tuple[DriftSignal, float, str] | None:
-        """Detect general style drift from baseline."""
         if not profile.baseline_style:
             return None
 
@@ -473,7 +397,6 @@ class BehaviorTracker(SafetyMonitor):
         current: StyleMetrics,
         profile: AgentBehaviorProfile,
     ) -> tuple[DriftSignal, float, str] | None:
-        """Detect increase in aggression."""
         if not profile.baseline_style:
             return None
 
@@ -494,7 +417,6 @@ class BehaviorTracker(SafetyMonitor):
         current: StyleMetrics,
         profile: AgentBehaviorProfile,
     ) -> tuple[DriftSignal, float, str] | None:
-        """Detect decrease in cooperation."""
         if not profile.baseline_style:
             return None
 
@@ -515,7 +437,6 @@ class BehaviorTracker(SafetyMonitor):
         current: StyleMetrics,
         profile: AgentBehaviorProfile,
     ) -> tuple[DriftSignal, float, str] | None:
-        """Detect shift in formality level."""
         if not profile.baseline_style:
             return None
 
@@ -535,7 +456,6 @@ class BehaviorTracker(SafetyMonitor):
         self,
         profile: AgentBehaviorProfile,
     ) -> tuple[DriftSignal, float, str] | None:
-        """Detect increasing inconsistency over time."""
         if len(profile.snapshots) < 5:
             return None
 
@@ -558,7 +478,6 @@ class BehaviorTracker(SafetyMonitor):
         return None
 
     def _calculate_variance(self, snapshots: list[BehaviorSnapshot]) -> float:
-        """Calculate behavior variance across snapshots."""
         if len(snapshots) < 2:
             return 0.0
 
@@ -579,7 +498,6 @@ class BehaviorTracker(SafetyMonitor):
         score: float,
         evidence: str,
     ) -> SafetyIndicator:
-        """Create a SafetyIndicator for a detected signal."""
         return SafetyIndicator(
             type=SafetyIndicatorType.BEHAVIORAL_DRIFT,
             severity=score,
@@ -588,11 +506,9 @@ class BehaviorTracker(SafetyMonitor):
         )
 
     def get_agent_profile(self, agent: str) -> AgentBehaviorProfile | None:
-        """Get behavioral profile for an agent."""
         return self._agent_profiles.get(agent)
 
     def get_drift_summary(self, agent: str) -> dict:
-        """Get drift summary for an agent."""
         profile = self._agent_profiles.get(agent)
         if not profile:
             return {
@@ -612,12 +528,10 @@ class BehaviorTracker(SafetyMonitor):
         }
 
     def reset_agent_profile(self, agent: str) -> None:
-        """Reset profile for a specific agent."""
         if agent in self._agent_profiles:
             del self._agent_profiles[agent]
             logger.debug("Agent profile reset", agent=agent)
 
     def reset_all_profiles(self) -> None:
-        """Reset all agent profiles."""
         self._agent_profiles.clear()
         logger.debug("All profiles reset")

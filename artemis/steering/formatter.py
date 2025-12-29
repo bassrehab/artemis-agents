@@ -9,21 +9,7 @@ from artemis.steering.vectors import SteeringVector
 
 
 class SteeringFormatter:
-    """Formats steering vectors into prompt instructions.
-
-    Converts the numeric steering vector dimensions into natural language
-    instructions that can be prepended to agent prompts.
-
-    Example:
-        ```python
-        formatter = SteeringFormatter()
-        vector = SteeringVector(formality=0.9, confidence=0.8)
-        instructions = formatter.format_instructions(vector, strength=0.8)
-        # Returns something like:
-        # "Style guidance: Use formal language and maintain a professional tone.
-        #  Be assertive and confident in your statements."
-        ```
-    """
+    """Formats steering vectors into prompt instructions."""
 
     # Dimension descriptions for different value ranges
     DIMENSION_DESCRIPTIONS = {
@@ -65,25 +51,13 @@ class SteeringFormatter:
     }
 
     def __init__(self, include_header: bool = True) -> None:
-        """Initialize the formatter.
-
-        Args:
-            include_header: Whether to include "Style guidance:" header.
-        """
+        """Initialize the formatter."""
         self.include_header = include_header
 
     def format_instructions(
         self, vector: SteeringVector, strength: float = 1.0
     ) -> str:
-        """Format steering vector into prompt instructions.
-
-        Args:
-            vector: The steering vector.
-            strength: How strongly to apply (affects language intensity).
-
-        Returns:
-            Prompt instructions string.
-        """
+        """Format steering vector into prompt instructions."""
         instructions: list[str] = []
 
         for dim in vector._dimensions():
@@ -104,16 +78,6 @@ class SteeringFormatter:
     def _format_dimension(
         self, dimension: str, value: float, strength: float
     ) -> str:
-        """Format a single dimension into instruction text.
-
-        Args:
-            dimension: Dimension name.
-            value: Dimension value (0.0-1.0).
-            strength: Application strength.
-
-        Returns:
-            Instruction text or empty string if neutral.
-        """
         # Skip dimensions that are near neutral (0.5)
         if 0.4 <= value <= 0.6:
             return ""
@@ -135,6 +99,7 @@ class SteeringFormatter:
             return ""
 
         # Apply strength modifier to language
+        # TODO: maybe add more nuanced strength levels?
         if strength < 0.5:
             desc = f"Consider: {desc.lower()}"
         elif strength > 0.8:
@@ -147,15 +112,7 @@ class SteeringFormatter:
     def format_system_prompt_addon(
         self, vector: SteeringVector, strength: float = 1.0
     ) -> str:
-        """Format as an addon for system prompts.
-
-        Args:
-            vector: The steering vector.
-            strength: Application strength.
-
-        Returns:
-            System prompt addon text.
-        """
+        """Format as an addon for system prompts."""
         instructions = self.format_instructions(vector, strength)
         if not instructions:
             return ""
@@ -165,15 +122,7 @@ class SteeringFormatter:
     def format_user_prompt_addon(
         self, vector: SteeringVector, strength: float = 1.0
     ) -> str:
-        """Format as an addon for user prompts.
-
-        Args:
-            vector: The steering vector.
-            strength: Application strength.
-
-        Returns:
-            User prompt addon text.
-        """
+        """Format as an addon for user prompts."""
         instructions = self.format_instructions(vector, strength)
         if not instructions:
             return ""

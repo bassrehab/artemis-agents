@@ -1,9 +1,4 @@
-"""
-Causal Strategy Module
-
-Strategic analysis for debate agents based on causal graph analysis.
-Provides attack planning, defense planning, and opponent modeling.
-"""
+"""Strategic analysis for debate agents based on causal graphs."""
 
 from __future__ import annotations
 
@@ -87,23 +82,14 @@ class RebuttalSuggestion:
 
 
 class CausalStrategy:
-    """Strategic analysis for debate agents.
-
-    Provides methods for planning attacks, defenses, and modeling
-    opponent strategy based on causal graph analysis.
-    """
+    """Strategic analysis for debate agents."""
 
     def __init__(
         self,
         own_graph: CausalGraph,
         opponent_graph: CausalGraph | None = None,
     ):
-        """Initialize strategy analyzer.
-
-        Args:
-            own_graph: Agent's own causal graph.
-            opponent_graph: Opponent's causal graph (optional).
-        """
+        """Initialize strategy analyzer."""
         self.own_graph = own_graph
         self.opponent_graph = opponent_graph
         self._own_analyzer = CausalAnalyzer(own_graph)
@@ -112,14 +98,7 @@ class CausalStrategy:
         )
 
     def map_attack_surface(self) -> list[AttackTarget]:
-        """Map the attack surface of opponent's arguments.
-
-        Identifies vulnerable points in opponent's causal graph
-        that can be targeted for rebuttal.
-
-        Returns:
-            List of AttackTarget sorted by vulnerability score.
-        """
+        """Find vulnerable points in opponent's causal graph."""
         if not self.opponent_graph or not self._opponent_analyzer:
             return []
 
@@ -165,7 +144,6 @@ class CausalStrategy:
     def _generate_attack_strategies(
         self, weak: WeakLinkResult
     ) -> list[str]:
-        """Generate attack strategies for a weak link."""
         strategies: list[str] = []
 
         source_label = ""
@@ -200,7 +178,7 @@ class CausalStrategy:
         return strategies
 
     def _estimate_attack_impact(self, weak: WeakLinkResult) -> float:
-        """Estimate the impact of successfully attacking a weak link."""
+        # TODO: might want to cache this for large graphs
         if not self.opponent_graph:
             return 0.5
 
@@ -227,14 +205,7 @@ class CausalStrategy:
     def suggest_rebuttals(
         self, opponent_argument: Argument
     ) -> list[RebuttalSuggestion]:
-        """Suggest rebuttals for an opponent's argument.
-
-        Args:
-            opponent_argument: The argument to rebut.
-
-        Returns:
-            List of RebuttalSuggestion sorted by expected impact.
-        """
+        """Suggest rebuttals for an opponent's argument."""
         suggestions: list[RebuttalSuggestion] = []
 
         for link in opponent_argument.causal_links:
@@ -290,11 +261,7 @@ class CausalStrategy:
         )
 
     def find_vulnerable_claims(self) -> list[VulnerableClaim]:
-        """Find claims in own graph that are vulnerable to attack.
-
-        Returns:
-            List of VulnerableClaim sorted by vulnerability.
-        """
+        """Find claims in own graph that are vulnerable to attack."""
         vulnerable: list[VulnerableClaim] = []
 
         weak_links = self._own_analyzer.find_weak_links(threshold=0.5)
@@ -324,11 +291,7 @@ class CausalStrategy:
         )
 
     def suggest_reinforcements(self) -> list[ReinforcementSuggestion]:
-        """Suggest reinforcements for weak links in own arguments.
-
-        Returns:
-            List of ReinforcementSuggestion sorted by priority.
-        """
+        """Suggest reinforcements for weak links in own arguments."""
         suggestions: list[ReinforcementSuggestion] = []
 
         weak_links = self._own_analyzer.find_weak_links(threshold=0.6)
@@ -367,7 +330,6 @@ class CausalStrategy:
         return sorted(suggestions, key=lambda x: x.priority, reverse=True)
 
     def _suggest_evidence_types(self, edge: object) -> list[str]:
-        """Suggest types of evidence that would strengthen a link."""
         suggestions = []
 
         if edge and edge.evidence_count < 2:
@@ -380,7 +342,6 @@ class CausalStrategy:
         return suggestions
 
     def _suggest_mechanisms(self, source: str, target: str) -> list[str]:
-        """Suggest mechanisms to explain a causal relationship."""
         return [
             f"Explain the process by which {source} leads to {target}",
             "Identify intermediate steps in the causal chain",
@@ -388,7 +349,6 @@ class CausalStrategy:
         ]
 
     def _check_opponent_coverage(self, source: str, target: str) -> float:
-        """Check if opponent has strong coverage of this area."""
         if not self.opponent_graph:
             return 0.0
 
@@ -399,11 +359,7 @@ class CausalStrategy:
         return 0.0
 
     def identify_defensive_priorities(self) -> list[DefensePriority]:
-        """Identify defensive priorities based on vulnerability analysis.
-
-        Returns:
-            List of DefensePriority sorted by priority score.
-        """
+        """Identify defensive priorities based on vulnerability analysis."""
         priorities: list[DefensePriority] = []
 
         critical_nodes = self._own_analyzer.find_critical_nodes()
@@ -452,11 +408,7 @@ class CausalStrategy:
         return sorted(priorities, key=lambda x: x.priority_score, reverse=True)
 
     def predict_opponent_targets(self) -> list[PredictedTarget]:
-        """Predict which of our nodes opponent is likely to target.
-
-        Returns:
-            List of PredictedTarget sorted by likelihood.
-        """
+        """Predict which of our nodes opponent is likely to target."""
         predictions: list[PredictedTarget] = []
 
         vulnerable = self.find_vulnerable_claims()
@@ -501,11 +453,7 @@ class CausalStrategy:
         return sorted(predictions, key=lambda x: x.likelihood, reverse=True)
 
     def analyze_opponent_strategy(self) -> OpponentStrategyProfile | None:
-        """Analyze opponent's overall debate strategy.
-
-        Returns:
-            OpponentStrategyProfile or None if no opponent graph.
-        """
+        """Analyze opponent's overall debate strategy."""
         if not self.opponent_graph or not self._opponent_analyzer:
             return None
 

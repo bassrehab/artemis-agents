@@ -107,7 +107,7 @@ class AgentClaimHistory:
 
 
 class DeceptionMonitor(SafetyMonitor):
-    """Detects fallacies, manipulation, inconsistencies, contradictions."""
+    """Detects fallacies, manipulation, and contradictions."""
 
     def __init__(
         self,
@@ -141,7 +141,6 @@ class DeceptionMonitor(SafetyMonitor):
         return "deception"
 
     async def analyze(self, turn: Turn, context: DebateContext) -> SafetyResult:
-        """Analyze a turn for deception indicators."""
         agent = turn.agent
         argument = turn.argument
 
@@ -237,7 +236,7 @@ class DeceptionMonitor(SafetyMonitor):
         self,
         content: str,
     ) -> list[tuple[str, float, str]]:
-        """Detect logical fallacies in content."""
+        # XXX: pretty basic keyword matching, could use ML
         results = []
 
         for fallacy_type, patterns in FALLACY_PATTERNS.items():
@@ -255,7 +254,6 @@ class DeceptionMonitor(SafetyMonitor):
         return results
 
     def _detect_manipulation(self, content: str) -> tuple[float, str]:
-        """Detect emotional manipulation tactics."""
         matches = []
         for pattern in MANIPULATION_PATTERNS:
             if pattern in content:
@@ -273,7 +271,6 @@ class DeceptionMonitor(SafetyMonitor):
         argument: Argument,
         history: AgentClaimHistory,
     ) -> tuple[float, str] | None:
-        """Detect contradictions with previous statements."""
         if not history.claims:
             return None
 
@@ -312,7 +309,6 @@ class DeceptionMonitor(SafetyMonitor):
         argument: Argument,
         _context: DebateContext,
     ) -> tuple[float, str] | None:
-        """Detect strawman misrepresentations of opponent arguments."""
         content = argument.content.lower()
 
         # Check for strawman indicator phrases
@@ -335,7 +331,6 @@ class DeceptionMonitor(SafetyMonitor):
         self,
         argument: Argument,
     ) -> tuple[float, str] | None:
-        """Check for suspicious citation patterns."""
         evidence_list = argument.evidence
         if not evidence_list:
             return None
@@ -368,7 +363,6 @@ class DeceptionMonitor(SafetyMonitor):
         round_num: int,
         history: AgentClaimHistory,
     ) -> None:
-        """Update agent's claim history."""
         content = argument.content.lower()
         keywords = self._extract_keywords(content)
 
@@ -393,8 +387,7 @@ class DeceptionMonitor(SafetyMonitor):
             history.claims = history.claims[-20:]
 
     def _extract_keywords(self, content: str) -> set[str]:
-        """Extract significant keywords from content."""
-        # Simple keyword extraction - remove common words
+        # simple keyword extraction - just removes stopwords
         stopwords = {
             "the", "a", "an", "is", "are", "was", "were", "be", "been",
             "being", "have", "has", "had", "do", "does", "did", "will",
@@ -423,7 +416,6 @@ class DeceptionMonitor(SafetyMonitor):
         return keywords
 
     def _get_signal_weight(self, signal: DeceptionSignal) -> float:
-        """Get weight for a signal type."""
         weights = {
             DeceptionSignal.FACTUAL_INCONSISTENCY: 0.5,
             DeceptionSignal.LOGICAL_FALLACY: self._fallacy_weight,
@@ -442,7 +434,6 @@ class DeceptionMonitor(SafetyMonitor):
         score: float,
         evidence: str,
     ) -> SafetyIndicator:
-        """Create a SafetyIndicator for a detected signal."""
         signal_to_type = {
             DeceptionSignal.FACTUAL_INCONSISTENCY: SafetyIndicatorType.FACTUAL_INCONSISTENCY,
             DeceptionSignal.LOGICAL_FALLACY: SafetyIndicatorType.LOGICAL_FALLACY,
@@ -466,11 +457,9 @@ class DeceptionMonitor(SafetyMonitor):
         )
 
     def get_agent_history(self, agent: str) -> AgentClaimHistory | None:
-        """Get claim history for an agent."""
         return self._agent_history.get(agent)
 
     def get_deception_summary(self, agent: str) -> dict[str, int]:
-        """Get deception summary for an agent."""
         history = self._agent_history.get(agent)
         if not history:
             return {"fallacies": 0, "contradictions": 0, "claims": 0}
@@ -482,12 +471,10 @@ class DeceptionMonitor(SafetyMonitor):
         }
 
     def reset_agent_history(self, agent: str) -> None:
-        """Reset history for a specific agent."""
         if agent in self._agent_history:
             del self._agent_history[agent]
             logger.debug("Agent history reset", agent=agent)
 
     def reset_all_history(self) -> None:
-        """Reset all agent histories."""
         self._agent_history.clear()
         logger.debug("All histories reset")

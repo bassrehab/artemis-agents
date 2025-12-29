@@ -1,8 +1,4 @@
-"""Multimodal evidence extraction for debates.
-
-Provides tools for extracting evidence from images and documents
-to support debate arguments with visual content.
-"""
+"""Multimodal evidence extraction from images and documents."""
 
 from __future__ import annotations
 
@@ -20,7 +16,7 @@ logger = get_logger(__name__)
 
 
 class ExtractionType(str, Enum):
-    """Type of evidence extraction."""
+    """Evidence extraction mode."""
 
     TEXT = "text"  # Extract text from document
     DESCRIPTION = "description"  # Describe image content
@@ -31,19 +27,7 @@ class ExtractionType(str, Enum):
 
 @dataclass
 class ExtractedContent:
-    """Content extracted from multimodal source.
-
-    Example:
-        ```python
-        content = ExtractedContent(
-            source_type=ContentType.IMAGE,
-            extraction_type=ExtractionType.DESCRIPTION,
-            text="A bar chart showing increasing AI adoption...",
-            confidence=0.85,
-            metadata={"model": "gpt-4o"},
-        )
-        ```
-    """
+    """Content extracted from multimodal source."""
 
     source_type: ContentType
     extraction_type: ExtractionType
@@ -53,29 +37,12 @@ class ExtractedContent:
 
     @property
     def is_reliable(self) -> bool:
-        """Check if extraction is reliable (confidence > 0.7)."""
+        """Check if confidence meets reliability threshold."""
         return self.confidence >= 0.7
 
 
 class MultimodalEvidenceExtractor:
-    """Extracts evidence from images and documents.
-
-    Uses LLM vision capabilities to analyze visual content
-    and extract relevant evidence for debates.
-
-    Example:
-        ```python
-        extractor = MultimodalEvidenceExtractor(model=vision_model)
-
-        # Extract from image
-        content = ContentPart(
-            type=ContentType.IMAGE,
-            url="https://example.com/chart.png",
-        )
-        result = await extractor.extract(content)
-        print(result.text)
-        ```
-    """
+    """Uses LLM vision to extract evidence from images and documents."""
 
     EXTRACTION_PROMPTS = {
         ExtractionType.DESCRIPTION: """Analyze this image and provide a detailed description.
@@ -129,19 +96,13 @@ Maintain the original structure where possible.""",
         model_name: str = "gpt-4o",
         api_key: str | None = None,
     ) -> None:
-        """Initialize the extractor.
-
-        Args:
-            model: Pre-configured vision model.
-            model_name: Model name if creating new instance.
-            api_key: API key for model.
-        """
+        """Initialize with optional pre-configured model."""
         self._model = model
         self._model_name = model_name
         self._api_key = api_key
 
     async def _get_model(self) -> "BaseModel":
-        """Get or create the model instance."""
+        # Lazy init - only create model when needed
         if self._model:
             return self._model
 
@@ -158,15 +119,7 @@ Maintain the original structure where possible.""",
         content: ContentPart,
         extraction_type: ExtractionType = ExtractionType.DESCRIPTION,
     ) -> ExtractedContent:
-        """Extract evidence from multimodal content.
-
-        Args:
-            content: The content part to analyze.
-            extraction_type: Type of extraction to perform.
-
-        Returns:
-            ExtractedContent with extracted text and metadata.
-        """
+        """Extract evidence from content using specified extraction mode."""
         if content.type == ContentType.TEXT:
             # Text content - just return as-is
             return ExtractedContent(
@@ -238,14 +191,7 @@ Maintain the original structure where possible.""",
         self,
         content: ContentPart,
     ) -> list[ExtractedContent]:
-        """Perform all extraction types on content.
-
-        Args:
-            content: The content part to analyze.
-
-        Returns:
-            List of ExtractedContent for each extraction type.
-        """
+        """Run all extraction types on the content."""
         results = []
         for extraction_type in ExtractionType:
             result = await self.extract(content, extraction_type)
@@ -257,15 +203,7 @@ Maintain the original structure where possible.""",
         content: ContentPart,
         debate_topic: str,
     ) -> ExtractedContent:
-        """Extract content relevant to a specific debate topic.
-
-        Args:
-            content: The content part to analyze.
-            debate_topic: The topic of the debate.
-
-        Returns:
-            ExtractedContent focused on debate relevance.
-        """
+        """Extract content relevant to a specific debate topic."""
         model = await self._get_model()
 
         prompt = f"""Analyze this content in the context of the following debate topic:
@@ -320,30 +258,14 @@ Be objective and analytical."""
 
 
 class DocumentProcessor:
-    """Processes documents for evidence extraction.
-
-    Handles PDF, text, and other document formats.
-
-    Example:
-        ```python
-        processor = DocumentProcessor()
-        pages = await processor.process_document(content)
-        for page in pages:
-            print(f"Page {page['number']}: {page['text'][:100]}...")
-        ```
-    """
+    """Handles PDF, text, and other document formats for extraction."""
 
     def __init__(
         self,
         max_pages: int = 10,
         chunk_size: int = 4000,
     ) -> None:
-        """Initialize the processor.
-
-        Args:
-            max_pages: Maximum pages to process.
-            chunk_size: Maximum characters per chunk.
-        """
+        """Initialize with page and chunk limits."""
         self.max_pages = max_pages
         self.chunk_size = chunk_size
 
@@ -351,14 +273,7 @@ class DocumentProcessor:
         self,
         content: ContentPart,
     ) -> list[dict[str, Any]]:
-        """Process a document into extractable chunks.
-
-        Args:
-            content: Document content part.
-
-        Returns:
-            List of page/chunk dictionaries.
-        """
+        """Process document into extractable chunks."""
         if content.type != ContentType.DOCUMENT:
             return []
 
@@ -384,9 +299,7 @@ class DocumentProcessor:
         }]
 
     def _process_pdf(self, data: bytes) -> list[dict[str, Any]]:
-        """Process PDF data (simplified stub)."""
-        # In production, use PyPDF2 or similar
-        # This is a placeholder that returns metadata
+        # Stub - would use PyPDF2 in production
         return [{
             "number": 1,
             "text": "[PDF content - requires PDF library for extraction]",
@@ -395,7 +308,6 @@ class DocumentProcessor:
         }]
 
     def _chunk_text(self, text: str) -> list[dict[str, Any]]:
-        """Split text into manageable chunks."""
         chunks = []
         lines = text.split("\n")
         current_chunk = ""
@@ -425,19 +337,7 @@ class DocumentProcessor:
 
 
 class ImageAnalyzer:
-    """Analyzes images for debate-relevant content.
-
-    Provides specialized analysis for charts, graphs,
-    and other visual evidence.
-
-    Example:
-        ```python
-        analyzer = ImageAnalyzer(model=vision_model)
-        analysis = await analyzer.analyze_chart(image_content)
-        print(f"Chart type: {analysis['chart_type']}")
-        print(f"Data: {analysis['data_points']}")
-        ```
-    """
+    """Specialized analysis for charts, graphs, and visual evidence."""
 
     CHART_ANALYSIS_PROMPT = """Analyze this chart/graph image:
 
@@ -457,7 +357,6 @@ Be precise with numbers and labels."""
         model_name: str = "gpt-4o",
         api_key: str | None = None,
     ) -> None:
-        """Initialize the analyzer."""
         self._extractor = MultimodalEvidenceExtractor(
             model=model,
             model_name=model_name,
@@ -468,14 +367,7 @@ Be precise with numbers and labels."""
         self,
         content: ContentPart,
     ) -> dict[str, Any]:
-        """Analyze a chart or graph image.
-
-        Args:
-            content: Image content part.
-
-        Returns:
-            Dictionary with chart analysis.
-        """
+        """Analyze a chart or graph image."""
         model = await self._extractor._get_model()
 
         from artemis.core.types import Message
@@ -512,15 +404,7 @@ Be precise with numbers and labels."""
         image1: ContentPart,
         image2: ContentPart,
     ) -> dict[str, Any]:
-        """Compare two images for debate evidence.
-
-        Args:
-            image1: First image content.
-            image2: Second image content.
-
-        Returns:
-            Dictionary with comparison analysis.
-        """
+        """Compare two images for debate evidence."""
         model = await self._extractor._get_model()
 
         prompt = """Compare these two images:

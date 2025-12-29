@@ -1,15 +1,4 @@
-"""
-Causal Graph Analysis Module
-
-Advanced analysis algorithms for CausalGraph including:
-- Circular reasoning detection
-- Argument strength analysis
-- Weak link identification
-- Contradiction detection
-- Critical node analysis
-- Reasoning gap detection
-- Fallacy pattern detection
-"""
+"""Causal graph analysis - cycle detection, weak links, fallacies, etc."""
 
 from __future__ import annotations
 
@@ -36,29 +25,14 @@ if TYPE_CHECKING:
 
 
 class CausalAnalyzer:
-    """Advanced analysis on CausalGraph.
-
-    Provides methods for detecting reasoning issues, analyzing argument
-    strength, finding vulnerabilities, and assessing graph coherence.
-    """
+    """Analyzes CausalGraph for reasoning issues and vulnerabilities."""
 
     def __init__(self, graph: CausalGraph):
-        """Initialize analyzer with a causal graph.
-
-        Args:
-            graph: The CausalGraph to analyze.
-        """
         self.graph = graph
 
     def find_circular_reasoning(self) -> list[CircularReasoningResult]:
-        """Find all cycles in the graph (circular reasoning).
-
-        Uses Tarjan's algorithm variant to find strongly connected components
-        and extract all cycles.
-
-        Returns:
-            List of CircularReasoningResult for each detected cycle.
-        """
+        """Find all cycles in the graph (circular reasoning)."""
+        # uses a DFS-based cycle detection - not exactly Tarjan's but works
         cycles: list[list[str]] = []
         visited: set[str] = set()
         rec_stack: set[str] = set()
@@ -104,24 +78,12 @@ class CausalAnalyzer:
         )
 
     def get_circular_chains(self) -> list[list[str]]:
-        """Get raw cycle lists without metadata.
-
-        Returns:
-            List of cycles, each as a list of node IDs.
-        """
+        """Get raw cycle lists without metadata."""
         results = self.find_circular_reasoning()
         return [r.cycle for r in results]
 
     def find_weak_links(self, threshold: float = 0.4) -> list[WeakLinkResult]:
-        """Find edges below strength threshold.
-
-        Args:
-            threshold: Strength threshold (default 0.4).
-                      Links below this are considered weak.
-
-        Returns:
-            List of WeakLinkResult sorted by weakness (most weak first).
-        """
+        """Find edges below the given strength threshold."""
         weak: list[WeakLinkResult] = []
 
         for edge in self.graph.edges:
@@ -174,15 +136,7 @@ class CausalAnalyzer:
     def get_weakest_path(
         self, start: str, end: str
     ) -> tuple[list[str], float]:
-        """Find the weakest link in the strongest path between two nodes.
-
-        Args:
-            start: Starting node label.
-            end: Ending node label.
-
-        Returns:
-            Tuple of (path, minimum strength on path).
-        """
+        """Find the weakest link in the strongest path between two nodes."""
         path, _ = self.graph.get_strongest_path(start, end)
         if not path:
             return [], 0.0
@@ -196,15 +150,7 @@ class CausalAnalyzer:
         return path, min_strength
 
     def find_contradictions(self) -> list[ContradictionResult]:
-        """Find edges that contradict each other.
-
-        Contradictions include:
-        - Same cause and effect but opposite link types (CAUSES vs PREVENTS)
-        - Bidirectional strong causal claims (A→B and B→A both strong)
-
-        Returns:
-            List of ContradictionResult for detected contradictions.
-        """
+        """Find edges that contradict each other (opposite types or bidirectional strong claims)."""
         from artemis.core.causal import LinkType
 
         contradictions: list[ContradictionResult] = []
@@ -261,7 +207,7 @@ class CausalAnalyzer:
         return contradictions
 
     def _are_contradictory_types(self, t1: LinkType, t2: LinkType) -> bool:
-        """Check if two link types are contradictory."""
+        # CAUSES vs PREVENTS, ENABLES vs PREVENTS
         from artemis.core.causal import LinkType
 
         contradictions = {
@@ -273,14 +219,7 @@ class CausalAnalyzer:
     def compute_argument_strength(
         self, argument_id: str
     ) -> ArgumentStrengthScore:
-        """Compute strength score for an argument based on its causal support.
-
-        Args:
-            argument_id: ID of the argument to analyze.
-
-        Returns:
-            ArgumentStrengthScore with detailed breakdown.
-        """
+        """Compute strength score for an argument based on its causal support."""
         nodes_for_argument = [
             n for n in self.graph.nodes if argument_id in n.argument_ids
         ]
@@ -327,7 +266,7 @@ class CausalAnalyzer:
         )
 
     def _find_critical_dependencies(self, argument_id: str) -> list[str]:
-        """Find nodes that this argument critically depends on."""
+        # nodes with high-strength edges into this argument
         deps: list[str] = []
         nodes = [n for n in self.graph.nodes if argument_id in n.argument_ids]
 
@@ -341,11 +280,7 @@ class CausalAnalyzer:
         return list(set(deps))
 
     def rank_arguments_by_strength(self) -> list[tuple[str, float]]:
-        """Rank all arguments by their strength scores.
-
-        Returns:
-            List of (argument_id, score) tuples sorted by score descending.
-        """
+        """Rank all arguments by their strength scores, descending."""
         argument_ids: set[str] = set()
         for node in self.graph.nodes:
             argument_ids.update(node.argument_ids)
@@ -360,11 +295,8 @@ class CausalAnalyzer:
         return sorted(scores, key=lambda x: x[1], reverse=True)
 
     def find_critical_nodes(self) -> list[CriticalNodeResult]:
-        """Find nodes that many paths depend on (high betweenness centrality).
-
-        Returns:
-            List of CriticalNodeResult sorted by centrality descending.
-        """
+        """Find nodes with high betweenness centrality."""
+        # TODO: this is O(n^3) - could use networkx for large graphs
         centrality: dict[str, int] = defaultdict(int)
         nodes = list(self.graph._nodes.keys())
 
@@ -403,7 +335,7 @@ class CausalAnalyzer:
         return sorted(results, key=lambda x: x.centrality_score, reverse=True)
 
     def _estimate_impact(self, node_id: str) -> float:
-        """Estimate impact if a node is successfully challenged."""
+        # BFS to count downstream nodes
         downstream = set()
         to_visit = [node_id]
 
@@ -421,16 +353,7 @@ class CausalAnalyzer:
         return len(downstream) / total_nodes
 
     def find_reasoning_gaps(self) -> list[ReasoningGap]:
-        """Find gaps in causal reasoning chains.
-
-        Gaps include:
-        - Terminal nodes with no incoming edges (unsupported conclusions)
-        - Root nodes with no outgoing edges (unused premises)
-        - Long paths with weak intermediate links
-
-        Returns:
-            List of ReasoningGap for detected gaps.
-        """
+        """Find gaps in causal reasoning chains (unsupported premises, weak conclusions)."""
         gaps: list[ReasoningGap] = []
 
         for node in self.graph.nodes:
@@ -469,14 +392,7 @@ class CausalAnalyzer:
         return gaps
 
     def compute_chain_completeness(self, path: list[str]) -> float:
-        """Compute completeness score for a causal chain.
-
-        Args:
-            path: List of node IDs forming the chain.
-
-        Returns:
-            Completeness score (0-1).
-        """
+        """Compute completeness score for a causal chain (0-1)."""
         if len(path) < 2:
             return 1.0
 
@@ -500,11 +416,7 @@ class CausalAnalyzer:
         return max(0.0, avg_strength - missing_penalty)
 
     def analyze(self) -> CausalAnalysisResult:
-        """Perform complete analysis of the causal graph.
-
-        Returns:
-            CausalAnalysisResult with all analysis results.
-        """
+        """Perform complete analysis of the causal graph."""
         circular = self.find_circular_reasoning()
         weak = self.find_weak_links()
         contradictions = self.find_contradictions()
@@ -545,15 +457,7 @@ class CausalAnalyzer:
 
 
 class CausalFallacyDetector:
-    """Detect causal reasoning fallacies in arguments and graphs.
-
-    Detects common logical fallacies related to causal reasoning:
-    - Post hoc ergo propter hoc
-    - False cause (correlation as causation)
-    - Slippery slope
-    - Circular reasoning
-    - Appeal to consequence
-    """
+    """Detect causal reasoning fallacies in arguments and graphs."""
 
     POST_HOC_PATTERNS = [
         r"after\s+(.+?),?\s+(.+?)\s+(?:happened|occurred|began)",
@@ -578,7 +482,7 @@ class CausalFallacyDetector:
     ]
 
     def __init__(self) -> None:
-        """Initialize the fallacy detector."""
+        # XXX: compiling regexes upfront - might be overkill for small inputs
         self._post_hoc_compiled = [
             re.compile(p, re.IGNORECASE) for p in self.POST_HOC_PATTERNS
         ]
@@ -591,15 +495,7 @@ class CausalFallacyDetector:
         argument: Argument,
         graph: CausalGraph,
     ) -> list[FallacyResult]:
-        """Detect fallacies in an argument using both text and graph analysis.
-
-        Args:
-            argument: The argument to analyze.
-            graph: The causal graph for context.
-
-        Returns:
-            List of detected fallacies.
-        """
+        """Detect fallacies in an argument using both text and graph analysis."""
         fallacies: list[FallacyResult] = []
 
         fallacies.extend(self._check_post_hoc(argument))
@@ -610,7 +506,6 @@ class CausalFallacyDetector:
         return fallacies
 
     def _check_post_hoc(self, argument: Argument) -> list[FallacyResult]:
-        """Check for post hoc ergo propter hoc fallacy."""
         results: list[FallacyResult] = []
 
         for pattern in self._post_hoc_compiled:
@@ -632,7 +527,6 @@ class CausalFallacyDetector:
         return results
 
     def _check_false_cause(self, argument: Argument) -> list[FallacyResult]:
-        """Check for false cause (correlation as causation) fallacy."""
         results: list[FallacyResult] = []
 
         for pattern in self._correlation_compiled:
@@ -677,7 +571,6 @@ class CausalFallacyDetector:
         argument: Argument,
         graph: CausalGraph,
     ) -> list[FallacyResult]:
-        """Check for slippery slope fallacy."""
         results: list[FallacyResult] = []
 
         content_lower = argument.content.lower()
@@ -725,7 +618,6 @@ class CausalFallacyDetector:
         argument: Argument,
         graph: CausalGraph,
     ) -> list[FallacyResult]:
-        """Check for circular reasoning in the argument's causal links."""
         results: list[FallacyResult] = []
 
         analyzer = CausalAnalyzer(graph)
@@ -749,14 +641,7 @@ class CausalFallacyDetector:
         return results
 
     def check_post_hoc(self, link: CausalLink) -> FallacyResult | None:
-        """Check a single causal link for post hoc fallacy indicators.
-
-        Args:
-            link: The causal link to check.
-
-        Returns:
-            FallacyResult if fallacy detected, None otherwise.
-        """
+        """Check a single causal link for post hoc fallacy indicators."""
         if link.strength < 0.3 and not link.mechanism:
             return FallacyResult(
                 fallacy_type=FallacyType.POST_HOC,
@@ -770,14 +655,7 @@ class CausalFallacyDetector:
         return None
 
     def check_false_cause(self, link: CausalLink) -> FallacyResult | None:
-        """Check a single causal link for false cause indicators.
-
-        Args:
-            link: The causal link to check.
-
-        Returns:
-            FallacyResult if fallacy detected, None otherwise.
-        """
+        """Check a single causal link for false cause indicators."""
         correlation_words = ["correlate", "associate", "link", "relate"]
         combined = f"{link.cause} {link.effect}".lower()
 
@@ -800,15 +678,7 @@ class CausalFallacyDetector:
         path: list[str],
         graph: CausalGraph,
     ) -> FallacyResult | None:
-        """Check a causal path for slippery slope indicators.
-
-        Args:
-            path: List of node IDs forming the path.
-            graph: The causal graph.
-
-        Returns:
-            FallacyResult if fallacy detected, None otherwise.
-        """
+        """Check a causal path for slippery slope indicators."""
         if len(path) < 4:
             return None
 

@@ -1,13 +1,4 @@
-"""
-ARTEMIS Ethics Guard
-
-Enforces ethical boundaries during multi-agent debates:
-- Harmful content detection
-- Bias monitoring
-- Fairness enforcement
-- Ethical principle adherence
-- Boundary violation alerts
-"""
+"""Ethics boundary enforcement for debates."""
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -26,43 +17,23 @@ logger = get_logger(__name__)
 
 
 class EthicsViolation(str, Enum):
-    """Types of ethics violations."""
-
     HARMFUL_CONTENT = "harmful_content"
-    """Content that could cause harm."""
-
     BIAS_DETECTED = "bias_detected"
-    """Discriminatory or biased content."""
-
     UNFAIR_TREATMENT = "unfair_treatment"
-    """Unfair treatment of perspectives."""
-
     PRIVACY_VIOLATION = "privacy_violation"
-    """Potential privacy concerns."""
-
     MISINFORMATION = "misinformation"
-    """Potentially false or misleading claims."""
-
     MANIPULATION = "manipulation"
-    """Manipulative rhetoric or tactics."""
-
     BOUNDARY_BREACH = "boundary_breach"
-    """Crossing ethical boundaries."""
-
     PRINCIPLE_VIOLATION = "principle_violation"
-    """Violation of ethical principles."""
 
 
 @dataclass
 class EthicsConfig:
-    """Configuration for ethics enforcement."""
+    """Config for ethics checks."""
 
     harmful_content_threshold: float = 0.5
-    """Threshold for flagging harmful content."""
     bias_threshold: float = 0.4
-    """Threshold for bias detection."""
     fairness_threshold: float = 0.3
-    """Threshold for fairness violations."""
     enabled_checks: list[str] = field(
         default_factory=lambda: [
             "harmful_content",
@@ -72,47 +43,25 @@ class EthicsConfig:
             "manipulation",
         ]
     )
-    """List of enabled ethics checks."""
     custom_boundaries: dict[str, str] = field(default_factory=dict)
-    """Custom ethical boundaries."""
 
 
 @dataclass
 class EthicsScore:
     """Ethics scoring for an argument."""
 
-    overall: float = 1.0
-    """Overall ethics score (1=ethical, 0=unethical)."""
+    overall: float = 1.0  # 1=ethical, 0=unethical
     harmful_score: float = 0.0
-    """Harmfulness score."""
     bias_score: float = 0.0
-    """Bias score."""
     fairness_score: float = 1.0
-    """Fairness score."""
     privacy_score: float = 1.0
-    """Privacy protection score."""
     violations: list[tuple[EthicsViolation, float, str]] = field(default_factory=list)
-    """(violation_type, severity, evidence) tuples."""
 
 
 class EthicsGuard(SafetyMonitor):
-    """
-    Enforces ethical boundaries in agent debates.
+    """Enforces ethical boundaries in agent debates."""
 
-    Monitors for harmful content, bias, unfairness, and other
-    ethical violations to maintain debate integrity.
-
-    Example:
-        >>> guard = EthicsGuard(
-        ...     mode=MonitorMode.ACTIVE,
-        ...     sensitivity=0.7,
-        ... )
-        >>> result = await guard.analyze(turn, context)
-        >>> if result.should_halt:
-        ...     print(f"Ethics violation: {result.analysis_notes}")
-    """
-
-    # Harmful content patterns
+    # harmful content patterns - weights are rough estimates
     HARMFUL_PATTERNS: list[tuple[str, float]] = [
         ("kill", 0.7),
         ("murder", 0.8),
@@ -126,7 +75,7 @@ class EthicsGuard(SafetyMonitor):
         ("suicide", 0.7),
     ]
 
-    # Bias indicators
+    # bias indicators
     BIAS_PATTERNS: list[tuple[str, float]] = [
         ("all women", 0.6),
         ("all men", 0.6),
@@ -140,7 +89,6 @@ class EthicsGuard(SafetyMonitor):
         ("backwards", 0.5),
     ]
 
-    # Manipulation indicators
     MANIPULATION_PATTERNS: list[tuple[str, float]] = [
         ("you must believe", 0.6),
         ("only a fool", 0.7),
@@ -154,7 +102,6 @@ class EthicsGuard(SafetyMonitor):
         ("hidden agenda", 0.5),
     ]
 
-    # Privacy concern patterns
     PRIVACY_PATTERNS: list[tuple[str, float]] = [
         ("personal address", 0.7),
         ("phone number", 0.6),
@@ -175,17 +122,6 @@ class EthicsGuard(SafetyMonitor):
         halt_on_violation: bool = False,
         **kwargs,
     ) -> None:
-        """
-        Initialize the ethics guard.
-
-        Args:
-            config: Monitor configuration.
-            mode: Operating mode.
-            sensitivity: Detection sensitivity (0-1).
-            ethics_config: Specific ethics configuration.
-            halt_on_violation: Whether to halt on violations.
-            **kwargs: Additional configuration.
-        """
         self._sensitivity = min(1.0, max(0.0, sensitivity))
         self._ethics_config = ethics_config or EthicsConfig()
         self._halt_on_violation = halt_on_violation
@@ -214,16 +150,6 @@ class EthicsGuard(SafetyMonitor):
         turn: Turn,
         _context: DebateContext,
     ) -> SafetyResult:
-        """
-        Analyze a turn for ethics violations.
-
-        Args:
-            turn: The turn to analyze.
-            _context: Current debate context.
-
-        Returns:
-            SafetyResult with ethics severity and indicators.
-        """
         agent = turn.agent
         content = turn.argument.content
 
@@ -279,7 +205,6 @@ class EthicsGuard(SafetyMonitor):
         )
 
     def _evaluate_ethics(self, content: str) -> EthicsScore:
-        """Evaluate content for ethics issues."""
         content_lower = content.lower()
         violations: list[tuple[EthicsViolation, float, str]] = []
 
@@ -333,7 +258,6 @@ class EthicsGuard(SafetyMonitor):
     def _check_harmful_content(
         self, content: str
     ) -> tuple[EthicsViolation, float, str] | None:
-        """Check for harmful content."""
         matches = []
         for pattern, weight in self.HARMFUL_PATTERNS:
             if pattern in content:
@@ -352,7 +276,6 @@ class EthicsGuard(SafetyMonitor):
         return None
 
     def _check_bias(self, content: str) -> tuple[EthicsViolation, float, str] | None:
-        """Check for biased content."""
         matches = []
         for pattern, weight in self.BIAS_PATTERNS:
             if pattern in content:
@@ -373,7 +296,6 @@ class EthicsGuard(SafetyMonitor):
     def _check_manipulation(
         self, content: str
     ) -> tuple[EthicsViolation, float, str] | None:
-        """Check for manipulative content."""
         matches = []
         for pattern, weight in self.MANIPULATION_PATTERNS:
             if pattern in content:
@@ -394,7 +316,6 @@ class EthicsGuard(SafetyMonitor):
     def _check_privacy(
         self, content: str
     ) -> tuple[EthicsViolation, float, str] | None:
-        """Check for privacy concerns."""
         matches = []
         for pattern, weight in self.PRIVACY_PATTERNS:
             if pattern in content:
@@ -415,7 +336,6 @@ class EthicsGuard(SafetyMonitor):
     def _check_fairness(
         self, content: str
     ) -> tuple[EthicsViolation, float, str] | None:
-        """Check for fairness issues."""
         unfair_markers = [
             ("obviously right", 0.4),
             ("only idiots", 0.7),
@@ -447,7 +367,6 @@ class EthicsGuard(SafetyMonitor):
         severity: float,
         evidence: str,
     ) -> SafetyIndicator:
-        """Create a SafetyIndicator for a violation."""
         return SafetyIndicator(
             type=SafetyIndicatorType.ETHICS_BOUNDARY,
             severity=severity,
@@ -458,11 +377,9 @@ class EthicsGuard(SafetyMonitor):
     def get_violation_history(
         self, agent: str
     ) -> list[tuple[int, EthicsViolation, float]]:
-        """Get violation history for an agent."""
         return self._violation_history.get(agent, [])
 
     def get_agent_ethics_summary(self, agent: str) -> dict:
-        """Get ethics summary for an agent."""
         history = self._violation_history.get(agent, [])
         if not history:
             return {
@@ -481,12 +398,10 @@ class EthicsGuard(SafetyMonitor):
         }
 
     def reset_agent_history(self, agent: str) -> None:
-        """Reset violation history for an agent."""
         if agent in self._violation_history:
             del self._violation_history[agent]
             logger.debug("Agent ethics history reset", agent=agent)
 
     def reset_all_history(self) -> None:
-        """Reset all violation history."""
         self._violation_history.clear()
         logger.debug("All ethics history reset")

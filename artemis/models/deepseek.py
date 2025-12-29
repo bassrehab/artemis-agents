@@ -76,17 +76,7 @@ class DeepSeekModel(BaseModel):
         max_retries: int = 3,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize the DeepSeek model.
-
-        Args:
-            model: Model identifier.
-            api_key: DeepSeek API key (defaults to DEEPSEEK_API_KEY env var).
-            base_url: Custom API base URL.
-            timeout: Request timeout in seconds.
-            max_retries: Maximum retry attempts.
-            **kwargs: Additional configuration.
-        """
+        """Initialize the DeepSeek model."""
         api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
         if not api_key:
             raise ValueError(
@@ -141,19 +131,7 @@ class DeepSeekModel(BaseModel):
         stop: list[str] | None = None,
         **kwargs: Any,
     ) -> ModelResponse:
-        """
-        Generate a response from DeepSeek.
-
-        Args:
-            messages: Conversation messages.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens to generate.
-            stop: Stop sequences.
-            **kwargs: Additional parameters.
-
-        Returns:
-            ModelResponse with content and usage.
-        """
+        """Generate a response from DeepSeek."""
         request_body = self._build_request(
             messages=messages,
             temperature=temperature,
@@ -174,22 +152,7 @@ class DeepSeekModel(BaseModel):
         max_tokens: int | None = None,
         **kwargs: Any,
     ) -> ReasoningResponse:
-        """
-        Generate a response with extended thinking.
-
-        DeepSeek R1 provides visible reasoning traces that show
-        the model's chain-of-thought process.
-
-        Args:
-            messages: Conversation messages.
-            thinking_budget: Token budget for thinking.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens for final response.
-            **kwargs: Additional parameters.
-
-        Returns:
-            ReasoningResponse with thinking trace and content.
-        """
+        """Generate a response with extended thinking and reasoning trace."""
         if not self.supports_reasoning:
             raise NotImplementedError(
                 f"Model {self.model} does not support extended reasoning. "
@@ -217,19 +180,7 @@ class DeepSeekModel(BaseModel):
         stop: list[str] | None = None,
         **kwargs: Any,
     ) -> AsyncIterator[str]:
-        """
-        Generate a streaming response.
-
-        Args:
-            messages: Conversation messages.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens.
-            stop: Stop sequences.
-            **kwargs: Additional parameters.
-
-        Yields:
-            Response chunks.
-        """
+        """Generate a streaming response."""
         request_body = self._build_request(
             messages=messages,
             temperature=temperature,
@@ -266,18 +217,8 @@ class DeepSeekModel(BaseModel):
                             yield content
 
     async def count_tokens(self, messages: list[Message]) -> int:
-        """
-        Estimate token count for messages.
-
-        DeepSeek doesn't provide a token counting endpoint,
-        so we estimate based on character count.
-
-        Args:
-            messages: Messages to count.
-
-        Returns:
-            Estimated token count.
-        """
+        """Estimate token count for messages."""
+        # HACK: DeepSeek has no token counting endpoint, so we estimate from char count
         total_chars = sum(
             len(msg.content) + len(msg.role) + 4  # Role tokens + format
             for msg in messages
@@ -295,7 +236,6 @@ class DeepSeekModel(BaseModel):
         thinking_budget: int | None = None,
         **kwargs: Any,
     ) -> dict[str, Any]:
-        """Build the API request body."""
         request: dict[str, Any] = {
             "model": self.model,
             "messages": self._messages_to_dicts(messages),
@@ -321,7 +261,6 @@ class DeepSeekModel(BaseModel):
         return request
 
     def _thinking_budget_to_effort(self, budget: int) -> str:
-        """Convert thinking budget to effort level."""
         if budget < 2000:
             return "low"
         elif budget < 8000:
@@ -330,7 +269,6 @@ class DeepSeekModel(BaseModel):
             return "high"
 
     async def _make_request(self, request_body: dict[str, Any]) -> dict[str, Any]:
-        """Make an API request with retries."""
         last_error: Exception | None = None
 
         for attempt in range(self.max_retries):
@@ -374,7 +312,6 @@ class DeepSeekModel(BaseModel):
         raise DeepSeekError(f"Request failed after {self.max_retries} attempts") from last_error
 
     def _parse_response(self, data: dict[str, Any]) -> ModelResponse:
-        """Parse API response into ModelResponse."""
         choice = data["choices"][0]
         message = choice["message"]
 
@@ -392,7 +329,6 @@ class DeepSeekModel(BaseModel):
         )
 
     def _parse_reasoning_response(self, data: dict[str, Any]) -> ReasoningResponse:
-        """Parse API response into ReasoningResponse."""
         choice = data["choices"][0]
         message = choice["message"]
 
@@ -418,7 +354,6 @@ class DeepSeekModel(BaseModel):
         )
 
     async def close(self) -> None:
-        """Close the HTTP client."""
         await self._client.aclose()
 
     async def __aenter__(self) -> "DeepSeekModel":

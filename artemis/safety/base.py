@@ -25,8 +25,6 @@ class MonitorMode(str, Enum):
 
 
 class MonitorPriority(str, Enum):
-    """Priority level for safety monitors."""
-
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -59,6 +57,8 @@ class MonitorState:
 class SafetyMonitor(ABC):
     """Base class for safety monitors."""
 
+    # FIXME: could use a cleaner config pattern here
+
     def __init__(
         self,
         config: MonitorConfig | None = None,
@@ -88,27 +88,22 @@ class SafetyMonitor(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Unique name identifier for this monitor."""
         pass
 
     @property
     def monitor_type(self) -> str:
-        """Type of safety concern this monitor addresses."""
         return "general"
 
     @property
     def state(self) -> MonitorState:
-        """Current monitor state."""
         return self._state
 
     @property
     def is_active(self) -> bool:
-        """Whether monitor is in active mode."""
         return self.config.mode == MonitorMode.ACTIVE
 
     @property
     def is_enabled(self) -> bool:
-        """Whether monitor is enabled."""
         return self.config.enabled
 
     @abstractmethod
@@ -117,7 +112,6 @@ class SafetyMonitor(ABC):
         turn: Turn,
         context: DebateContext,
     ) -> SafetyResult:
-        """Analyze a turn for safety concerns."""
         pass
 
     async def process(
@@ -125,7 +119,7 @@ class SafetyMonitor(ABC):
         turn: Turn,
         context: DebateContext,
     ) -> SafetyResult:
-        """Process turn with full monitoring pipeline."""
+        """Run full monitoring pipeline on a turn."""
         if not self.is_enabled:
             return SafetyResult(monitor=self.name, severity=0.0)
 
@@ -206,7 +200,7 @@ class SafetyMonitor(ABC):
             stats["alert_count"] += 1
 
     def get_agent_risk_score(self, agent: str) -> float:
-        """Get cumulative risk score for an agent (0-1)."""
+        """Cumulative risk score for an agent (0-1)."""
         if agent not in self._state.agent_stats:
             return 0.0
 
@@ -271,7 +265,7 @@ class SafetyMonitor(ABC):
 
 
 class CompositeMonitor(SafetyMonitor):
-    """Combines multiple sub-monitors into one."""
+    """Combines multiple monitors into one."""
 
     def __init__(
         self,
@@ -335,7 +329,7 @@ class CompositeMonitor(SafetyMonitor):
 
 
 class MonitorRegistry:
-    """Registry for managing safety monitors."""
+    """Simple registry for safety monitors."""
 
     def __init__(self):
         self._monitors: dict[str, SafetyMonitor] = {}
@@ -403,7 +397,7 @@ class MonitorRegistry:
 
 
 class SafetyManager:
-    """High-level manager for coordinating safety monitors."""
+    """Coordinates multiple safety monitors."""
 
     def __init__(
         self,
@@ -434,7 +428,7 @@ class SafetyManager:
         return self._registry.get(name)
 
     async def analyze_turn(self, turn: Turn, context: DebateContext):
-        """Analyze a turn with all enabled monitors."""
+        """Run all enabled monitors on a turn."""
         results = []
 
         for monitor in self._registry.get_enabled():

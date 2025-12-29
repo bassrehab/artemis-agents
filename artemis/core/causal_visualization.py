@@ -1,13 +1,4 @@
-"""
-Causal Graph Visualization Module
-
-Export causal graphs to various formats for visualization and analysis:
-- DOT format (Graphviz)
-- Mermaid diagrams
-- JSON export
-- Timeline visualization
-- HTML reports
-"""
+"""Export causal graphs to DOT, Mermaid, JSON, and HTML formats."""
 
 from __future__ import annotations
 
@@ -22,10 +13,7 @@ if TYPE_CHECKING:
 
 
 class CausalVisualizer:
-    """Export causal graphs to various visualization formats.
-
-    Supports DOT (Graphviz), Mermaid, JSON, and HTML report generation.
-    """
+    """Export causal graphs to various visualization formats."""
 
     LINK_TYPE_STYLES = {
         "causes": {"color": "#2563eb", "style": "solid", "arrow": "->"},
@@ -36,11 +24,7 @@ class CausalVisualizer:
     }
 
     def __init__(self, graph: CausalGraph):
-        """Initialize visualizer with a causal graph.
-
-        Args:
-            graph: The CausalGraph to visualize.
-        """
+        """Initialize visualizer with a causal graph."""
         self.graph = graph
 
     def to_dot(
@@ -49,16 +33,7 @@ class CausalVisualizer:
         weak_threshold: float = 0.4,
         title: str | None = None,
     ) -> str:
-        """Export graph to DOT format for Graphviz.
-
-        Args:
-            highlight_weak: Highlight weak edges in red.
-            weak_threshold: Threshold for considering an edge weak.
-            title: Optional graph title.
-
-        Returns:
-            DOT format string.
-        """
+        """Export graph to DOT format for Graphviz."""
         lines = ["digraph CausalGraph {"]
         lines.append("    rankdir=TB;")
         lines.append("    node [shape=box, style=rounded];")
@@ -117,11 +92,9 @@ class CausalVisualizer:
         return "\n".join(lines)
 
     def _escape_dot_id(self, s: str) -> str:
-        """Escape a string for use as DOT node ID."""
         return s.replace('"', '\\"').replace("\n", " ")
 
     def _escape_dot_label(self, s: str) -> str:
-        """Escape a string for use as DOT label."""
         return s.replace('"', '\\"').replace("\n", "\\n")
 
     def to_mermaid(
@@ -130,16 +103,7 @@ class CausalVisualizer:
         highlight_weak: bool = False,
         weak_threshold: float = 0.4,
     ) -> str:
-        """Export graph to Mermaid diagram format.
-
-        Args:
-            direction: Graph direction (TB, BT, LR, RL).
-            highlight_weak: Highlight weak edges differently.
-            weak_threshold: Threshold for considering an edge weak.
-
-        Returns:
-            Mermaid diagram string.
-        """
+        """Export graph to Mermaid diagram format."""
         lines = [f"graph {direction}"]
 
         node_ids: dict[str, str] = {}
@@ -180,18 +144,11 @@ class CausalVisualizer:
         return "\n".join(lines)
 
     def _escape_mermaid(self, s: str) -> str:
-        """Escape a string for Mermaid labels."""
+        # mermaid chokes on brackets and quotes
         return s.replace('"', "'").replace("\n", " ").replace("[", "(").replace("]", ")")
 
     def to_json(self, include_analysis: bool = False) -> dict[str, object]:
-        """Export graph to JSON format.
-
-        Args:
-            include_analysis: Include analysis results if True.
-
-        Returns:
-            Dictionary representation of the graph.
-        """
+        """Export graph to JSON format."""
         from artemis.core.causal_analysis import CausalAnalyzer
 
         nodes = []
@@ -241,14 +198,7 @@ class CausalVisualizer:
     def generate_timeline(
         self, snapshots: list[GraphSnapshot]
     ) -> str:
-        """Generate a timeline visualization showing graph evolution.
-
-        Args:
-            snapshots: List of GraphSnapshot at different points.
-
-        Returns:
-            Mermaid timeline diagram string.
-        """
+        """Generate a timeline visualization showing graph evolution."""
         if not snapshots:
             return "gantt\n    title Graph Evolution\n    (no data)"
 
@@ -286,15 +236,7 @@ class CausalVisualizer:
         analysis: CausalAnalysisResult | None = None,
         title: str = "Causal Graph Analysis Report",
     ) -> str:
-        """Generate an HTML report with graph visualization and analysis.
-
-        Args:
-            analysis: Pre-computed analysis results (computed if not provided).
-            title: Report title.
-
-        Returns:
-            HTML report string.
-        """
+        """Generate an HTML report with graph visualization and analysis."""
         from artemis.core.causal_analysis import CausalAnalyzer
 
         if analysis is None:
@@ -437,7 +379,6 @@ class CausalVisualizer:
         return html_content
 
     def _generate_weak_links_section(self, analysis: CausalAnalysisResult) -> str:
-        """Generate HTML section for weak links."""
         if not analysis.weak_links:
             return ""
 
@@ -475,7 +416,6 @@ class CausalVisualizer:
         """
 
     def _generate_contradictions_section(self, analysis: CausalAnalysisResult) -> str:
-        """Generate HTML section for contradictions."""
         if not analysis.contradictions:
             return ""
 
@@ -506,7 +446,6 @@ class CausalVisualizer:
         """
 
     def _generate_critical_nodes_section(self, analysis: CausalAnalysisResult) -> str:
-        """Generate HTML section for critical nodes."""
         if not analysis.critical_nodes:
             return ""
 
@@ -537,7 +476,6 @@ class CausalVisualizer:
         """
 
     def _generate_fallacies_section(self, analysis: CausalAnalysisResult) -> str:
-        """Generate HTML section for detected fallacies."""
         if not analysis.fallacies:
             return ""
 
@@ -578,16 +516,7 @@ def create_snapshot(
     round_num: int,
     turn_num: int,
 ) -> GraphSnapshot:
-    """Create a snapshot of the current graph state.
-
-    Args:
-        graph: The causal graph.
-        round_num: Current round number.
-        turn_num: Current turn number.
-
-    Returns:
-        GraphSnapshot of the current state.
-    """
+    """Create a snapshot of the current graph state."""
     return GraphSnapshot(
         round=round_num,
         turn=turn_num,

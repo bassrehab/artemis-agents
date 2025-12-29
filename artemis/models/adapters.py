@@ -17,17 +17,7 @@ logger = get_logger(__name__)
 
 
 class ContentAdapter(ABC):
-    """Abstract base class for multimodal content adapters.
-
-    Adapters format multimodal content for specific LLM providers.
-
-    Example:
-        ```python
-        adapter = OpenAIContentAdapter()
-        if adapter.supports_type(ContentType.IMAGE):
-            formatted = adapter.format_content(message.parts)
-        ```
-    """
+    """Base class for multimodal content adapters."""
 
     @property
     @abstractmethod
@@ -37,37 +27,16 @@ class ContentAdapter(ABC):
 
     @abstractmethod
     def supports_type(self, content_type: ContentType) -> bool:
-        """Check if this adapter supports the given content type.
-
-        Args:
-            content_type: The content type to check.
-
-        Returns:
-            True if supported, False otherwise.
-        """
+        """Check if this adapter supports the given content type."""
         pass
 
     @abstractmethod
     def format_content(self, parts: list[ContentPart]) -> list[dict[str, Any]]:
-        """Format content parts for the provider's API.
-
-        Args:
-            parts: List of content parts to format.
-
-        Returns:
-            List of formatted content dictionaries.
-        """
+        """Format content parts for the provider's API."""
         pass
 
     def format_message(self, message: Message) -> dict[str, Any]:
-        """Format a complete message for the provider.
-
-        Args:
-            message: The message to format.
-
-        Returns:
-            Formatted message dictionary.
-        """
+        """Format a complete message for the provider."""
         if not message.parts or not message.is_multimodal:
             # Simple text message
             return {"role": message.role, "content": message.content}
@@ -78,27 +47,16 @@ class ContentAdapter(ABC):
 
 
 class OpenAIContentAdapter(ContentAdapter):
-    """Content adapter for OpenAI's vision API.
-
-    Formats content for GPT-4 Vision and similar models.
-
-    Example:
-        ```python
-        adapter = OpenAIContentAdapter()
-        messages = [adapter.format_message(msg) for msg in messages]
-        ```
-    """
+    """Content adapter for OpenAI's vision API."""
 
     @property
     def provider_name(self) -> str:
         return "openai"
 
     def supports_type(self, content_type: ContentType) -> bool:
-        """OpenAI supports text and images."""
         return content_type in (ContentType.TEXT, ContentType.IMAGE)
 
     def format_content(self, parts: list[ContentPart]) -> list[dict[str, Any]]:
-        """Format content for OpenAI API."""
         formatted = []
 
         for part in parts:
@@ -137,27 +95,16 @@ class OpenAIContentAdapter(ContentAdapter):
 
 
 class AnthropicContentAdapter(ContentAdapter):
-    """Content adapter for Anthropic's Claude vision API.
-
-    Formats content for Claude 3 and similar models.
-
-    Example:
-        ```python
-        adapter = AnthropicContentAdapter()
-        messages = [adapter.format_message(msg) for msg in messages]
-        ```
-    """
+    """Content adapter for Anthropic's Claude vision API."""
 
     @property
     def provider_name(self) -> str:
         return "anthropic"
 
     def supports_type(self, content_type: ContentType) -> bool:
-        """Anthropic supports text, images, and PDFs."""
         return content_type in (ContentType.TEXT, ContentType.IMAGE, ContentType.DOCUMENT)
 
     def format_content(self, parts: list[ContentPart]) -> list[dict[str, Any]]:
-        """Format content for Anthropic API."""
         formatted = []
 
         for part in parts:
@@ -206,27 +153,16 @@ class AnthropicContentAdapter(ContentAdapter):
 
 
 class GoogleContentAdapter(ContentAdapter):
-    """Content adapter for Google's Gemini multimodal API.
-
-    Formats content for Gemini Pro Vision and similar models.
-
-    Example:
-        ```python
-        adapter = GoogleContentAdapter()
-        messages = [adapter.format_message(msg) for msg in messages]
-        ```
-    """
+    """Content adapter for Google's Gemini multimodal API."""
 
     @property
     def provider_name(self) -> str:
         return "google"
 
     def supports_type(self, content_type: ContentType) -> bool:
-        """Google Gemini supports text, images, and documents."""
         return content_type in (ContentType.TEXT, ContentType.IMAGE, ContentType.DOCUMENT)
 
     def format_content(self, parts: list[ContentPart]) -> list[dict[str, Any]]:
-        """Format content for Gemini API."""
         formatted = []
 
         for part in parts:
@@ -272,28 +208,16 @@ class GoogleContentAdapter(ContentAdapter):
 
 
 class TextOnlyAdapter(ContentAdapter):
-    """Fallback adapter that converts all content to text.
-
-    Use for models that don't support multimodal content.
-
-    Example:
-        ```python
-        adapter = TextOnlyAdapter()
-        # All content converted to text descriptions
-        formatted = adapter.format_content(parts)
-        ```
-    """
+    """Fallback adapter that converts all content to text."""
 
     @property
     def provider_name(self) -> str:
         return "text_only"
 
     def supports_type(self, content_type: ContentType) -> bool:
-        """Only text is fully supported, others are converted."""
         return content_type == ContentType.TEXT
 
     def format_content(self, parts: list[ContentPart]) -> list[dict[str, Any]]:
-        """Convert all content to text."""
         formatted = []
 
         for part in parts:
@@ -303,7 +227,7 @@ class TextOnlyAdapter(ContentAdapter):
         return formatted
 
     def format_message(self, message: Message) -> dict[str, Any]:
-        """Format message as text only."""
+        # works but could be cleaner - just concatenates everything
         if not message.parts or not message.is_multimodal:
             return {"role": message.role, "content": message.content}
 
@@ -316,20 +240,7 @@ class TextOnlyAdapter(ContentAdapter):
 
 
 def get_adapter(provider: str) -> ContentAdapter:
-    """Get the appropriate content adapter for a provider.
-
-    Args:
-        provider: Provider name (openai, anthropic, google, etc.)
-
-    Returns:
-        Appropriate ContentAdapter instance.
-
-    Example:
-        ```python
-        adapter = get_adapter("openai")
-        formatted = adapter.format_message(message)
-        ```
-    """
+    """Get the appropriate content adapter for a provider."""
     adapters = {
         "openai": OpenAIContentAdapter,
         "anthropic": AnthropicContentAdapter,

@@ -20,32 +20,14 @@ class CitationStatus(str, Enum):
     """Status of a citation validation."""
 
     VALID = "valid"
-    """Citation is valid and verifiable."""
-
     INVALID = "invalid"
-    """Citation is invalid or doesn't exist."""
-
     UNVERIFIABLE = "unverifiable"
-    """Cannot verify (external service unavailable)."""
-
     PARTIAL = "partial"
-    """Some information matches but not all."""
 
 
 @dataclass
 class Citation:
-    """A parsed citation.
-
-    Example:
-        ```python
-        citation = Citation(
-            raw_text="Smith et al. (2023)",
-            author="Smith",
-            year=2023,
-            citation_type="author_year",
-        )
-        ```
-    """
+    """A parsed citation from text."""
 
     raw_text: str
     author: str | None = None
@@ -59,18 +41,7 @@ class Citation:
 
 @dataclass
 class ValidationResult:
-    """Result of validating a citation.
-
-    Example:
-        ```python
-        result = ValidationResult(
-            citation=citation,
-            status=CitationStatus.VALID,
-            confidence=0.9,
-            source_info={"title": "Actual Paper Title"},
-        )
-        ```
-    """
+    """Result of validating a citation."""
 
     citation: Citation
     status: CitationStatus
@@ -80,16 +51,9 @@ class ValidationResult:
 
 
 class CitationParser:
-    """Parses citations from text.
+    """Parses citations from text."""
 
-    Example:
-        ```python
-        parser = CitationParser()
-        citations = parser.parse("According to Smith (2023)...")
-        ```
-    """
-
-    # Citation patterns
+    # NOTE: these patterns handle most academic citation styles but may miss edge cases
     PATTERNS = {
         "author_year_paren": re.compile(
             r"(\b[A-Z][a-z]+(?:\s+(?:et\s+al\.?|and\s+[A-Z][a-z]+))?\s*)\((\d{4})\)"
@@ -103,14 +67,7 @@ class CitationParser:
     }
 
     def parse(self, text: str) -> list[Citation]:
-        """Parse all citations from text.
-
-        Args:
-            text: Text containing citations.
-
-        Returns:
-            List of parsed Citation objects.
-        """
+        """Parse all citations from text."""
         citations = []
 
         # Author (Year) format
@@ -155,24 +112,9 @@ class CitationParser:
 
 
 class CitationValidator:
-    """Validates citations against external sources.
-
-    Supports validation hooks for different types of citations.
-
-    Example:
-        ```python
-        validator = CitationValidator()
-
-        # Add custom validation hook
-        validator.add_hook("doi", my_doi_validator)
-
-        # Validate citations
-        results = await validator.validate_all(citations)
-        ```
-    """
+    """Validates citations against external sources."""
 
     def __init__(self) -> None:
-        """Initialize the validator."""
         self._parser = CitationParser()
         self._hooks: dict[str, callable] = {}
         self._cache: dict[str, ValidationResult] = {}
@@ -182,24 +124,12 @@ class CitationValidator:
         citation_type: str,
         validator: callable,
     ) -> None:
-        """Add a validation hook for a citation type.
-
-        Args:
-            citation_type: Type of citation (doi, url, author_year, etc.)
-            validator: Async function that validates the citation.
-        """
+        """Add a validation hook for a citation type."""
         self._hooks[citation_type] = validator
         logger.debug("Added validation hook", citation_type=citation_type)
 
     async def validate(self, citation: Citation) -> ValidationResult:
-        """Validate a single citation.
-
-        Args:
-            citation: The citation to validate.
-
-        Returns:
-            ValidationResult with status and details.
-        """
+        """Validate a single citation."""
         # Check cache
         cache_key = citation.raw_text
         if cache_key in self._cache:
@@ -225,7 +155,7 @@ class CitationValidator:
         return result
 
     def _validate_heuristic(self, citation: Citation) -> ValidationResult:
-        """Validate using heuristics when no hook is available."""
+        # FIXME: should probably add more robust DOI validation
         # DOI format check
         if citation.doi:
             # DOIs should start with 10.
@@ -293,28 +223,14 @@ class CitationValidator:
         self,
         citations: list[Citation],
     ) -> list[ValidationResult]:
-        """Validate multiple citations.
-
-        Args:
-            citations: List of citations to validate.
-
-        Returns:
-            List of validation results.
-        """
+        """Validate multiple citations concurrently."""
         import asyncio
 
         tasks = [self.validate(c) for c in citations]
         return await asyncio.gather(*tasks)
 
     async def validate_text(self, text: str) -> list[ValidationResult]:
-        """Parse and validate all citations in text.
-
-        Args:
-            text: Text containing citations.
-
-        Returns:
-            List of validation results.
-        """
+        """Parse and validate all citations in text."""
         citations = self._parser.parse(text)
         return await self.validate_all(citations)
 
@@ -323,11 +239,7 @@ class CitationValidator:
         self._cache.clear()
 
     def get_statistics(self) -> dict[str, int]:
-        """Get validation statistics from cache.
-
-        Returns:
-            Dictionary with counts by status.
-        """
+        """Get validation statistics from cache."""
         stats = {status.value: 0 for status in CitationStatus}
         for result in self._cache.values():
             stats[result.status.value] += 1
@@ -337,16 +249,7 @@ class CitationValidator:
 # Example validation hooks for common sources
 
 async def validate_doi_crossref(citation: Citation) -> ValidationResult:
-    """Validate DOI using CrossRef API.
-
-    Note: This is a stub - actual implementation would make HTTP request.
-
-    Args:
-        citation: Citation with DOI.
-
-    Returns:
-        ValidationResult.
-    """
+    """Validate DOI using CrossRef API (stub implementation)."""
     # In production, would use httpx to query CrossRef API:
     # https://api.crossref.org/works/{doi}
 
@@ -367,16 +270,7 @@ async def validate_doi_crossref(citation: Citation) -> ValidationResult:
 
 
 async def validate_url_archive(citation: Citation) -> ValidationResult:
-    """Validate URL using Web Archive.
-
-    Note: This is a stub - actual implementation would check archive.org.
-
-    Args:
-        citation: Citation with URL.
-
-    Returns:
-        ValidationResult.
-    """
+    """Validate URL using Web Archive (stub implementation)."""
     if not citation.url:
         return ValidationResult(
             citation=citation,

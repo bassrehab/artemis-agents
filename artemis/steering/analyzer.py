@@ -13,35 +13,17 @@ from artemis.steering.vectors import SteeringVector
 
 @dataclass
 class StyleMetrics:
-    """Measured style metrics from text analysis.
-
-    These metrics are extracted from text and can be compared
-    against target steering vectors.
-    """
+    """Measured style metrics from text analysis."""
 
     formality: float = 0.5
-    """Measured formality level."""
-
     aggression: float = 0.3
-    """Measured aggression level."""
-
     evidence_emphasis: float = 0.5
-    """Measured evidence emphasis."""
-
     conciseness: float = 0.5
-    """Measured conciseness."""
-
     emotional_appeal: float = 0.3
-    """Measured emotional appeal."""
-
     confidence: float = 0.5
-    """Measured confidence."""
-
-    creativity: float = 0.5
-    """Measured creativity (harder to assess heuristically)."""
+    creativity: float = 0.5  # harder to assess heuristically
 
     def to_vector(self) -> SteeringVector:
-        """Convert metrics to a steering vector."""
         return SteeringVector(
             formality=self.formality,
             aggression=self.aggression,
@@ -54,20 +36,7 @@ class StyleMetrics:
 
 
 class SteeringEffectivenessAnalyzer:
-    """Analyzes text to measure steering effectiveness.
-
-    Uses heuristic text analysis to estimate how well an output
-    matches a target steering vector.
-
-    Example:
-        ```python
-        analyzer = SteeringEffectivenessAnalyzer()
-        metrics = analyzer.analyze_output("The data clearly shows...")
-        effectiveness = analyzer.calculate_effectiveness(
-            metrics, target_vector
-        )
-        ```
-    """
+    """Analyzes text to measure steering effectiveness."""
 
     # Formal language indicators
     FORMAL_INDICATORS = [
@@ -179,14 +148,7 @@ class SteeringEffectivenessAnalyzer:
     ]
 
     def analyze_output(self, text: str) -> StyleMetrics:
-        """Analyze text to extract style metrics.
-
-        Args:
-            text: The text to analyze.
-
-        Returns:
-            StyleMetrics with measured values.
-        """
+        """Analyze text to extract style metrics."""
         text_lower = text.lower()
         word_count = len(text.split())
 
@@ -225,7 +187,7 @@ class SteeringEffectivenessAnalyzer:
         emotional_count = self._count_patterns(text_lower, self.EMOTIONAL_INDICATORS)
         emotional_appeal = min(1.0, 0.2 + (emotional_count / word_count) * 15)
 
-        # Creativity is hard to measure heuristically - default to neutral
+        # TODO: creativity is hard to measure heuristically - needs better approach
         creativity = 0.5
 
         return StyleMetrics(
@@ -239,7 +201,6 @@ class SteeringEffectivenessAnalyzer:
         )
 
     def _count_patterns(self, text: str, patterns: list[str]) -> int:
-        """Count occurrences of patterns in text."""
         total = 0
         for pattern in patterns:
             total += len(re.findall(pattern, text, re.IGNORECASE))
@@ -248,16 +209,6 @@ class SteeringEffectivenessAnalyzer:
     def _calculate_ratio(
         self, positive: int, negative: int, base: float = 0.5
     ) -> float:
-        """Calculate ratio-based metric.
-
-        Args:
-            positive: Count of positive indicators.
-            negative: Count of negative indicators.
-            base: Base value when counts are equal.
-
-        Returns:
-            Value between 0.0 and 1.0.
-        """
         total = positive + negative
         if total == 0:
             return base
@@ -267,7 +218,6 @@ class SteeringEffectivenessAnalyzer:
         return ratio
 
     def _avg_sentence_length(self, text: str) -> float:
-        """Calculate average sentence length."""
         sentences = re.split(r"[.!?]+", text)
         sentences = [s.strip() for s in sentences if s.strip()]
 
@@ -280,15 +230,7 @@ class SteeringEffectivenessAnalyzer:
     def calculate_effectiveness(
         self, metrics: StyleMetrics, target: SteeringVector
     ) -> float:
-        """Calculate how well metrics match target vector.
-
-        Args:
-            metrics: Measured style metrics.
-            target: Target steering vector.
-
-        Returns:
-            Effectiveness score (0.0-1.0, higher is better).
-        """
+        """Calculate how well metrics match target vector."""
         measured = metrics.to_vector()
         distance = measured.distance(target)
 
@@ -303,15 +245,7 @@ class SteeringEffectivenessAnalyzer:
     def get_dimension_matches(
         self, metrics: StyleMetrics, target: SteeringVector
     ) -> dict[str, float]:
-        """Get per-dimension match scores.
-
-        Args:
-            metrics: Measured style metrics.
-            target: Target steering vector.
-
-        Returns:
-            Dictionary of dimension -> match score (0.0-1.0).
-        """
+        """Get per-dimension match scores."""
         matches = {}
         measured = metrics.to_vector()
 

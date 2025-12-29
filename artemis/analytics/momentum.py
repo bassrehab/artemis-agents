@@ -18,29 +18,13 @@ if TYPE_CHECKING:
 
 
 class MomentumTracker:
-    """Tracks debate momentum and detects turning points.
-
-    Momentum is calculated based on evaluation scores and their rate of change.
-    Turning points are detected when momentum significantly shifts.
-
-    Example:
-        tracker = MomentumTracker(smoothing_window=2)
-        momentum_history, turning_points = tracker.compute_from_transcript(
-            transcript, agents
-        )
-    """
+    """Tracks debate momentum and detects turning points."""
 
     def __init__(
         self,
         smoothing_window: int = 2,
         turning_point_threshold: float = 0.3,
     ) -> None:
-        """Initialize momentum tracker.
-
-        Args:
-            smoothing_window: Number of rounds to average for smoothing
-            turning_point_threshold: Minimum momentum shift to flag as turning point
-        """
         self.smoothing_window = smoothing_window
         self.turning_point_threshold = turning_point_threshold
 
@@ -49,15 +33,7 @@ class MomentumTracker:
         transcript: list[Turn],
         agents: list[str],
     ) -> tuple[list[MomentumPoint], list[TurningPoint]]:
-        """Compute momentum history and detect turning points.
-
-        Args:
-            transcript: List of Turn objects from the debate
-            agents: List of agent names
-
-        Returns:
-            Tuple of (momentum_history, turning_points)
-        """
+        """Compute momentum history and detect turning points."""
         if not transcript:
             return [], []
 
@@ -117,7 +93,6 @@ class MomentumTracker:
         round_turns: list[Turn],
         agents: list[str],
     ) -> dict[str, float]:
-        """Compute average score per agent for a round."""
         agent_scores: dict[str, list[float]] = {agent: [] for agent in agents}
 
         for turn in round_turns:
@@ -134,10 +109,7 @@ class MomentumTracker:
         scores: list[float],
         window: int,
     ) -> float:
-        """Compute momentum using exponential smoothing.
-
-        Momentum is the smoothed rate of change of scores.
-        """
+        # exponential smoothing for rate of change
         if len(scores) < 2:
             return 0.0
 
@@ -174,7 +146,6 @@ class MomentumTracker:
         momentum_history: list[MomentumPoint],
         agents: list[str],
     ) -> list[TurningPoint]:
-        """Detect turning points where momentum significantly shifts."""
         turning_points: list[TurningPoint] = []
 
         # Group by round
@@ -244,7 +215,6 @@ class MomentumTracker:
         sign_flip: bool,
         large_shift: bool,
     ) -> str:
-        """Generate human-readable analysis of a turning point."""
         if sign_flip:
             if curr_momentum > 0:
                 return f"{agent} reversed their declining trend and gained momentum"
@@ -261,11 +231,7 @@ class MomentumTracker:
         self,
         transcript: list[Turn],
     ) -> list[SwayEvent]:
-        """Detect significant sway events in the debate.
-
-        A sway event is when a single argument significantly affects
-        the balance of the debate.
-        """
+        """Detect significant sway events in the debate."""
         sway_events: list[SwayEvent] = []
 
         # Look for turns with high scores that follow low opponent scores
@@ -320,7 +286,6 @@ class MomentumTracker:
         return sway_events
 
     def _determine_trigger_type(self, turn: Turn) -> str:
-        """Determine what type of argument caused the sway."""
         if not turn.argument:
             return "rhetorical"
 
@@ -341,18 +306,7 @@ class MomentumTracker:
         previous_scores: dict[str, list[float]],
         agents: list[str],
     ) -> dict[str, float]:
-        """Compute momentum for a single round.
-
-        Useful for live/streaming updates during a debate.
-
-        Args:
-            round_turns: Turns from the current round
-            previous_scores: Historical scores per agent
-            agents: List of agent names
-
-        Returns:
-            Dictionary of agent -> momentum value
-        """
+        """Compute momentum for a single round (useful for live updates)."""
         round_scores = self._compute_round_scores(round_turns, agents)
         momentum = {}
 
@@ -365,27 +319,13 @@ class MomentumTracker:
 
 
 class JuryPulseTracker:
-    """Track jury sentiment during debate execution.
-
-    This is optional and expensive as it requires additional LLM calls
-    to poll the jury after each round.
-
-    Example:
-        pulse_tracker = JuryPulseTracker(jury, sample_frequency=1)
-        sentiment = await pulse_tracker.sample_sentiment(transcript, context)
-    """
+    """Track jury sentiment during debate execution (expensive - requires LLM calls)."""
 
     def __init__(
         self,
         jury: JuryPanel,
         sample_frequency: int = 1,
     ) -> None:
-        """Initialize pulse tracker.
-
-        Args:
-            jury: The jury panel to poll
-            sample_frequency: How often to sample (1 = every round)
-        """
         self._jury = jury
         self._sample_frequency = sample_frequency
         self._history: list[JurySentiment] = []
@@ -396,17 +336,7 @@ class JuryPulseTracker:
         transcript: list[Turn],
         context: DebateContext,
     ) -> JurySentiment | None:
-        """Poll jury for current sentiment.
-
-        This triggers LLM calls for each juror - use sparingly.
-
-        Args:
-            transcript: Current debate transcript
-            context: Current debate context
-
-        Returns:
-            JurySentiment snapshot, or None if skipped due to frequency
-        """
+        """Poll jury for current sentiment (triggers LLM calls - use sparingly)."""
         self._sample_count += 1
 
         # Skip if not at sample frequency
@@ -416,7 +346,7 @@ class JuryPulseTracker:
         # Get current round
         current_round = max(t.round for t in transcript) if transcript else 0
 
-        # Poll each juror (this is expensive!)
+        # XXX: this is expensive - polls each juror individually
         from artemis.core.jury import JurorEvaluation
 
         evaluations: list[JurorEvaluation] = []
@@ -443,13 +373,7 @@ class JuryPulseTracker:
         self,
         evaluations: list[Any],
     ) -> dict[str, float]:
-        """Compute agent leanings from juror evaluations.
-
-        Returns values in range [-1, 1] where:
-        - Positive = winning
-        - Negative = losing
-        - 0 = neutral
-        """
+        # returns values in [-1, 1] where positive = winning
         if not evaluations:
             return {}
 
@@ -473,7 +397,6 @@ class JuryPulseTracker:
         self,
         evaluations: list[Any],
     ) -> dict[str, dict[str, float]]:
-        """Compute per-perspective breakdown."""
         breakdown: dict[str, dict[str, float]] = {}
 
         for e in evaluations:
@@ -483,10 +406,8 @@ class JuryPulseTracker:
         return breakdown
 
     def get_sentiment_history(self) -> list[JurySentiment]:
-        """Return accumulated sentiment samples."""
         return self._history.copy()
 
     def clear_history(self) -> None:
-        """Clear accumulated history."""
         self._history = []
         self._sample_count = 0
