@@ -302,7 +302,7 @@ class UnanimousAggregator(VerdictAggregator):
                 sub_verdicts=[],
             )
 
-        decisions = set(v.decision.lower() for v in verdicts)
+        decisions = {v.decision.lower() for v in verdicts}
 
         if len(decisions) == 1:
             # Unanimous

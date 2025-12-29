@@ -48,8 +48,8 @@ class VerificationRuleBase(ABC):
     @abstractmethod
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Verify the argument against this rule.
@@ -89,8 +89,8 @@ class CausalChainRule(VerificationRuleBase):
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Verify causal chains in the argument."""
@@ -243,8 +243,8 @@ class CitationRule(VerificationRuleBase):
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Verify citations in the argument."""
@@ -342,8 +342,8 @@ class LogicalConsistencyRule(VerificationRuleBase):
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Check for logical contradictions."""
@@ -431,8 +431,8 @@ class EvidenceSupportRule(VerificationRuleBase):
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Verify evidence support for claims."""
@@ -547,8 +547,8 @@ class FallacyFreeRule(VerificationRuleBase):
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
         config: dict[str, Any] | None = None,
     ) -> VerificationResult:
         """Check for logical fallacies."""

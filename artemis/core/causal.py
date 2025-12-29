@@ -323,7 +323,7 @@ class CausalGraph:
         Returns:
             Dictionary mapping node_id to centrality score (0-1).
         """
-        centrality: dict[str, int] = {node_id: 0 for node_id in self._nodes}
+        centrality: dict[str, int] = dict.fromkeys(self._nodes, 0)
         nodes = list(self._nodes.keys())
 
         for source in nodes:

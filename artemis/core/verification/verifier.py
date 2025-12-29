@@ -74,8 +74,8 @@ class ArgumentVerifier:
 
     async def verify(
         self,
-        argument: "Argument",
-        context: "DebateContext | None" = None,
+        argument: Argument,
+        context: DebateContext | None = None,
     ) -> VerificationReport:
         """Verify an argument against all configured rules."""
         logger.info(
@@ -125,10 +125,7 @@ class ArgumentVerifier:
         all_passed = all(r.passed for r in results)
         score_passed = overall_score >= self.spec.min_score
 
-        if self.spec.strict_mode:
-            overall_passed = all_passed and score_passed
-        else:
-            overall_passed = score_passed
+        overall_passed = (all_passed and score_passed) if self.spec.strict_mode else score_passed
 
         # Build summary
         failed_rules = [r for r in results if not r.passed]
@@ -166,8 +163,8 @@ class ArgumentVerifier:
 
     async def verify_batch(
         self,
-        arguments: list["Argument"],
-        context: "DebateContext | None" = None,
+        arguments: list[Argument],
+        context: DebateContext | None = None,
     ) -> list[VerificationReport]:
         """Verify multiple arguments concurrently."""
         import asyncio

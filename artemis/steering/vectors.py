@@ -6,7 +6,7 @@ agent behavior at runtime.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -93,11 +93,11 @@ class SteeringVector:
         return {dim: getattr(self, dim) for dim in self._dimensions()}
 
     @classmethod
-    def from_dict(cls, d: dict[str, float]) -> "SteeringVector":
+    def from_dict(cls, d: dict[str, float]) -> SteeringVector:
         """Create from dictionary."""
         return cls(**{k: v for k, v in d.items() if k in cls().__dict__})
 
-    def blend(self, other: "SteeringVector", weight: float) -> "SteeringVector":
+    def blend(self, other: SteeringVector, weight: float) -> SteeringVector:
         """Blend with another vector.
 
         Args:
@@ -118,7 +118,7 @@ class SteeringVector:
 
         return SteeringVector(**blended)
 
-    def distance(self, other: "SteeringVector") -> float:
+    def distance(self, other: SteeringVector) -> float:
         """Calculate Euclidean distance to another vector.
 
         Args:
@@ -194,7 +194,7 @@ class SteeringConfig:
                 f"Adaptation rate must be between 0.0 and 1.0, got {self.adaptation_rate}"
             )
 
-    def with_strength(self, strength: float) -> "SteeringConfig":
+    def with_strength(self, strength: float) -> SteeringConfig:
         """Create a copy with different strength."""
         return SteeringConfig(
             vector=self.vector,
@@ -206,7 +206,7 @@ class SteeringConfig:
             max_strength=self.max_strength,
         )
 
-    def with_vector(self, vector: SteeringVector) -> "SteeringConfig":
+    def with_vector(self, vector: SteeringVector) -> SteeringConfig:
         """Create a copy with different vector."""
         return SteeringConfig(
             vector=vector,

@@ -10,6 +10,15 @@ Contains the core ARTEMIS implementation:
 """
 
 from artemis.core.agent import Agent, DebateStrategy, OpponentModel, StrategyContext
+from artemis.core.aggregation import (
+    ConfidenceWeightedAggregator,
+    MajorityVoteAggregator,
+    UnanimousAggregator,
+    VerdictAggregator,
+    WeightedAverageAggregator,
+    WeightedMajorityAggregator,
+    create_aggregator,
+)
 from artemis.core.argument import ArgumentBuilder, ArgumentHierarchy, ArgumentParser
 from artemis.core.causal import (
     CausalEdge,
@@ -35,6 +44,13 @@ from artemis.core.causal_visualization import (
     create_snapshot,
 )
 from artemis.core.debate import Debate, DebateError, DebateHaltedError
+from artemis.core.decomposition import (
+    HybridDecomposer,
+    LLMTopicDecomposer,
+    ManualDecomposer,
+    RuleBasedDecomposer,
+    TopicDecomposer,
+)
 from artemis.core.disagreement import DisagreementAnalyzer, DisagreementType
 from artemis.core.ethics import (
     EthicalConcern,
@@ -61,6 +77,7 @@ from artemis.core.evidence import (
     ExtractedEvidence,
 )
 from artemis.core.feedback import FeedbackSummary, FeedbackSynthesizer
+from artemis.core.hierarchical import HierarchicalDebate
 from artemis.core.jury import (
     ConsensusResult,
     JurorEvaluation,
@@ -72,39 +89,42 @@ from artemis.core.llm_evaluation import (
     EvaluatorFactory,
     LLMCriterionEvaluator,
 )
+from artemis.core.multimodal_evidence import (
+    DocumentProcessor,
+    ExtractedContent,
+    ExtractionType,
+    ImageAnalyzer,
+    MultimodalEvidenceExtractor,
+)
 from artemis.core.streaming import (
     ConsoleStreamCallback,
     StreamCallback,
     StreamingDebate,
 )
-from artemis.core.aggregation import (
-    ConfidenceWeightedAggregator,
-    MajorityVoteAggregator,
-    UnanimousAggregator,
-    VerdictAggregator,
-    WeightedAverageAggregator,
-    WeightedMajorityAggregator,
-    create_aggregator,
-)
-from artemis.core.decomposition import (
-    HybridDecomposer,
-    LLMTopicDecomposer,
-    ManualDecomposer,
-    RuleBasedDecomposer,
-    TopicDecomposer,
-)
-from artemis.core.hierarchical import HierarchicalDebate
 from artemis.core.types import (
+    # Hierarchical Debate Types
+    AggregationMethod,
     # Argument
     Argument,
     # Evaluation
     ArgumentEvaluation,
     # Enums
     ArgumentLevel,
+    # Causal Analysis Types (v2)
+    ArgumentStrengthScore,
+    AttackTarget,
+    CausalAnalysisResult,
     CausalGraphUpdate,
     # Evidence and Causal
     CausalLink,
+    CircularReasoningResult,
+    CompoundVerdict,
+    # Multimodal Types
+    ContentPart,
+    ContentType,
+    ContradictionResult,
     CriterionScore,
+    CriticalNodeResult,
     # Configuration
     DebateConfig,
     # Context
@@ -113,59 +133,45 @@ from artemis.core.types import (
     DebateMetadata,
     DebateResult,
     DebateState,
+    DecompositionStrategy,
     # Verdict
     DissentingOpinion,
     EvaluationCriteria,
     EvaluationMode,
     Evidence,
+    FallacyResult,
+    FallacyType,
+    GraphSnapshot,
+    HierarchicalContext,
+    HierarchyLevel,
     JuryPerspective,
     # Messages
     Message,
     ModelResponse,
     ReasoningConfig,
+    ReasoningGap,
     ReasoningResponse,
+    ReinforcementSuggestion,
     # Safety
     SafetyAlert,
     SafetyIndicator,
     SafetyIndicatorType,
     SafetyResult,
+    # Streaming Types
+    StreamEvent,
+    StreamEventType,
+    SubDebateSpec,
     # Turn
     Turn,
     Usage,
     Verdict,
-    # Causal Analysis Types (v2)
-    ArgumentStrengthScore,
-    AttackTarget,
-    CausalAnalysisResult,
-    CircularReasoningResult,
-    ContradictionResult,
-    CriticalNodeResult,
-    FallacyResult,
-    FallacyType,
-    GraphSnapshot,
-    ReasoningGap,
-    ReinforcementSuggestion,
+    VerificationReport,
+    VerificationResult,
+    VerificationRule,
+    VerificationRuleType,
+    VerificationSpec,
+    VerificationViolation,
     WeakLinkResult,
-    # Streaming Types
-    StreamEvent,
-    StreamEventType,
-    # Hierarchical Debate Types
-    AggregationMethod,
-    CompoundVerdict,
-    DecompositionStrategy,
-    HierarchicalContext,
-    HierarchyLevel,
-    SubDebateSpec,
-    # Multimodal Types
-    ContentPart,
-    ContentType,
-)
-from artemis.core.multimodal_evidence import (
-    DocumentProcessor,
-    ExtractedContent,
-    ExtractionType,
-    ImageAnalyzer,
-    MultimodalEvidenceExtractor,
 )
 from artemis.core.verification import (
     ArgumentVerifier,
@@ -177,14 +183,6 @@ from artemis.core.verification import (
     LogicalConsistencyRule,
     VerificationError,
     VerificationRuleBase,
-)
-from artemis.core.types import (
-    VerificationReport,
-    VerificationResult,
-    VerificationRule,
-    VerificationRuleType,
-    VerificationSpec,
-    VerificationViolation,
 )
 
 __all__ = [

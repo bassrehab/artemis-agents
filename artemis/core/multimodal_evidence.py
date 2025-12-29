@@ -92,7 +92,7 @@ Maintain the original structure where possible.""",
 
     def __init__(
         self,
-        model: "BaseModel | None" = None,
+        model: BaseModel | None = None,
         model_name: str = "gpt-4o",
         api_key: str | None = None,
     ) -> None:
@@ -101,7 +101,7 @@ Maintain the original structure where possible.""",
         self._model_name = model_name
         self._api_key = api_key
 
-    async def _get_model(self) -> "BaseModel":
+    async def _get_model(self) -> BaseModel:
         # Lazy init - only create model when needed
         if self._model:
             return self._model
@@ -251,7 +251,7 @@ Be objective and analytical."""
             return ExtractedContent(
                 source_type=content.type,
                 extraction_type=ExtractionType.SUMMARY,
-                text=f"[Extraction failed]",
+                text="[Extraction failed]",
                 confidence=0.0,
                 metadata={"error": str(e)},
             )
@@ -353,7 +353,7 @@ Be precise with numbers and labels."""
 
     def __init__(
         self,
-        model: "BaseModel | None" = None,
+        model: BaseModel | None = None,
         model_name: str = "gpt-4o",
         api_key: str | None = None,
     ) -> None:

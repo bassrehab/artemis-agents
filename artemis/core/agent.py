@@ -144,7 +144,7 @@ class Agent:
         self._current_strategy = DebateStrategy.ESTABLISH
 
         # Steering controller for behavior modification
-        self._steering_controller: "SteeringController | None" = None
+        self._steering_controller: SteeringController | None = None
 
         logger.debug(
             "Agent initialized",
@@ -172,11 +172,11 @@ class Agent:
         return self._current_strategy
 
     @property
-    def steering_controller(self) -> "SteeringController | None":
+    def steering_controller(self) -> SteeringController | None:
         """The steering controller for behavior modification."""
         return self._steering_controller
 
-    def set_steering(self, controller: "SteeringController") -> None:
+    def set_steering(self, controller: SteeringController) -> None:
         """Set the steering controller for this agent.
 
         Args:

@@ -248,7 +248,7 @@ Ensure:
 
     def __init__(
         self,
-        model: "BaseModel | None" = None,
+        model: BaseModel | None = None,
         model_name: str = "gpt-4o-mini",
         api_key: str | None = None,
     ) -> None:
@@ -267,7 +267,7 @@ Ensure:
     def strategy(self) -> DecompositionStrategy:
         return DecompositionStrategy.LLM
 
-    async def _get_model(self) -> "BaseModel":
+    async def _get_model(self) -> BaseModel:
         """Get or create the model instance."""
         if self._model:
             return self._model
@@ -383,7 +383,7 @@ class HybridDecomposer(TopicDecomposer):
 
     def __init__(
         self,
-        model: "BaseModel | None" = None,
+        model: BaseModel | None = None,
         model_name: str = "gpt-4o-mini",
         api_key: str | None = None,
     ) -> None:

@@ -5,7 +5,6 @@ Common steering configurations for typical debate scenarios.
 
 from artemis.steering.vectors import SteeringConfig, SteeringMode, SteeringVector
 
-
 # Preset vectors for common styles
 PRESET_VECTORS = {
     "formal_academic": SteeringVector(

@@ -17,13 +17,10 @@ from artemis.core.decomposition import (
     TopicDecomposer,
 )
 from artemis.core.types import (
-    AggregationMethod,
     CompoundVerdict,
     DebateConfig,
     DebateResult,
     HierarchicalContext,
-    HierarchyLevel,
-    SubDebateSpec,
     Verdict,
 )
 from artemis.utils.logging import get_logger
@@ -64,14 +61,14 @@ class HierarchicalDebate:
     def __init__(
         self,
         topic: str,
-        agents: list["Agent"],
+        agents: list[Agent],
         decomposer: TopicDecomposer | None = None,
         aggregator: VerdictAggregator | None = None,
         rounds: int = 3,
         max_depth: int = 2,
         config: DebateConfig | None = None,
-        jury: "JuryPanel | None" = None,
-        evaluator: "AdaptiveEvaluator | None" = None,
+        jury: JuryPanel | None = None,
+        evaluator: AdaptiveEvaluator | None = None,
         **kwargs: Any,
     ) -> None:
         """Initialize a hierarchical debate.
@@ -207,7 +204,7 @@ class HierarchicalDebate:
         sub_verdicts: list[Verdict] = []
         sub_topics: list[str] = []
 
-        for i, spec in enumerate(specs):
+        for spec in specs:
             # Create child context
             child_context = HierarchicalContext(
                 parent_topic=topic,

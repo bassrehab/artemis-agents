@@ -6,12 +6,12 @@ optionally adapts the vector based on effectiveness feedback.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from artemis.steering.vectors import SteeringConfig, SteeringMode, SteeringVector
 from artemis.steering.formatter import SteeringFormatter
+from artemis.steering.vectors import SteeringConfig, SteeringMode, SteeringVector
 
 if TYPE_CHECKING:
     from artemis.steering.analyzer import StyleMetrics
@@ -27,7 +27,7 @@ class SteeringApplication:
     prompt_before: str
     prompt_after: str
     output: str | None = None
-    metrics: "StyleMetrics | None" = None
+    metrics: StyleMetrics | None = None
 
 
 class SteeringController:
