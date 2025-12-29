@@ -358,17 +358,29 @@ class Agent:
                 level=level,
             )
 
-            # Enhance extraction with LLM if available
+            # Enhance extraction with LLM if available (run in parallel for speed)
             evidence = argument.evidence
             causal_links = argument.causal_links
 
-            if self._llm_evidence_extractor and not evidence:
-                # Use LLM extraction if regex found nothing
-                evidence = await self._llm_evidence_extractor.extract(content)
+            # Run LLM extractions in parallel if both are needed
+            import asyncio
+            extraction_tasks = []
+            need_evidence = self._llm_evidence_extractor and not evidence
+            need_causal = self._llm_causal_extractor and not causal_links
 
-            if self._llm_causal_extractor and not causal_links:
-                # Use LLM extraction if regex found nothing
-                causal_links = await self._llm_causal_extractor.extract(content)
+            if need_evidence:
+                extraction_tasks.append(self._llm_evidence_extractor.extract(content))
+            if need_causal:
+                extraction_tasks.append(self._llm_causal_extractor.extract(content))
+
+            if extraction_tasks:
+                results = await asyncio.gather(*extraction_tasks)
+                idx = 0
+                if need_evidence:
+                    evidence = results[idx]
+                    idx += 1
+                if need_causal:
+                    causal_links = results[idx]
 
             # Rebuild argument with enhanced extraction and optional thinking trace
             if (evidence != argument.evidence or

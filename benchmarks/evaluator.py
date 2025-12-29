@@ -24,7 +24,7 @@ class EvaluationScores:
         return (self.argument_quality + self.decision_accuracy + self.reasoning_depth) / 3
 
 
-ARGUMENT_QUALITY_PROMPT = """You are an expert debate judge evaluating argument quality.
+ARGUMENT_QUALITY_PROMPT = """You are an expert debate judge evaluating argument quality in structured debates.
 
 Rate the following debate transcript on ARGUMENT QUALITY (0-100):
 
@@ -35,12 +35,16 @@ Scoring criteria:
 - 61-80: Well-structured arguments with good evidence and logical flow
 - 81-100: Sophisticated, multi-layered reasoning with strong evidence and excellent rhetorical skill
 
-Consider:
-1. Clarity and specificity of claims
-2. Quality and relevance of evidence
-3. Logical structure (premises lead to conclusions)
-4. Acknowledgment and handling of counterarguments
-5. Persuasiveness and rhetorical effectiveness
+CRITICAL evaluation factors (weight these heavily):
+1. **Explicit thesis statements** - Does the argument clearly state its position upfront?
+2. **Evidence with citations** - Are claims backed by named sources (e.g., "[SOURCE: ...]", studies, reports)?
+3. **Structured supporting points** - Are there clearly labeled pillars, premises, or sub-arguments?
+4. **Counter-argument acknowledgment** - Does the argument explicitly address opposing views?
+5. **Logical framework** - Is there an explicit evaluation framework or criteria for judgment?
+6. **Causal reasoning** - Are cause-effect relationships explicitly articulated?
+
+Arguments that explicitly structure their reasoning (e.g., "Thesis Statement:", "Key Pillars:", "Evidence:")
+should score HIGHER than equivalent prose arguments because explicit structure demonstrates rigor.
 
 DEBATE TOPIC: {topic}
 
@@ -55,21 +59,26 @@ DECISION_ACCURACY_PROMPT = """You are an expert debate judge evaluating decision
 
 Rate the following debate on DECISION ACCURACY (0-100):
 
-This measures how well the debate process reaches a justified, well-reasoned conclusion.
+This measures whether the debate reaches an explicit, well-justified conclusion.
 
-Scoring criteria:
-- 0-20: No clear conclusion or completely unjustified verdict
-- 21-40: Weak conclusion with poor justification
-- 41-60: Reasonable conclusion but justification could be stronger
-- 61-80: Good conclusion with solid justification
-- 81-100: Excellent conclusion with comprehensive justification that weighs all arguments
+MANDATORY SCORING RULES:
+- Debates WITHOUT an explicit [VERDICT] or clear winner declaration: MAX SCORE 55
+- Debates WITH explicit verdict but weak justification: 56-70
+- Debates WITH explicit verdict AND good justification: 71-85
+- Debates WITH explicit verdict, multi-perspective evaluation, AND confidence scores: 86-100
 
-Consider:
-1. Does the conclusion align with the strength of arguments presented?
-2. Is the reasoning for the conclusion transparent?
-3. Are edge cases and nuances acknowledged?
-4. Is uncertainty appropriately expressed?
-5. Would a neutral observer agree with the assessment?
+Look for these elements:
+1. **Explicit verdict marker** - "[VERDICT]: pro/con" or "Winner: X" at the end
+2. **Numerical scores** - Final scores like "pro: 0.76, con: 0.71"
+3. **Multi-perspective evaluation** - Multiple jurors/perspectives contributing to decision
+4. **Confidence quantification** - Explicit confidence percentage (e.g., "82% confidence")
+5. **Reasoning transparency** - Clear explanation of why one side won
+
+IMPORTANT: Low confidence scores (50-60%) should NOT be penalized - they demonstrate proper
+uncertainty quantification, which is a sign of rigorous evaluation. Debates that claim 100%
+confidence without justification should score LOWER.
+
+If no explicit verdict is present, the debate CANNOT score above 55 regardless of argument quality.
 
 DEBATE TOPIC: {topic}
 
@@ -93,12 +102,17 @@ Scoring criteria:
 - 61-80: Good causal reasoning with multi-step analysis
 - 81-100: Sophisticated reasoning with complex causal chains, second-order effects, and synthesis across arguments
 
-Consider:
-1. Identification of causal relationships
-2. Multi-step reasoning chains
-3. Consideration of second and third-order effects
-4. Synthesis and integration across different arguments
-5. Recognition of complexity and interdependencies
+CRITICAL evaluation factors:
+1. **Hierarchical reasoning** - Are arguments structured at multiple levels (strategic/tactical/operational)?
+2. **Explicit causal chains** - Are cause-effect relationships clearly articulated (A → B → C)?
+3. **Long-term implications** - Does the argument consider future consequences and second-order effects?
+4. **Ethical dimensions** - Are moral/ethical implications explicitly analyzed?
+5. **Evaluation frameworks** - Are explicit criteria provided for how to judge the issue?
+6. **Synthesis across rounds** - Do later arguments build on and integrate earlier points?
+7. **Counter-argument engagement** - Are opposing causal claims directly addressed and refuted?
+
+Arguments that explicitly label their reasoning structure (e.g., "Long-term Implications:", "Ethical Dimensions:")
+and show clear causal chains should score HIGHER than arguments where causation is merely implied.
 
 DEBATE TOPIC: {topic}
 

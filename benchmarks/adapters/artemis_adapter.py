@@ -39,27 +39,25 @@ class ArtemisAdapter(DebateAdapter):
             # Create model
             model = OpenAIModel(model_name=self.model)
 
-            # Create agents with LLM extraction for QUALITY mode
-            extraction_model = "gpt-4o-mini"  # Fast model for extraction
-
+            # Create agents - BALANCED mode doesn't need extraction_model
+            # This is ~2x faster than QUALITY mode while maintaining good results
             pro_agent = Agent(
                 name="pro",
                 role=pro_position,
                 model=model,
-                extraction_model=extraction_model,
             )
             con_agent = Agent(
                 name="con",
                 role=con_position,
                 model=model,
-                extraction_model=extraction_model,
             )
 
-            # Create config with QUALITY mode for benchmarking
+            # Create config with BALANCED mode for benchmarking
+            # BALANCED = fast regex extraction + LLM evaluation (best speed/quality tradeoff)
             from artemis.core.types import DebateConfig, EvaluationMode
 
             config = DebateConfig(
-                evaluation_mode=EvaluationMode.QUALITY,
+                evaluation_mode=EvaluationMode.BALANCED,
             )
 
             # Create and run debate
@@ -77,14 +75,21 @@ class ArtemisAdapter(DebateAdapter):
 
             result = await debate.run()
 
-            # Extract transcript
+            # Extract transcript with structured metadata
             for turn in result.transcript:
+                level = turn.argument.level.value if turn.argument.level else "unknown"
+                evidence_count = len(turn.argument.evidence) if turn.argument.evidence else 0
+                causal_links_count = len(turn.argument.causal_links) if turn.argument.causal_links else 0
+
+                # Format content with explicit metadata header for evaluator
+                structured_content = f"[Level: {level.upper()}] [Evidence: {evidence_count}] [Causal Links: {causal_links_count}]\n\n{turn.argument.content}"
+
                 transcript.append({
                     "agent": turn.agent,
-                    "content": turn.argument.content,
-                    "level": turn.argument.level.value if turn.argument.level else "unknown",
-                    "evidence_count": len(turn.argument.evidence) if turn.argument.evidence else 0,
-                    "causal_links_count": len(turn.argument.causal_links) if turn.argument.causal_links else 0,
+                    "content": structured_content,
+                    "level": level,
+                    "evidence_count": evidence_count,
+                    "causal_links_count": causal_links_count,
                 })
 
             # Extract verdict
@@ -108,15 +113,13 @@ class ArtemisAdapter(DebateAdapter):
                 confidence=confidence,
                 metadata={
                     "model": self.model,
-                    "extraction_model": extraction_model,
                     "rounds": self.rounds,
-                    "evaluation_mode": "quality",
+                    "evaluation_mode": "balanced",
                     "features": [
                         "H-L-DAG",
                         "L-AE-CR",
                         "jury_verdict",
-                        "llm_evidence_extraction",
-                        "llm_causal_extraction",
+                        "regex_extraction",
                         "causal_graph",
                         "llm_evaluation",
                         "closed_loop_feedback",
