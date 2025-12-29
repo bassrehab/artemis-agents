@@ -39,16 +39,20 @@ class ArtemisAdapter(DebateAdapter):
             # Create model
             model = OpenAIModel(model_name=self.model)
 
-            # Create agents
+            # Create agents with LLM extraction for QUALITY mode
+            extraction_model = "gpt-4o-mini"  # Fast model for extraction
+
             pro_agent = Agent(
                 name="pro",
                 role=pro_position,
                 model=model,
+                extraction_model=extraction_model,
             )
             con_agent = Agent(
                 name="con",
                 role=con_position,
                 model=model,
+                extraction_model=extraction_model,
             )
 
             # Create config with QUALITY mode for benchmarking
@@ -80,6 +84,7 @@ class ArtemisAdapter(DebateAdapter):
                     "content": turn.argument.content,
                     "level": turn.argument.level.value if turn.argument.level else "unknown",
                     "evidence_count": len(turn.argument.evidence) if turn.argument.evidence else 0,
+                    "causal_links_count": len(turn.argument.causal_links) if turn.argument.causal_links else 0,
                 })
 
             # Extract verdict
@@ -103,13 +108,16 @@ class ArtemisAdapter(DebateAdapter):
                 confidence=confidence,
                 metadata={
                     "model": self.model,
+                    "extraction_model": extraction_model,
                     "rounds": self.rounds,
                     "evaluation_mode": "quality",
                     "features": [
                         "H-L-DAG",
                         "L-AE-CR",
                         "jury_verdict",
-                        "evidence_tracking",
+                        "llm_evidence_extraction",
+                        "llm_causal_extraction",
+                        "causal_graph",
                         "llm_evaluation",
                         "closed_loop_feedback",
                         "adaptive_level_selection",

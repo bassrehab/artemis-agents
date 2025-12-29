@@ -93,6 +93,7 @@ class Agent:
         persona: str | None = None,
         reasoning: ReasoningConfig | None = None,
         api_key: str | None = None,
+        extraction_model: str | None = None,
         **model_kwargs: Any,
     ) -> None:
         self.name = name
@@ -100,6 +101,7 @@ class Agent:
         self.position = position
         self.persona = persona
         self.reasoning = reasoning or ReasoningConfig(enabled=False)
+        self._extraction_model = extraction_model
 
         # Initialize the model (lazy import to avoid circular dependency)
         from artemis.models.base import BaseModel as ModelBase
@@ -113,9 +115,20 @@ class Agent:
         # Argument parser for extracting structure
         self._parser = ArgumentParser()
 
-        # Evidence and causal extractors
+        # Evidence and causal extractors (regex-based, used as fallback)
         self._evidence_extractor = EvidenceExtractor()
         self._causal_extractor = CausalExtractor()
+
+        # LLM-based extractors (used when extraction_model is set)
+        self._llm_causal_extractor = None
+        self._llm_evidence_extractor = None
+        if extraction_model:
+            from artemis.core.llm_extraction import (
+                LLMCausalExtractor,
+                LLMEvidenceExtractor,
+            )
+            self._llm_causal_extractor = LLMCausalExtractor(model_name=extraction_model)
+            self._llm_evidence_extractor = LLMEvidenceExtractor(model_name=extraction_model)
 
         # Track generated arguments
         self._argument_history: list[Argument] = []
@@ -135,6 +148,7 @@ class Agent:
             role=role,
             model=self._model.model,
             reasoning_enabled=self.reasoning.enabled,
+            extraction_model=extraction_model,
         )
 
     @property
@@ -344,19 +358,33 @@ class Agent:
                 level=level,
             )
 
-            # Add thinking trace if available
-            if thinking_trace and self.reasoning.include_trace_in_output:
+            # Enhance extraction with LLM if available
+            evidence = argument.evidence
+            causal_links = argument.causal_links
+
+            if self._llm_evidence_extractor and not evidence:
+                # Use LLM extraction if regex found nothing
+                evidence = await self._llm_evidence_extractor.extract(content)
+
+            if self._llm_causal_extractor and not causal_links:
+                # Use LLM extraction if regex found nothing
+                causal_links = await self._llm_causal_extractor.extract(content)
+
+            # Rebuild argument with enhanced extraction and optional thinking trace
+            if (evidence != argument.evidence or
+                causal_links != argument.causal_links or
+                (thinking_trace and self.reasoning.include_trace_in_output)):
                 argument = Argument(
                     id=argument.id,
                     agent=argument.agent,
                     level=argument.level,
                     content=argument.content,
-                    evidence=argument.evidence,
-                    causal_links=argument.causal_links,
+                    evidence=evidence,
+                    causal_links=causal_links,
                     rebuts=argument.rebuts,
                     supports=argument.supports,
                     ethical_score=argument.ethical_score,
-                    thinking_trace=thinking_trace,
+                    thinking_trace=thinking_trace if self.reasoning.include_trace_in_output else None,
                     timestamp=argument.timestamp,
                 )
 
